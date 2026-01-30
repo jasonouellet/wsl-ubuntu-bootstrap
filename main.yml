@@ -1,0 +1,103 @@
+---
+# =========================================
+# WSL Bootstrap - Main Playbook
+# =========================================
+# This playbook sets up a complete WSL
+# environment with all necessary tools
+# including:
+# - Base system packages
+# - Python & pip packages
+# - Container tools (OCI)
+# - Terraform & Hashicorp tools
+# - .NET SDK
+# - Node.js
+# - Azure CLI
+# - SSL/TLS configuration
+#
+# Usage:
+#   ansible-playbook main.yml
+#   ansible-playbook main.yml --tags nodejs
+#   ansible-playbook main.yml --check
+
+- name: WSL Bootstrap Playbook
+  hosts: localhost
+  connection: local
+  become: yes
+  gather_facts: yes
+
+  pre_tasks:
+    - name: Display playbook information
+      ansible.builtin.debug:
+        msg:
+          - "WSL Bootstrapping Playbook"
+          - "======================="
+          - "Target: {{ inventory_hostname }}"
+          - "OS: {{ ansible_os_family }}"
+          - "Distro: {{ ansible_lsb.description | default('Unknown') }}"
+      tags:
+        - always
+
+  roles:
+    # Base system setup
+    - name: common
+      tags: common
+      when: enable_common
+
+    # SSL/TLS configuration
+    - name: ssl-config
+      tags: ssl-config
+      when: enable_ssl_config
+
+    # Programming languages & runtimes
+    - name: python
+      tags: python
+      when: enable_python
+
+    - name: nodejs
+      tags: nodejs
+      when: enable_nodejs
+
+    - name: dotnet
+      tags: dotnet
+      when: enable_dotnet
+
+    # Infrastructure as Code & DevOps tools
+    - name: terraform
+      tags: terraform
+      when: enable_terraform
+
+    - name: azure-cli
+      tags: azure-cli
+      when: enable_azure_cli
+
+    # Container tools
+    - name: containers
+      tags: containers
+      when: enable_containers
+
+    # System maintenance
+    - name: maintenance
+      tags: maintenance
+      when: enable_maintenance
+
+  post_tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg:
+          - "==========================================="
+          - "WSL Bootstrapping Completed Successfully!"
+          - "==========================================="
+      tags:
+        - always
+
+    - name: Suggest next steps
+      ansible.builtin.debug:
+        msg:
+          - ""
+          - "Next steps:"
+          - "1. Configure git: git config --global user.email 'you@example.com'"
+          - "2. Setup ssh keys: ssh-keygen -t ed25519"
+          - "3. Test terraform: terraform version"
+          - "4. Test azure cli: az login"
+      tags:
+        - always

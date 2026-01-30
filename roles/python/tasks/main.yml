@@ -1,0 +1,33 @@
+---
+- name: Install Python packages (APT)
+  ansible.builtin.apt:
+    name: "{{ python_packages_apt }}"
+    state: present
+    update_cache: yes
+  tags:
+    - python
+    - packages
+
+- name: Install Python packages (PIP)
+  ansible.builtin.pip:
+    name: "{{ python_packages_pip }}"
+    state: present
+    executable: /usr/bin/pip3
+  tags:
+    - python
+    - packages
+
+- name: Verify Python installation
+  ansible.builtin.command: python3 --version
+  register: python_version
+  changed_when: false
+  tags:
+    - python
+    - test
+
+- name: Display Python version
+  ansible.builtin.debug:
+    msg: "Python installed: {{ python_version.stdout }}"
+  tags:
+    - python
+    - test

@@ -1,0 +1,46 @@
+---
+- name: Check if system is Ubuntu/Debian
+  ansible.builtin.fail:
+    msg: "This playbook is only supported on Debian-based systems."
+  when: ansible_os_family != "Debian"
+  tags:
+    - always
+
+- name: Gather OS distribution facts
+  ansible.builtin.setup:
+    filter: ansible_lsb
+  tags:
+    - common
+    - always
+
+- name: Configure sudo NOPASSWD for current user
+  ansible.builtin.lineinfile:
+    path: "/etc/sudoers.d/{{ ansible_user_id }}"
+    line: "{{ ansible_user_id }} ALL=(ALL) NOPASSWD:ALL"
+    create: yes
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  when: configure_nopasswd_sudo | default(true)
+  tags:
+    - common
+    - sudo
+    - security
+
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags:
+    - common
+    - packages
+
+- name: Install base Linux packages
+  ansible.builtin.apt:
+    name: "{{ common_packages_linux }}"
+    state: present
+    autoclean: yes
+  tags:
+    - common
+    - packages

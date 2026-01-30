@@ -1,0 +1,85 @@
+---
+- name: Check if CA certificate is provided
+  ansible.builtin.set_fact:
+    ca_cert_provided: "{{ ssl_ca_cert_name != '' and ssl_ca_cert_name is defined }}"
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Display certificate info
+  ansible.builtin.debug:
+    msg: "Installing CA certificate: {{ ssl_ca_cert_name }}"
+  when: ca_cert_provided
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Display skipping message
+  ansible.builtin.debug:
+    msg: "No CA certificate configured (ssl_ca_cert_name is empty). Skipping certificate installation."
+  when: not ca_cert_provided
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Check if certificate file exists
+  ansible.builtin.stat:
+    path: "{{ ssl_ca_cert_name }}"
+  register: cert_file_stat
+  when: ca_cert_provided
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Fail if certificate file not found
+  ansible.builtin.fail:
+    msg: "CA certificate file '{{ ssl_ca_cert_name }}' not found in the playbook directory"
+  when: ca_cert_provided and not cert_file_stat.stat.exists
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Create CA certificate directory
+  ansible.builtin.file:
+    path: "{{ ssl_ca_cert_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: ca_cert_provided
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Install IA CA certificate
+  ansible.builtin.copy:
+    src: "{{ ssl_ca_cert_name }}"
+    dest: "{{ ssl_ca_cert_full_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Update CA certificates
+  when: ca_cert_provided
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Fix SSL handshake for OpenSSL v3.0.2 - Remove legacy options
+  ansible.builtin.replace:
+    path: "{{ ssl_openssl_config_path }}"
+    after: '^\[system_default_sect\]'
+    before: '^\['
+    regexp: '^\s*Options\s*=.*$'
+    replace: ''
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Fix SSL handshake for OpenSSL v3.0.2 - Add UnsafeLegacyRenegotiation
+  ansible.builtin.lineinfile:
+    path: "{{ ssl_openssl_config_path }}"
+    insertafter: '^\[system_default_sect\]'
+    line: 'Options = UnsafeLegacyRenegotiation'
+  tags:
+    - ssl-config
+    - certificates

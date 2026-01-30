@@ -1,0 +1,8 @@
+---
+- name: Update CA certificates
+  ansible.builtin.command: update-ca-certificates --fresh
+  args:
+    creates: "{{ ssl_ca_cert_pem_path }}"
+  tags:
+    - ssl-config
+    - certificates
