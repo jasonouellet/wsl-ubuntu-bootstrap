@@ -1,0 +1,135 @@
+---
+# =========================================
+# Global Variables for DevOps Bootstrap
+# =========================================
+
+# System
+ansible_become: yes
+ansible_become_method: sudo
+
+# Configure sudo NOPASSWD (recommended for WSL/dev environments)
+# Change to 'no' if you want to disable automatic sudo configuration
+configure_nopasswd_sudo: yes
+
+# Distribution info
+distro_codename: "{{ ansible_lsb.codename | default('focal') }}"
+
+# =========================================
+# Common / Base System Packages
+# =========================================
+common_packages_linux:
+  - ca-certificates
+  - curl
+  - git
+  - lsb-release
+  - software-properties-common
+  - apt-transport-https
+  - gnupg
+  - unzip
+  - zip
+  - jq
+  - wget
+  - pinentry-gtk2  # GTK+ PIN entry dialog for GnuPG
+
+# =========================================
+# Python Configuration
+# =========================================
+python_packages_apt:
+  - python3-full
+  - python3-pip
+  - python3-setuptools
+  - python3-virtualenv
+
+python_packages_pip:
+  - pre-commit
+  - yamllint
+  - pylint
+  - black
+  - mkdocs
+  - mkdocs-material
+  - mkdocs-techdocs-core
+  - mkdocs-macros-plugin
+  - mkdocs-include-markdown-plugin
+  - mkdocs-redirects
+  - mkdocs-monorepo-plugin
+  - plantuml-markdown
+  - markdown-graphviz-inline
+
+# =========================================
+# OCI / Container Tools
+# =========================================
+container_packages:
+  - buildah
+  - skopeo
+
+# =========================================
+# Hashicorp Tools
+# =========================================
+hashicorp_packages:
+  - terraform
+  - packer
+  - vault
+  - consul
+  - boundary
+  - nomad
+
+hashicorp_apt_key: https://apt.releases.hashicorp.com/gpg
+hashicorp_apt_repo_url: "https://apt.releases.hashicorp.com"
+
+# =========================================
+# .NET Configuration
+# =========================================
+dotnet_packages:
+  - dotnet-sdk-8.0
+
+dotnet_ppa_repo: ppa:dotnet/backports
+
+# =========================================
+# Node.js Configuration
+# =========================================
+nodejs_version: "22"  # LTS version
+nodejs_setup_script_url: "https://deb.nodesource.com/setup_{{ nodejs_version }}.x"
+nodejs_setup_script_dest: /tmp/node-setup.x
+
+nodejs_packages:
+  - build-essential
+  - gcc
+  - g++
+  - make
+
+# =========================================
+# Azure CLI Configuration
+# =========================================
+azure_cli_apt_key: https://packages.microsoft.com/keys/microsoft.asc
+azure_cli_apt_repo_base: https://packages.microsoft.com/repos/azure-cli/
+
+# =========================================
+# SSL/TLS Configuration
+# =========================================
+ssl_openssl_config_path: /etc/ssl/openssl.cnf
+ssl_ca_cert_path: /usr/local/share/ca-certificates
+# Organization CA certificate filename (optional)
+# Set this variable to your organization's CA certificate filename
+# Example: ssl_ca_cert_name: company-root-ca.crt
+# Leave empty or undefined to skip certificate installation
+ssl_ca_cert_name: ""
+ssl_ca_cert_full_path: "{{ ssl_ca_cert_path }}/{{ ssl_ca_cert_name }}"
+ssl_ca_cert_pem_path: "/etc/ssl/certs/{{ ssl_ca_cert_name }}"
+
+# =========================================
+# Maintenance Configuration
+# =========================================
+maintenance_enable_auto_update: yes
+
+# =========================================
+# Features Flags (enable/disable components)
+# =========================================
+enable_common: yes
+enable_python: yes
+enable_containers: yes
+enable_ssl_config: yes
+enable_terraform: yes
+enable_dotnet: yes
+enable_nodejs: yes
+enable_azure_cli: yes
+enable_maintenance: yes

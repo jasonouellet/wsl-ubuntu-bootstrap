@@ -1,0 +1,65 @@
+---
+- name: Install build toolchain for Node.js
+  ansible.builtin.apt:
+    name: "{{ nodejs_packages }}"
+    state: present
+    update_cache: yes
+  tags:
+    - nodejs
+    - build
+    - packages
+
+- name: Download NodeSource setup script
+  ansible.builtin.get_url:
+    url: "{{ nodejs_setup_script_url }}"
+    dest: "{{ nodejs_setup_script_dest }}"
+    mode: '0644'
+    backup: yes
+  tags:
+    - nodejs
+    - setup
+
+- name: Run NodeSource setup script
+  ansible.builtin.command: bash {{ nodejs_setup_script_dest }}
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+  become: yes
+  tags:
+    - nodejs
+    - setup
+
+- name: Install Node.js runtime
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+  tags:
+    - nodejs
+    - packages
+
+- name: Verify Node.js installation
+  block:
+    - name: Check Node.js version
+      ansible.builtin.command: node --version
+      register: node_version
+      changed_when: false
+      tags:
+        - nodejs
+        - test
+
+    - name: Check npm version
+      ansible.builtin.command: npm --version
+      register: npm_version
+      changed_when: false
+      tags:
+        - nodejs
+        - test
+
+    - name: Display Node.js and npm versions
+      ansible.builtin.debug:
+        msg:
+          - "Node.js: {{ node_version.stdout }}"
+          - "npm: {{ npm_version.stdout }}"
+      tags:
+        - nodejs
+        - test

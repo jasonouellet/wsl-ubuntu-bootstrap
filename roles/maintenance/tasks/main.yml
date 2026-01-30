@@ -1,0 +1,52 @@
+---
+# =========================================
+# Maintenance Role - Automated Updates
+# =========================================
+
+- name: Create maintenance scripts directory
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    mode: '0755'
+
+- name: Deploy auto-update script
+  ansible.builtin.copy:
+    src: auto-update.sh
+    dest: /usr/local/bin/auto-update.sh
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Create log directory for auto-update
+  ansible.builtin.file:
+    path: /var/log
+    state: directory
+    mode: '0755'
+
+- name: Ensure cron is installed
+  ansible.builtin.apt:
+    name: cron
+    state: present
+    update_cache: no
+
+- name: Create daily cron job for auto-update (3 AM)
+  ansible.builtin.cron:
+    name: "Automated system update"
+    minute: "0"
+    hour: "3"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: root
+    job: "/usr/local/bin/auto-update.sh > /dev/null 2>&1"
+    state: present
+  when: maintenance_enable_auto_update | default(true)
+
+- name: Display maintenance configuration
+  ansible.builtin.debug:
+    msg:
+      - "Maintenance role configured successfully"
+      - "Auto-update script: /usr/local/bin/auto-update.sh"
+      - "Log file: /var/log/auto-update.log"
+      - "Schedule: Daily at 3:00 AM"
+      - "Manual execution: sudo /usr/local/bin/auto-update.sh"

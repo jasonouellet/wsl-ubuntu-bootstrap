@@ -1,0 +1,7 @@
+---
+# Default variables for common role
+common_role_enabled: yes
+
+# Configure sudo without password (recommended for WSL/dev environments)
+# Set to 'no' in production environments
+configure_nopasswd_sudo: yes
