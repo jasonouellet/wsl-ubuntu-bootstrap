@@ -192,18 +192,20 @@ ansible-playbook main.yml -e @group_vars/custom.yml
 
 ## 📦 Available Roles
 
+<!-- markdownlint-disable MD013 -->
 | Role | Description | Content |
 |------|-------------|------|
-| **common** | Base system | Essential packages, OS checks, sudo configuration |
-| **ssl-config** | SSL/TLS | CA certificates, OpenSSL configuration |
-| **python** | Python | Python 3, pip, virtualenv, pre-commit, yamllint |
-| **containers** | OCI Containers | Buildah, Skopeo |
-| **terraform** | Hashicorp | Terraform, Packer, Vault, Consul, Boundary, Nomad |
-| **dotnet** | .NET | .NET SDK 8.0 |
-| **nodejs** | Node.js | Node.js 22 LTS, npm, compilation toolchain |
-| **azure-cli** | Azure | Azure CLI for Microsoft Azure cloud management |
-| **github-cli** | GitHub | GitHub CLI for repository automation and management |
-| **maintenance** | Maintenance | Daily automatic updates (cron 3 AM) |
+| [**common**](roles/common/README.md) | Base system | Essential packages, OS checks, sudo configuration |
+| [**ssl-config**](roles/ssl-config/README.md) | SSL/TLS | CA certificates, OpenSSL configuration |
+| [**python**](roles/python/README.md) | Python | Python 3, pip, virtualenv, pre-commit, yamllint |
+| [**containers**](roles/containers/README.md) | OCI Containers | Buildah, Skopeo |
+| [**terraform**](roles/terraform/README.md) | Hashicorp | Terraform, Packer, Vault, Consul, Boundary, Nomad |
+| [**dotnet**](roles/dotnet/README.md) | .NET | .NET SDK 8.0 |
+| [**nodejs**](roles/nodejs/README.md) | Node.js | Node.js 22 LTS, npm, compilation toolchain |
+| [**azure-cli**](roles/azure-cli/README.md) | Azure | Azure CLI for Microsoft Azure cloud management |
+| [**github-cli**](roles/github-cli/README.md) | GitHub | GitHub CLI for repository automation and management |
+| [**maintenance**](roles/maintenance/README.md) | Maintenance | Daily automatic updates (cron 3 AM) |
+<!-- markdownlint-enable MD013 -->
 
 ## 🎨 Features
 
