@@ -8,17 +8,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  validate-changelog:
+  lint-and-validate:
     runs-on: ubuntu-latest
-    name: Validate CHANGELOG
+    name: Lint, Pre-commit, and CHANGELOG guard
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check for unreleased changes
+      - name: Detect releasable commits and guard CHANGELOG
         run: |
           # Get commits with conventional commit format (feat:, fix:, BREAKING CHANGE:)
           COMMITS=$(git log --oneline --all -E \
@@ -43,53 +43,49 @@ jobs:
             exit 1
           fi
 
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
+      - name: Set up Python for linting
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      - name: Install Ansible and dependencies
+      - name: Install Ansible and lint dependencies
         run: |
           python -m pip install --upgrade pip
           pip install ansible-core>=2.16 ansible-lint
 
-      - name: Run pre-commit hooks
+      - name: Run pre-commit hooks (all files)
         uses: pre-commit/action@v3.0.1
 
-      - name: Lint Ansible playbooks and roles
+      - name: Lint Ansible playbooks and roles (ansible-lint)
         run: |
           ansible-lint main.yml -v
 
-      - name: Check Ansible syntax
+      - name: Ansible syntax check (main playbook)
         run: |
           ansible-playbook main.yml --syntax-check
 
-  test:
+  dry-run-playbook:
     runs-on: ubuntu-latest
-    name: Test Playbook Execution
+    name: Playbook syntax + dry-run
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python for playbook checks
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      - name: Install Ansible
+      - name: Install Ansible runtime
         run: |
           python -m pip install --upgrade pip
           pip install ansible-core>=2.16
 
-      - name: Run playbook syntax check
+      - name: Ansible syntax check (main playbook)
         run: |
           ansible-playbook main.yml --syntax-check
 
-      - name: Run playbook with dry-run
+      - name: Playbook dry-run (local connection)
         run: |
           ansible-playbook main.yml --check -i localhost, --connection=local -K || true
