@@ -7,9 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Release pipeline with automatic versioning and CHANGELOG validation
+- Support for both automatic (release-please) and manual tag-based releases
+- CI validation for CHANGELOG updates with releasable commits
+- Hybrid release workflow requiring CHANGELOG updates
+
+### Fixed
+
+- Corrected YAML boolean values (yes/no → true/false) for ansible-lint compliance
+- Fixed command vs shell module usage in NodeSource setup task
+- Resolved Node.js version consistency (v22.22.0 with npm 10.9.4)
+
+### Changed
+
+- Configured trunk-based development workflow (main branch only)
+- Updated CI/CD to support manual trigger via workflow_dispatch
+
 ## [0.1.0] - 2026-01-30
 
-### Added
+### Initial Release
 
 - Role-based architecture with 8 independent Ansible roles:
   - **common**: Base packages, system configuration, automatic sudo NOPASSWD setup

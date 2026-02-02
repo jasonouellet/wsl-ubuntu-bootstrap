@@ -1,0 +1,79 @@
+name: Release - Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-changelog:
+    runs-on: ubuntu-latest
+    name: Validate CHANGELOG
+    outputs:
+      changelog-updated: ${{ steps.check-changelog.outputs.updated }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if CHANGELOG was modified
+        id: check-changelog
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LATEST_TAG" ]; then
+            echo "First release - CHANGELOG check passed"
+            echo "updated=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Check if CHANGELOG.md was modified since last tag
+          if git diff $LATEST_TAG..HEAD --name-only | grep -q "CHANGELOG.md"; then
+            echo "CHANGELOG.md was modified"
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "CHANGELOG.md was NOT modified since last release"
+            echo "updated=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+  create-release:
+    runs-on: ubuntu-latest
+    name: Create GitHub Release
+    needs: validate-changelog
+    if: needs.validate-changelog.outputs.changelog-updated == 'true' || startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=$GITHUB_REF_NAME" >> $GITHUB_OUTPUT
+          else
+            echo "Not a tag - skipping release"
+            exit 0
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: steps.version.outputs.version != ''
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.version }}
+          draft: false
+          prerelease: false
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
