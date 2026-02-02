@@ -37,9 +37,9 @@ ansible-playbook main.yml --tags new-feature
 
 <!-- List the benefits of implementing this feature -->
 
-- 
-- 
-- 
+-
+-
+-
 
 ## Implementation Considerations
 
