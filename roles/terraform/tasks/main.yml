@@ -35,7 +35,9 @@
 
 - name: Add Hashicorp APT repository (modern method)
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg] {{ hashicorp_apt_repo_url }} {{ distro_codename }} main"
+    repo: >
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg]
+      {{ hashicorp_apt_repo_url }} {{ distro_codename }} main
     filename: hashicorp
     state: present
     update_cache: yes
@@ -74,7 +76,7 @@
   ansible.builtin.command: terraform -install-autocomplete
   args:
     creates: /etc/bash_completion.d/terraform
-  ignore_errors: yes  # May not be critical if it fails
+  failed_when: false
   tags:
     - terraform
     - autocomplete

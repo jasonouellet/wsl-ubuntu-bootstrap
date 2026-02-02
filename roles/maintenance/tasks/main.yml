@@ -8,6 +8,8 @@
     path: /usr/local/bin
     state: directory
     mode: '0755'
+  tags:
+    - maintenance
 
 - name: Deploy auto-update script
   ansible.builtin.copy:
@@ -16,18 +18,24 @@
     mode: '0755'
     owner: root
     group: root
+  tags:
+    - maintenance
 
 - name: Create log directory for auto-update
   ansible.builtin.file:
     path: /var/log
     state: directory
     mode: '0755'
+  tags:
+    - maintenance
 
 - name: Ensure cron is installed
   ansible.builtin.apt:
     name: cron
     state: present
     update_cache: no
+  tags:
+    - maintenance
 
 - name: Create daily cron job for auto-update (3 AM)
   ansible.builtin.cron:
@@ -41,6 +49,8 @@
     job: "/usr/local/bin/auto-update.sh > /dev/null 2>&1"
     state: present
   when: maintenance_enable_auto_update | default(true)
+  tags:
+    - maintenance
 
 - name: Display maintenance configuration
   ansible.builtin.debug:
@@ -50,3 +60,35 @@
       - "Log file: /var/log/auto-update.log"
       - "Schedule: Daily at 3:00 AM"
       - "Manual execution: sudo /usr/local/bin/auto-update.sh"
+  tags:
+    - maintenance
+
+- name: Verify auto-update script is executable
+  ansible.builtin.stat:
+    path: /usr/local/bin/auto-update.sh
+  register: autoupdate_script
+  tags:
+    - maintenance
+    - test
+
+- name: Verify cron service is running
+  ansible.builtin.systemd:
+    name: cron
+    state: started
+  check_mode: yes
+  register: cron_status
+  changed_when: false
+  failed_when: false
+  tags:
+    - maintenance
+    - test
+
+- name: Display maintenance verification
+  ansible.builtin.debug:
+    msg:
+      - "Auto-update script exists: {{ autoupdate_script.stat.exists }}"
+      - "Auto-update script executable: {{ autoupdate_script.stat.executable | default(false) }}"
+      - "Cron service status: {{ cron_status.status.ActiveState | default('unknown') }}"
+  tags:
+    - maintenance
+    - test

@@ -17,7 +17,7 @@
   ansible.builtin.lineinfile:
     path: "/etc/sudoers.d/{{ ansible_user_id }}"
     line: "{{ ansible_user_id }} ALL=(ALL) NOPASSWD:ALL"
-    create: yes
+    create: true
     owner: root
     group: root
     mode: '0440'
@@ -30,7 +30,7 @@
 
 - name: Update package cache
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
   tags:
     - common
@@ -40,7 +40,28 @@
   ansible.builtin.apt:
     name: "{{ common_packages_linux }}"
     state: present
-    autoclean: yes
+    autoclean: true
   tags:
     - common
     - packages
+
+- name: Verify essential packages are installed
+  ansible.builtin.command: "dpkg -l {{ item }}"
+  loop:
+    - git
+    - curl
+    - wget
+  register: package_check
+  changed_when: false
+  failed_when: false
+  tags:
+    - common
+    - test
+
+- name: Display package verification results
+  ansible.builtin.debug:
+    msg: "Essential packages verified: git, curl, wget"
+  when: package_check is succeeded
+  tags:
+    - common
+    - test

@@ -51,14 +51,14 @@ for role in "${ROLES[@]}"; do
     echo "=========================================="
     echo -e "${BLUE}Testing role: $role${NC}"
     echo "=========================================="
-    
+
     if ansible-playbook main.yml --tags "$role" $MODE_FLAG $SUDO_FLAG -v; then
         echo -e "${GREEN}✓ Role '$role' - PASSED${NC}"
         echo ""
     else
         echo -e "${RED}✗ Role '$role' - FAILED${NC}"
         echo ""
-        
+
         # Ask if we should continue
         read -p "Continue testing other roles? (y/n) " -n 1 -r
         echo
@@ -66,7 +66,7 @@ for role in "${ROLES[@]}"; do
             exit 1
         fi
     fi
-    
+
     sleep 1
 done
 
