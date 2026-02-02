@@ -8,11 +8,42 @@ on:
   workflow_dispatch:
 
 jobs:
-  validate:
+  validate-changelog:
     runs-on: ubuntu-latest
-    name: Validate Code & Configuration
+    name: Validate CHANGELOG
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for unreleased changes
+        run: |
+          # Get commits with conventional commit format (feat:, fix:, BREAKING CHANGE:)
+          COMMITS=$(git log --oneline --all -E \
+            --grep="^feat:" --grep="^fix:" --grep="BREAKING CHANGE:" \
+            2>/dev/null || true)
+
+          if [ -z "$COMMITS" ]; then
+            echo "No releasable commits found - skipping CHANGELOG check"
+            exit 0
+          fi
+
+          # Check if CHANGELOG mentions "Unreleased" section
+          if grep -q "## \[Unreleased\]" CHANGELOG.md; then
+            echo "✓ CHANGELOG has Unreleased section"
+            exit 0
+          elif grep -q "## \[.*\]" CHANGELOG.md; then
+            echo "⚠ CHANGELOG exists but no Unreleased section found"
+            echo "If you added feat: or fix: commits, please update CHANGELOG.md"
+            exit 0
+          else
+            echo "✗ CHANGELOG.md not found or improperly formatted"
+            exit 1
+          fi
+
+
       - name: Checkout code
         uses: actions/checkout@v4
 
