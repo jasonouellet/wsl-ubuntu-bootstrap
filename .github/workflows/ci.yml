@@ -1,0 +1,63 @@
+name: CI - Validate & Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Code & Configuration
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core>=2.16 ansible-lint
+
+      - name: Run pre-commit hooks
+        uses: pre-commit/action@v3.0.1
+
+      - name: Lint Ansible playbooks and roles
+        run: |
+          ansible-lint main.yml -v
+
+      - name: Check Ansible syntax
+        run: |
+          ansible-playbook main.yml --syntax-check
+
+  test:
+    runs-on: ubuntu-latest
+    name: Test Playbook Execution
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core>=2.16
+
+      - name: Run playbook syntax check
+        run: |
+          ansible-playbook main.yml --syntax-check
+
+      - name: Run playbook with dry-run
+        run: |
+          ansible-playbook main.yml --check -i localhost, --connection=local -K || true
