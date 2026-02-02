@@ -32,11 +32,11 @@ boolean gates in [main.yml](main.yml):
 
 ### 2. Variable Architecture
 
-- **Global variables**: [group_vars/all.yml](group_vars/all.yml) - contains
+* **Global variables**: [group_vars/all.yml](group_vars/all.yml) - contains
   ALL package lists, URLs, and configuration
-- **Custom variables**: Users create `group_vars/custom.yml` (copy from
+* **Custom variables**: Users create `group_vars/custom.yml` (copy from
   `custom.yml.example`) for environment-specific overrides
-- **No hardcoded values** in tasks - always reference variables
+* **No hardcoded values** in tasks - always reference variables
 
 ### 3. Task Patterns
 
@@ -61,10 +61,10 @@ Example from [python role](roles/python/tasks/main.yml):
 
 Every task must have tags. Common tags:
 
-- `common`, `python`, `nodejs`, `terraform`, `dotnet`, `azure-cli`,
+* `common`, `python`, `nodejs`, `terraform`, `dotnet`, `azure-cli`,
   `containers`, `ssl-config`, `maintenance`
-- `packages`, `repository`, `gpg` (cross-cutting concerns)
-- `security`, `sudo` (for sensitive operations)
+* `packages`, `repository`, `gpg` (cross-cutting concerns)
+* `security`, `sudo` (for sensitive operations)
 
 Usage: `ansible-playbook main.yml --tags python` or
 `ansible-playbook main.yml --skip-tags maintenance`
@@ -136,10 +136,10 @@ ansible-playbook main.yml --skip-tags maintenance --check
 
 File: [ansible.cfg](ansible.cfg)
 
-- `connection: local` (no remote SSH)
-- `fact_caching: jsonfile` (caches system info in `.ansible/facts/`)
-- Fact cache timeout: 86400s (24 hours)
-- Parallel execution: 10 forks for concurrent installs
+* `connection: local` (no remote SSH)
+* `fact_caching: jsonfile` (caches system info in `.ansible/facts/`)
+* Fact cache timeout: 86400s (24 hours)
+* Parallel execution: 10 forks for concurrent installs
 
 ### Sudo Configuration
 
@@ -150,31 +150,31 @@ without `-K` flag. Security: sudoers file validated with `visudo -cf %s`.
 
 ### Distribution Compatibility
 
-- Targets: Debian/Ubuntu (validates `ansible_os_family == "Debian"`)
-- Distro codename auto-detected: `ansible_lsb.codename` → used for package
+* Targets: Debian/Ubuntu (validates `ansible_os_family == "Debian"`)
+* Distro codename auto-detected: `ansible_lsb.codename` → used for package
   repo selection
-- Playbook detects and displays: OS family, distro description, LSB info
+* Playbook detects and displays: OS family, distro description, LSB info
 
 ### Python Packages
 
 The role installs both APT and pip packages:
 
-- **APT**: `python3-full`, `python3-pip`, `python3-virtualenv`,
+* **APT**: `python3-full`, `python3-pip`, `python3-virtualenv`,
   `python3-setuptools`
-- **PIP**: Pre-commit, linters (pylint, black), documentation tools
+* **PIP**: Pre-commit, linters (pylint, black), documentation tools
   (mkdocs, plantuml-markdown)
-- Executable path: `/usr/bin/pip3` (explicit in tasks)
+* Executable path: `/usr/bin/pip3` (explicit in tasks)
 
 ### Package Lists Location
 
 All package lists are in `group_vars/all.yml`:
 
-- `common_packages_linux` - base system
-- `python_packages_apt` and `python_packages_pip` - Python ecosystem
-- `hashicorp_packages` - Terraform, Vault, Nomad, Consul, Boundary, Packer
-- `container_packages` - Buildah, Skopeo (OCI tools)
-- `dotnet_packages` - .NET SDK
-- `nodejs_packages` - build tools (gcc, g++, make)
+* `common_packages_linux` - base system
+* `python_packages_apt` and `python_packages_pip` - Python ecosystem
+* `hashicorp_packages` - Terraform, Vault, Nomad, Consul, Boundary, Packer
+* `container_packages` - Buildah, Skopeo (OCI tools)
+* `dotnet_packages` - .NET SDK
+* `nodejs_packages` - build tools (gcc, g++, make)
 
 ## Common Modifications
 
@@ -196,11 +196,11 @@ All package lists are in `group_vars/all.yml`:
 
 ### Handling External URLs/Keys
 
-- Store URLs in variables (`group_vars/all.yml`)
-- Use `ansible.builtin.get_url` for downloads with checksums when possible
-- GPG keys downloaded, converted with `gpg --dearmor`, stored in
+* Store URLs in variables (`group_vars/all.yml`)
+* Use `ansible.builtin.get_url` for downloads with checksums when possible
+* GPG keys downloaded, converted with `gpg --dearmor`, stored in
   `/etc/apt/keyrings/`
-- Never hardcode tokens/credentials (use `group_vars/custom.yml` for secrets)
+* Never hardcode tokens/credentials (use `group_vars/custom.yml` for secrets)
 
 ## File References
 
@@ -215,11 +215,11 @@ All package lists are in `group_vars/all.yml`:
 
 ## Code Quality
 
-- **Validation**: `./validate.sh` runs ansible-lint (see
+* **Validation**: `./validate.sh` runs ansible-lint (see
   [.ansible-lint](.ansible-lint))
-- **Naming**: Tasks use YAML style (lowercase, dash-separated) and
+* **Naming**: Tasks use YAML style (lowercase, dash-separated) and
   descriptive names
-- **Idempotency**: All tasks designed to be repeatable - use `state: present`,
+* **Idempotency**: All tasks designed to be repeatable - use `state: present`,
   `changed_when: false` for read-only operations
-- **Comments**: Header comments in `.yml` files document playbook intent and
+* **Comments**: Header comments in `.yml` files document playbook intent and
   usage examples

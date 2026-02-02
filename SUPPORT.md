@@ -8,15 +8,15 @@ Thank you for using WSL Ubuntu Bootstrap! Here's how to get help:
 
 First, check the project documentation:
 
-- **[README.md](README.md)** - Installation, usage, and configuration
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Development and contribution guidelines
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
+* **[README.md](README.md)** - Installation, usage, and configuration
+* **[CONTRIBUTING.md](CONTRIBUTING.md)** - Development and contribution guidelines
+* **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
 
 ## 🔍 Before Asking for Help
 
 1. **Search existing issues**: Your question might already be answered
-   - [Open Issues](../../issues)
-   - [Closed Issues](../../issues?q=is%3Aissue+is%3Aclosed)
+   * [Open Issues](../../issues)
+   * [Closed Issues](../../issues?q=is%3Aissue+is%3Aclosed)
 
 2. **Check the documentation**: Review README and role-specific docs
 
@@ -39,16 +39,16 @@ First, check the project documentation:
 For general questions, feature requests, and discussions:
 
 1. **GitHub Discussions** (Recommended)
-   - General questions
-   - Feature ideas
-   - Show and tell
-   - Community help
+   * General questions
+   * Feature ideas
+   * Show and tell
+   * Community help
 
 2. **GitHub Issues** (For bugs and problems)
-   - Bug reports
-   - Installation issues
-   - Configuration problems
-   - Unexpected behavior
+   * Bug reports
+   * Installation issues
+   * Configuration problems
+   * Unexpected behavior
 
 ### What to Include
 
@@ -56,9 +56,9 @@ When asking for help, please provide:
 
 **Environment:**
 
-- OS: Ubuntu 24.04 LTS
-- Ansible version: 2.16.3
-- WSL version: WSL2 (if applicable)
+* OS: Ubuntu 24.04 LTS
+* Ansible version: 2.16.3
+* WSL version: WSL2 (if applicable)
 
 **Problem:**
 
@@ -94,9 +94,9 @@ Error messages or relevant output
 
 **What I've Tried:**
 
-- Checked documentation
-- Ran validate.sh
-- Searched existing issues
+* Checked documentation
+* Ran validate.sh
+* Searched existing issues
 
 ## 🐛 Reporting Bugs
 
@@ -104,11 +104,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#-reporting-bugs) for detailed guidelines.
 
 **Quick checklist:**
 
-- [ ] Searched existing issues
-- [ ] Tested with latest version
-- [ ] Included environment details
-- [ ] Provided reproduction steps
-- [ ] Attached relevant logs
+* [ ] Searched existing issues
+* [ ] Tested with latest version
+* [ ] Included environment details
+* [ ] Provided reproduction steps
+* [ ] Attached relevant logs
 
 ## 💡 Feature Requests
 
@@ -116,10 +116,10 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#-feature-requests) for guidelines.
 
 **Use the feature request template:**
 
-- Problem/Use case
-- Proposed solution
-- Alternatives considered
-- Additional context
+* Problem/Use case
+* Proposed solution
+* Alternatives considered
+* Additional context
 
 ## 🔧 Troubleshooting
 
@@ -188,48 +188,48 @@ ansible-playbook main.yml -vvv
 
 ### Official Documentation
 
-- [Ansible Documentation](https://docs.ansible.com/)
-- [Ubuntu WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
-- [Terraform Documentation](https://www.terraform.io/docs)
-- [Azure CLI Documentation](https://docs.microsoft.com/en-us/cli/azure/)
+* [Ansible Documentation](https://docs.ansible.com/)
+* [Ubuntu WSL Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
+* [Terraform Documentation](https://www.terraform.io/docs)
+* [Azure CLI Documentation](https://docs.microsoft.com/en-us/cli/azure/)
 
 ### Tutorials and Guides
 
-- [Getting Started with Ansible](https://docs.ansible.com/ansible/latest/user_guide/intro_getting_started.html)
-- [Ansible Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
-- [WSL Best Practices](https://docs.microsoft.com/en-us/windows/wsl/best-practices)
+* [Getting Started with Ansible](https://docs.ansible.com/ansible/latest/user_guide/intro_getting_started.html)
+* [Ansible Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
+* [WSL Best Practices](https://docs.microsoft.com/en-us/windows/wsl/best-practices)
 
 ## ⏱️ Response Times
 
 This is a community-driven project. Typical response times:
 
-- **Issues**: 24-48 hours for initial response
-- **Pull Requests**: 48-72 hours for review
-- **Discussions**: Community-dependent
+* **Issues**: 24-48 hours for initial response
+* **Pull Requests**: 48-72 hours for review
+* **Discussions**: Community-dependent
 
 ## 🤝 Contributing
 
 The best way to get help is to help others!
 
-- Answer questions in discussions
-- Help triage issues
-- Improve documentation
-- Submit bug fixes
+* Answer questions in discussions
+* Help triage issues
+* Improve documentation
+* Submit bug fixes
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## 📬 Contact
 
-- **GitHub Issues**: For bugs and problems
-- **GitHub Discussions**: For questions and ideas
-- **Pull Requests**: For contributions
+* **GitHub Issues**: For bugs and problems
+* **GitHub Discussions**: For questions and ideas
+* **Pull Requests**: For contributions
 
 **Note**: This project does not offer:
 
-- Private support contracts
-- On-call assistance
-- Guaranteed response times
-- Implementation services
+* Private support contracts
+* On-call assistance
+* Guaranteed response times
+* Implementation services
 
 ## 🙏 Thank You
 

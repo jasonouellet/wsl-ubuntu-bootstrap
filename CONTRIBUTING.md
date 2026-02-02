@@ -5,12 +5,12 @@ This document provides guidelines for contributing to this project.
 
 ## 🎯 Ways to Contribute
 
-- Report bugs and issues
-- Suggest new features or enhancements
-- Submit bug fixes
-- Add new roles or improve existing ones
-- Improve documentation
-- Add tests and validation
+* Report bugs and issues
+* Suggest new features or enhancements
+* Submit bug fixes
+* Add new roles or improve existing ones
+* Improve documentation
+* Add tests and validation
 
 ## 📋 Before You Start
 
@@ -88,13 +88,13 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/) format:
 
 **Types:**
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
+* `feat`: New feature
+* `fix`: Bug fix
+* `docs`: Documentation changes
+* `style`: Code style changes (formatting, etc.)
+* `refactor`: Code refactoring
+* `test`: Adding or updating tests
+* `chore`: Maintenance tasks
 
 **Examples:**
 
@@ -164,19 +164,19 @@ docs(readme): update installation instructions
    ```
 
 6. **Open a Pull Request** with:
-   - Clear description of changes
-   - Reference to related issues
-   - Test results
-   - Screenshots (if applicable)
+   * Clear description of changes
+   * Reference to related issues
+   * Test results
+   * Screenshots (if applicable)
 
 ### Pull Request Checklist
 
-- [ ] Code follows project style guidelines
-- [ ] All tests pass successfully
-- [ ] Documentation updated (README, CHANGELOG)
-- [ ] Commit messages follow conventions
-- [ ] No merge conflicts with main branch
-- [ ] Added tests for new functionality (if applicable)
+* [ ] Code follows project style guidelines
+* [ ] All tests pass successfully
+* [ ] Documentation updated (README, CHANGELOG)
+* [ ] Commit messages follow conventions
+* [ ] No merge conflicts with main branch
+* [ ] Added tests for new functionality (if applicable)
 
 ## 🐛 Reporting Bugs
 
@@ -187,9 +187,9 @@ When reporting bugs, please include:
 3. **Expected Behavior**: What you expected to happen
 4. **Actual Behavior**: What actually happened
 5. **Environment**:
-   - OS version (e.g., Ubuntu 24.04)
-   - Ansible version
-   - WSL version (if applicable)
+   * OS version (e.g., Ubuntu 24.04)
+   * Ansible version
+   * WSL version (if applicable)
 6. **Logs**: Relevant error messages or logs
 7. **Configuration**: Relevant `group_vars` settings
 
@@ -206,18 +206,18 @@ When suggesting features:
 
 Good documentation is crucial:
 
-- Update README.md for user-facing changes
-- Update CHANGELOG.md following [Keep a Changelog](https://keepachangelog.com/)
-- Add inline comments for complex logic
-- Include examples in role documentation
+* Update README.md for user-facing changes
+* Update CHANGELOG.md following [Keep a Changelog](https://keepachangelog.com/)
+* Add inline comments for complex logic
+* Include examples in role documentation
 
 ## 🔍 Code Review
 
 All submissions require review. We aim to:
 
-- Respond to PRs within 48 hours
-- Provide constructive feedback
-- Merge approved changes promptly
+* Respond to PRs within 48 hours
+* Provide constructive feedback
+* Merge approved changes promptly
 
 ## 📜 License
 
@@ -228,14 +228,14 @@ project's [MIT License](LICENSE).
 
 Contributors will be recognized in:
 
-- CHANGELOG.md for their contributions
-- GitHub contributors page
-- Release notes for significant features
+* CHANGELOG.md for their contributions
+* GitHub contributors page
+* Release notes for significant features
 
 ## ❓ Questions?
 
-- Open an issue for questions
-- Check existing documentation
-- Review closed issues for solutions
+* Open an issue for questions
+* Check existing documentation
+* Review closed issues for solutions
 
 Thank you for contributing! 🎉

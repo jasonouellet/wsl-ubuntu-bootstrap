@@ -9,23 +9,23 @@ distribution.
 
 ## 📚 Documentation
 
-- [Contributing Guidelines](CONTRIBUTING.md) - How to contribute to the project
-- [Code of Conduct](CODE_OF_CONDUCT.md) - Community behavior standards
-- [Security Policy](SECURITY.md) - Security policy and vulnerability reporting
-- [Support](SUPPORT.md) - How to get help
-- [Changelog](CHANGELOG.md) - Version history and changes
+* [Contributing Guidelines](CONTRIBUTING.md) - How to contribute to the project
+* [Code of Conduct](CODE_OF_CONDUCT.md) - Community behavior standards
+* [Security Policy](SECURITY.md) - Security policy and vulnerability reporting
+* [Support](SUPPORT.md) - How to get help
+* [Changelog](CHANGELOG.md) - Version history and changes
 
 ## 🎯 Objective
 
 This project automatically configures all necessary tools for a modern
 DevOps development environment, including:
 
-- **Languages & Runtimes**: Python 3, Node.js, .NET SDK
-- **Infrastructure as Code**: Terraform and complete Hashicorp suite
-- **Cloud Tools**: Azure CLI
-- **Containers**: Buildah, Skopeo (OCI)
-- **Security**: CA certificates, SSL/TLS configuration
-- **Base system**: Essential packages, sudo configuration
+* **Languages & Runtimes**: Python 3, Node.js, .NET SDK
+* **Infrastructure as Code**: Terraform and complete Hashicorp suite
+* **Cloud Tools**: Azure CLI
+* **Containers**: Buildah, Skopeo (OCI)
+* **Security**: CA certificates, SSL/TLS configuration
+* **Base system**: Essential packages, sudo configuration
 
 ## 📁 Project Structure
 
@@ -211,34 +211,34 @@ ansible-playbook main.yml -e @group_vars/custom.yml
 
 ### ✅ Modern Architecture
 
-- **Modular**: Each component in an independent and reusable role
-- **Idempotent**: Multiple executions without side effects
-- **Configurable**: Feature flags and centralized variables
-- **Testable**: Validation scripts and per-role testing
+* **Modular**: Each component in an independent and reusable role
+* **Idempotent**: Multiple executions without side effects
+* **Configurable**: Feature flags and centralized variables
+* **Testable**: Validation scripts and per-role testing
 
 ### ✅ Ansible Best Practices
 
-- Role-based structure following industry standards
-- Centralized variables in `group_vars/`
-- Handlers for system notifications
-- Granular tags for selective execution
-- Quality configuration with ansible-lint
-- Full check mode (dry-run) support
+* Role-based structure following industry standards
+* Centralized variables in `group_vars/`
+* Handlers for system notifications
+* Granular tags for selective execution
+* Quality configuration with ansible-lint
+* Full check mode (dry-run) support
 
 ### ✅ Security
 
-- GPG keys with modern method (`signed-by`)
-- Key storage in `/etc/apt/keyrings/` (Ubuntu 22.04+ standard)
-- Automatic conversion of ASCII keys to binary format
-- Secure and controllable sudo configuration
-- CA certificate validation
+* GPG keys with modern method (`signed-by`)
+* Key storage in `/etc/apt/keyrings/` (Ubuntu 22.04+ standard)
+* Automatic conversion of ASCII keys to binary format
+* Secure and controllable sudo configuration
+* CA certificate validation
 
 ### ✅ Error Handling
 
-- OS verification (Debian/Ubuntu only)
-- `block/rescue` blocks for error handling
-- `ignore_errors` for non-critical tasks
-- Explicit error messages
+* OS verification (Debian/Ubuntu only)
+* `block/rescue` blocks for error handling
+* `ignore_errors` for non-critical tasks
+* Explicit error messages
 
 ## 📋 CA Certificates (Optional)
 
@@ -258,9 +258,9 @@ cp /path/to/your-company-root-ca.crt ./
 
 The `ssl-config` role will automatically:
 
-- Check if the certificate file exists
-- Install it in `/usr/local/share/ca-certificates/`
-- Update the system trust chain
+* Check if the certificate file exists
+* Install it in `/usr/local/share/ca-certificates/`
+* Update the system trust chain
 
 **To disable certificate installation**, leave `ssl_ca_cert_name` empty:
 
@@ -294,25 +294,25 @@ ansible-lint main.yml roles/
 
 ### Ansible
 
-- [Ansible Documentation](https://docs.ansible.com/ansible/latest/)
-- [Ansible Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
-- [Ansible Roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html)
-- [Ansible Galaxy](https://galaxy.ansible.com/) - Share Ansible roles
+* [Ansible Documentation](https://docs.ansible.com/ansible/latest/)
+* [Ansible Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
+* [Ansible Roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html)
+* [Ansible Galaxy](https://galaxy.ansible.com/) - Share Ansible roles
 
 ### Project
 
-- [Issues](../../issues) - Report bugs or request features
-- [Pull Requests](../../pulls) - Submit contributions
-- [Discussions](../../discussions) - Community questions and discussions
+* [Issues](../../issues) - Report bugs or request features
+* [Pull Requests](../../pulls) - Submit contributions
+* [Discussions](../../discussions) - Community questions and discussions
 
 ## 🤝 Contribution
 
 Contributions are welcome! Check [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
-- How to set up the development environment
-- Code standards and best practices
-- Pull Request submission process
-- Testing guidelines
+* How to set up the development environment
+* Code standards and best practices
+* Pull Request submission process
+* Testing guidelines
 
 To report security issues, see [SECURITY.md](SECURITY.md).
 
@@ -320,10 +320,10 @@ To report security issues, see [SECURITY.md](SECURITY.md).
 
 Need help? Check [SUPPORT.md](SUPPORT.md) for:
 
-- Documentation and resources
-- Common troubleshooting
-- How to get help
-- Expected response times
+* Documentation and resources
+* Common troubleshooting
+* How to get help
+* Expected response times
 
 ## 📄 License
 

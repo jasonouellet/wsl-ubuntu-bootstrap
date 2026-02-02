@@ -3,6 +3,8 @@ rules:
     line_length: 120
     code_blocks: false
     tables: false
+  ul-style:
+    style: asterisk
   no-hard-tabs: false
   ul-indent:
     indent: 2

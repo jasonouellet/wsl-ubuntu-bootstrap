@@ -37,9 +37,9 @@ ansible-playbook main.yml --tags new-feature
 
 <!-- List the benefits of implementing this feature -->
 
--
--
--
+*
+*
+*
 
 ## Implementation Considerations
 
@@ -47,17 +47,17 @@ ansible-playbook main.yml --tags new-feature
 
 ### Affected Components
 
-- [ ] New role
-- [ ] Existing role modification
-- [ ] Configuration change
-- [ ] Documentation
-- [ ] Testing
+* [ ] New role
+* [ ] Existing role modification
+* [ ] Configuration change
+* [ ] Documentation
+* [ ] Testing
 
 ### Backward Compatibility
 
-- [ ] Fully backward compatible
-- [ ] Requires migration steps
-- [ ] Breaking change
+* [ ] Fully backward compatible
+* [ ] Requires migration steps
+* [ ] Breaking change
 
 ## Additional Context
 
@@ -67,14 +67,14 @@ ansible-playbook main.yml --tags new-feature
 
 <!-- Would you be interested in implementing this feature? -->
 
-- [ ] Yes, I can submit a pull request
-- [ ] No, but I can help with testing
-- [ ] No, but I can help with documentation
-- [ ] No, I'm just suggesting the idea
+* [ ] Yes, I can submit a pull request
+* [ ] No, but I can help with testing
+* [ ] No, but I can help with documentation
+* [ ] No, I'm just suggesting the idea
 
 ## Related Issues
 
 <!-- Link to related issues or discussions -->
 
-- Related to #
-- Depends on #
+* Related to #
+* Depends on #
