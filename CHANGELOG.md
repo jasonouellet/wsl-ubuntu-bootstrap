@@ -13,11 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for both automatic (release-please) and manual tag-based releases
 - CI validation for CHANGELOG updates with releasable commits
 - Hybrid release workflow requiring CHANGELOG updates
+- GitHub CLI role for repository automation and GPG key management
+- Markdown linting fixes for all GitHub templates (PR, Issues, Copilot)
 
 ### Fixed
 
 - Corrected YAML boolean values (yes/no → true/false) for ansible-lint compliance
 - Fixed command vs shell module usage in NodeSource setup task
+- Fixed markdown linting in GitHub templates and CI documentation
+- Fixed line length and heading formatting in Copilot instructions
 - Resolved Node.js version consistency (v22.22.0 with npm 10.9.4)
 
 ### Changed

@@ -10,7 +10,8 @@ We release patches for security vulnerabilities. Currently supported versions:
 
 ## Reporting a Vulnerability
 
-The WSL Ubuntu Bootstrap team takes security seriously. We appreciate your efforts to responsibly disclose your findings.
+The WSL Ubuntu Bootstrap team takes security seriously.
+We appreciate your efforts to responsibly disclose your findings.
 
 ### How to Report
 
@@ -62,6 +63,7 @@ This project handles sensitive operations. Please be aware:
    - Tokens
 
 2. **Use Ansible Vault** for sensitive variables
+
    ```bash
    ansible-vault create group_vars/vault.yml
    ```
@@ -130,12 +132,14 @@ This playbook is designed for **development environments**, particularly WSL:
 ### Recommended Practices
 
 For development use:
+
 - ✅ Use on isolated WSL instances
 - ✅ Keep WSL updated regularly
 - ✅ Backup important data
 - ✅ Review changes before applying
 
 For production use:
+
 - ❌ Disable NOPASSWD sudo
 - ❌ Disable auto-updates
 - ❌ Review all roles thoroughly
@@ -146,12 +150,14 @@ For production use:
 Security updates are released as patch versions (e.g., 0.1.1).
 
 **Subscribe to notifications:**
+
 - Watch the repository for releases
 - Check CHANGELOG.md for security-related changes
 
 ## Third-Party Dependencies
 
 This project relies on:
+
 - Ansible (automation engine)
 - APT packages from Ubuntu/Debian
 - Third-party repositories (HashiCorp, Microsoft, NodeSource)
@@ -159,6 +165,7 @@ This project relies on:
 - NPM packages (if installed)
 
 **Responsibility:**
+
 - We ensure secure installation practices
 - Upstream vulnerabilities are outside our control
 - Monitor security advisories for dependencies
@@ -174,13 +181,14 @@ Contributors should:
    - Privilege escalation
 
 2. **Test security features**:
+
    ```bash
    # Verify GPG keys
    apt-key list
-   
+
    # Check file permissions
    ls -la /etc/sudoers.d/
-   
+
    # Review crontabs
    sudo crontab -l
    ```

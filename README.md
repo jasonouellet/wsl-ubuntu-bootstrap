@@ -202,6 +202,7 @@ ansible-playbook main.yml -e @group_vars/custom.yml
 | **dotnet** | .NET | .NET SDK 8.0 |
 | **nodejs** | Node.js | Node.js 22 LTS, npm, compilation toolchain |
 | **azure-cli** | Azure | Azure CLI for Microsoft Azure cloud management |
+| **github-cli** | GitHub | GitHub CLI for repository automation and management |
 | **maintenance** | Maintenance | Daily automatic updates (cron 3 AM) |
 
 ## 🎨 Features

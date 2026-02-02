@@ -1,6 +1,7 @@
 # Contributing to WSL Ubuntu Bootstrap
 
-Thank you for your interest in contributing to WSL Ubuntu Bootstrap! This document provides guidelines for contributing to this project.
+Thank you for your interest in contributing to WSL Ubuntu Bootstrap!
+This document provides guidelines for contributing to this project.
 
 ## 🎯 Ways to Contribute
 
@@ -13,7 +14,8 @@ Thank you for your interest in contributing to WSL Ubuntu Bootstrap! This docume
 
 ## 📋 Before You Start
 
-1. Check existing [issues](../../issues) and [pull requests](../../pulls) to avoid duplicates
+1. Check existing [issues](../../issues) and [pull requests](../../pulls)
+   to avoid duplicates
 2. For major changes, open an issue first to discuss your proposal
 3. Ensure you have a working Ansible environment (Ubuntu/Debian)
 
@@ -219,7 +221,8 @@ All submissions require review. We aim to:
 
 ## 📜 License
 
-By contributing, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
+By contributing, you agree that your contributions will be licensed under the
+project's [MIT License](LICENSE).
 
 ## 🙏 Recognition
 

@@ -21,11 +21,13 @@ First, check the project documentation:
 2. **Check the documentation**: Review README and role-specific docs
 
 3. **Run validation**: Use the included validation script
+
    ```bash
    ./validate.sh
    ```
 
 4. **Test in check mode**: Verify your configuration
+
    ```bash
    ansible-playbook main.yml --check -K
    ```
@@ -52,27 +54,32 @@ For general questions, feature requests, and discussions:
 
 When asking for help, please provide:
 
-```markdown
 **Environment:**
+
 - OS: Ubuntu 24.04 LTS
 - Ansible version: 2.16.3
 - WSL version: WSL2 (if applicable)
 
 **Problem:**
+
 Clear description of the issue
 
 **Steps to Reproduce:**
+
 1. Step one
 2. Step two
 3. ...
 
 **Expected Behavior:**
+
 What you expected to happen
 
 **Actual Behavior:**
+
 What actually happened
 
 **Configuration:**
+
 ```yaml
 # Relevant group_vars/all.yml settings
 enable_python: yes
@@ -80,21 +87,23 @@ enable_nodejs: yes
 ```
 
 **Logs/Output:**
-```
+
+```text
 Error messages or relevant output
 ```
 
 **What I've Tried:**
+
 - Checked documentation
 - Ran validate.sh
 - Searched existing issues
-```
 
 ## 🐛 Reporting Bugs
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#-reporting-bugs) for detailed guidelines.
 
 **Quick checklist:**
+
 - [ ] Searched existing issues
 - [ ] Tested with latest version
 - [ ] Included environment details
@@ -106,6 +115,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#-reporting-bugs) for detailed guidelines.
 See [CONTRIBUTING.md](CONTRIBUTING.md#-feature-requests) for guidelines.
 
 **Use the feature request template:**
+
 - Problem/Use case
 - Proposed solution
 - Alternatives considered
@@ -144,6 +154,7 @@ apt-key list
 #### 4. Role Fails in Check Mode
 
 Some tasks need actual execution:
+
 ```bash
 # Skip check mode for fact-gathering tasks
 # This is handled automatically in the playbook
@@ -152,6 +163,7 @@ Some tasks need actual execution:
 ### Debug Mode
 
 Run with verbose output:
+
 ```bash
 # Basic verbosity
 ansible-playbook main.yml -v
@@ -213,6 +225,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 - **Pull Requests**: For contributions
 
 **Note**: This project does not offer:
+
 - Private support contracts
 - On-call assistance
 - Guaranteed response times
@@ -220,11 +233,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## 🙏 Thank You
 
-Thank you for using WSL Ubuntu Bootstrap! We appreciate your patience and understanding as this is a community-maintained project.
+Thank you for using WSL Ubuntu Bootstrap!
+We appreciate your patience and understanding as this is a community-maintained project.
 
 ---
 
 **Need immediate help?**
+
 1. Check the README.md troubleshooting section
 2. Run `./validate.sh`
 3. Search closed issues
