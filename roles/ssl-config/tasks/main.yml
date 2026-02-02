@@ -83,3 +83,35 @@
   tags:
     - ssl-config
     - certificates
+
+- name: Verify OpenSSL configuration
+  ansible.builtin.command: openssl version
+  register: openssl_version
+  changed_when: false
+  tags:
+    - ssl-config
+    - test
+
+- name: Display OpenSSL version
+  ansible.builtin.debug:
+    msg: "OpenSSL version: {{ openssl_version.stdout }}"
+  tags:
+    - ssl-config
+    - test
+
+- name: Verify CA certificate installation
+  ansible.builtin.stat:
+    path: "{{ ssl_ca_cert_full_path }}"
+  register: installed_cert
+  when: ca_cert_provided
+  tags:
+    - ssl-config
+    - test
+
+- name: Display certificate installation status
+  ansible.builtin.debug:
+    msg: "CA certificate installed: {{ installed_cert.stat.exists | default(false) }}"
+  when: ca_cert_provided
+  tags:
+    - ssl-config
+    - test

@@ -3,7 +3,7 @@
   ansible.builtin.command: lsb_release -cs
   register: distro_codename_result
   changed_when: false
-  check_mode: no
+  check_mode: false
   tags:
     - azure-cli
     - always
@@ -41,10 +41,12 @@
 
 - name: Add Azure CLI APT repository
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/microsoft-azure-cli.gpg] {{ azure_cli_apt_repo_base }} {{ distro_codename_result.stdout }} main"
+    repo: >
+      deb [signed-by=/etc/apt/keyrings/microsoft-azure-cli.gpg]
+      {{ azure_cli_apt_repo_base }} {{ distro_codename_result.stdout }} main
     filename: azure-cli
     state: present
-    update_cache: yes
+    update_cache: true
   tags:
     - azure-cli
     - packages
@@ -54,7 +56,7 @@
   ansible.builtin.apt:
     name: azure-cli
     state: present
-    update_cache: yes
+    update_cache: true
   tags:
     - azure-cli
     - packages

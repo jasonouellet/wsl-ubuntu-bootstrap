@@ -18,60 +18,84 @@ distro_codename: "{{ ansible_lsb.codename | default('focal') }}"
 # Common / Base System Packages
 # =========================================
 common_packages_linux:
-  - ca-certificates
-  - curl
-  - git
-  - lsb-release
-  - software-properties-common
-  - apt-transport-https
-  - gnupg
-  - unzip
-  - zip
-  - jq
-  - wget
-  - pinentry-gtk2  # GTK+ PIN entry dialog for GnuPG
+  # System & Repository Management
+  - lsb-release                    # Linux Standard Base and distribution information
+  - software-properties-common     # Manage software repositories and PPAs
+  - apt-transport-https            # HTTPS support for APT package manager
+  - ca-certificates                # SSL/TLS certificate authorities
+  # Development Tools
+  - git                            # Version control system
+  # Networking & Download
+  - curl                           # HTTP client for downloading files and APIs
+  - wget                           # Download files from the web
+  # Security & Encryption
+  - gnupg                          # GPG encryption and digital signatures
+  - pinentry-gtk2                  # GTK+ PIN entry dialog for GnuPG
+  # Archives & Data Processing
+  - zip                            # Create compressed ZIP archives
+  - unzip                          # Decompress ZIP archives
+  - jq                             # Command-line JSON processor
+  # Python & CLI Tools
+  - pipx                           # Install Python CLI applications in isolation
+  # Linting & Validation Tools
+  - ansible-lint                   # Ansible playbook and role linting
+  - shellcheck                     # Shell script static analysis and linting
+  - yamllint                       # YAML file linting
 
 # =========================================
 # Python Configuration
 # =========================================
 python_packages_apt:
-  - python3-full
-  - python3-pip
-  - python3-setuptools
-  - python3-virtualenv
+  - python3-full           # Complete Python 3 environment with development files
+  - python3-pip            # Package installer for Python
+  - python3-setuptools     # Python package development tools
+  - python3-virtualenv     # Isolated Python environments
+
+python_tools_pipx:
+  # Code Quality & Linting
+  - black                  # Python code formatter
+  - pylint                 # Python code analyzer
+  - pre-commit             # Git hooks framework for code quality
+  - yamllint               # YAML linter
 
 python_packages_pip:
-  - pre-commit
-  - yamllint
-  - pylint
-  - black
-  - mkdocs
-  - mkdocs-material
-  - mkdocs-techdocs-core
-  - mkdocs-macros-plugin
-  - mkdocs-include-markdown-plugin
-  - mkdocs-redirects
-  - mkdocs-monorepo-plugin
-  - plantuml-markdown
-  - markdown-graphviz-inline
+  # Code Quality & Linting
+  - black                              # Python code formatter
+  - pylint                             # Python code analyzer
+  - pre-commit                         # Git hooks framework for code quality
+  - yamllint                           # YAML linter (alternative to apt version)
+  # Documentation Tools
+  - mkdocs                             # Static site generator for documentation
+  - mkdocs-material                    # Material design theme for MkDocs
+  - mkdocs-techdocs-core               # TechDocs core plugins for Backstage
+  - mkdocs-macros-plugin               # Macro support in Markdown
+  - mkdocs-include-markdown-plugin     # Include external Markdown files
+  - mkdocs-redirects                   # Redirect support for moved pages
+  - mkdocs-monorepo-plugin             # Multi-repository support
+  - plantuml-markdown                  # PlantUML diagram support
+  - markdown-graphviz-inline           # Inline Graphviz diagrams in Markdown
 
 # =========================================
 # OCI / Container Tools
 # =========================================
 container_packages:
-  - buildah
-  - skopeo
+  - buildah                # Build OCI images without requiring a running daemon
+  - skopeo                 # Inspect and copy container images
 
 # =========================================
 # Hashicorp Tools
 # =========================================
 hashicorp_packages:
-  - terraform
-  - packer
-  - vault
-  - consul
-  - boundary
-  - nomad
+  # Infrastructure as Code
+  - terraform              # Infrastructure provisioning and management
+  - packer                 # Machine image builder
+  # Security & Secrets
+  - vault                  # Secrets management and encryption
+  # Service Mesh & Networking
+  - consul                 # Service mesh and service discovery
+  - boundary               # Secure remote access to infrastructure
+  # Orchestration
+  - nomad                  # Flexible workload scheduler and orchestrator
 
 hashicorp_apt_key: https://apt.releases.hashicorp.com/gpg
 hashicorp_apt_repo_url: "https://apt.releases.hashicorp.com"
@@ -80,7 +104,7 @@ hashicorp_apt_repo_url: "https://apt.releases.hashicorp.com"
 # .NET Configuration
 # =========================================
 dotnet_packages:
-  - dotnet-sdk-8.0
+  - dotnet-sdk-8.0         # .NET 8 SDK for development and compilation
 
 dotnet_ppa_repo: ppa:dotnet/backports
 
@@ -90,12 +114,16 @@ dotnet_ppa_repo: ppa:dotnet/backports
 nodejs_version: "22"  # LTS version
 nodejs_setup_script_url: "https://deb.nodesource.com/setup_{{ nodejs_version }}.x"
 nodejs_setup_script_dest: /tmp/node-setup.x
+nodejs_setup_script_options: "--yes"  # Automatic yes to prompts
 
 nodejs_packages:
-  - build-essential
-  - gcc
-  - g++
-  - make
+  - build-essential        # Essential packages for compiling C/C++ from source
+  - gcc                    # GNU C compiler
+  - g++                    # GNU C++ compiler
+  - make                   # Build automation tool
+
+nodejs_global_npm_packages:
+  - markdownlint-cli2      # Markdown linting CLI tool (v2 - latest)
 
 # =========================================
 # Azure CLI Configuration

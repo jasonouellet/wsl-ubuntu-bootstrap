@@ -40,7 +40,8 @@ wsl-ubuntu-bootstrap/
 ├── validate.sh                 # Project validation script
 ├── test-role.sh                # Individual role testing script
 ├── test-roles.sh               # All roles testing script
-├── *.crt                        # Organization CA certificate(s) - optional, not committed to git
+├── *.crt                       # Organization CA certificate(s)
+│                               # optional, not committed to git
 ├── group_vars/
 │   ├── all.yml                 # Global variables
 │   ├── custom.yml.example      # Customization example

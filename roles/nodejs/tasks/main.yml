@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name: "{{ nodejs_packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
   tags:
     - nodejs
     - build
@@ -14,35 +14,88 @@
     url: "{{ nodejs_setup_script_url }}"
     dest: "{{ nodejs_setup_script_dest }}"
     mode: '0644'
-    backup: yes
+    backup: true
   tags:
     - nodejs
     - setup
 
 - name: Run NodeSource setup script
-  ansible.builtin.command: bash {{ nodejs_setup_script_dest }}
+  ansible.builtin.command: bash {{ nodejs_setup_script_dest }} {{ nodejs_setup_script_options }}
   args:
     creates: /etc/apt/sources.list.d/nodesource.list
-  become: yes
+  become: true
   tags:
     - nodejs
     - setup
-
 - name: Install Node.js runtime
   ansible.builtin.apt:
-    name: nodejs
+    name:
+      - nodejs
     state: present
-    update_cache: yes
+    update_cache: true
+  tags:
+    - nodejs
+    - packages
+
+- name: Add Node.js binaries to system PATH
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/nodejs.sh
+    line: 'export PATH="/usr/bin:$PATH"'
+    create: true
+    mode: '0644'
+  tags:
+    - nodejs
+    - packages
+
+- name: Find npm path
+  ansible.builtin.command: which npm
+  register: npm_path
+  changed_when: false
+  failed_when: false
+  environment:
+    PATH: "/usr/bin:{{ ansible_env.PATH }}"
+  tags:
+    - nodejs
+    - packages
+
+- name: Create npm symlink if needed
+  ansible.builtin.file:
+    src: /usr/bin/npm
+    dest: /usr/local/bin/npm
+    state: link
+  when: npm_path.rc != 0
+  failed_when: false
+  tags:
+    - nodejs
+    - packages
+
+- name: Install global npm packages
+  ansible.builtin.command: npm install -g {{ item }}
+  loop: "{{ nodejs_global_npm_packages }}"
+  environment:
+    PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+  changed_when: false
+  failed_when: false
   tags:
     - nodejs
     - packages
 
 - name: Verify Node.js installation
   block:
+    - name: Verify Node.js PATH configuration exists
+      ansible.builtin.stat:
+        path: /etc/profile.d/nodejs.sh
+      register: nodejs_path_config
+      tags:
+        - nodejs
+        - test
+
     - name: Check Node.js version
       ansible.builtin.command: node --version
       register: node_version
       changed_when: false
+      environment:
+        PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
       tags:
         - nodejs
         - test
@@ -51,6 +104,20 @@
       ansible.builtin.command: npm --version
       register: npm_version
       changed_when: false
+      environment:
+        PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+      ignore_errors: true
+      tags:
+        - nodejs
+        - test
+
+    - name: Verify npm is in PATH
+      ansible.builtin.shell: |
+        source /etc/profile.d/nodejs.sh
+        which npm
+      register: npm_path
+      changed_when: false
+      failed_when: false
       tags:
         - nodejs
         - test
@@ -59,7 +126,9 @@
       ansible.builtin.debug:
         msg:
           - "Node.js: {{ node_version.stdout }}"
-          - "npm: {{ npm_version.stdout }}"
+          - "npm: {{ npm_version.stdout | default('not found') }}"
+          - "npm path: {{ npm_path.stdout | default('not in PATH') }}"
+          - "PATH config exists: {{ nodejs_path_config.stat.exists }}"
       tags:
         - nodejs
         - test

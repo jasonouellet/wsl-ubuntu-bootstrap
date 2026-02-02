@@ -1,0 +1,9 @@
+rules:
+  line-length:
+    line_length: 120
+  no-hard-tabs: false
+  ul-indent:
+    indent: 2
+  no-multiple-blanks:
+    maximum: 1
+  no-trailing-punctuation: false
