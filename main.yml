@@ -70,6 +70,10 @@
       tags: azure-cli
       when: enable_azure_cli
 
+    - name: github-cli
+      tags: github-cli
+      when: enable_github_cli
+
     # Container tools
     - name: containers
       tags: containers

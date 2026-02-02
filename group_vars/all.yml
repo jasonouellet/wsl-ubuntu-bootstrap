@@ -160,4 +160,5 @@ enable_terraform: yes
 enable_dotnet: yes
 enable_nodejs: yes
 enable_azure_cli: yes
+enable_github_cli: yes
 enable_maintenance: yes

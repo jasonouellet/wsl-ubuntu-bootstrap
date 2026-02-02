@@ -1,0 +1,7 @@
+---
+# GitHub CLI Role - Defaults
+enable_github_cli: yes
+
+# GitHub CLI installation variables
+github_cli_gpg_key_id: "{{ gpg_key_id | default('') }}"
+github_cli_upload_gpg_key: no
