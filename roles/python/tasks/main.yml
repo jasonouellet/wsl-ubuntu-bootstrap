@@ -50,7 +50,7 @@
 
 - name: Get real user home directory
   ansible.builtin.set_fact:
-    real_user_home: "{{ lookup('env', 'SUDO_USER') | default(ansible_user_id, true) }}"
+    python_real_user_home: "{{ lookup('env', 'SUDO_USER') | default(ansible_user_id, true) }}"
   become: false
   tags:
     - python
@@ -58,11 +58,11 @@
 
 - name: Add pipx to user PATH in .bashrc
   ansible.builtin.lineinfile:
-    path: "/home/{{ real_user_home }}/.bashrc"
+    path: "/home/{{ python_real_user_home }}/.bashrc"
     line: 'export PATH="$HOME/.local/bin:$PATH"'
     create: true
     mode: '0644'
-    owner: "{{ real_user_home }}"
+    owner: "{{ python_real_user_home }}"
     state: present
   become: true
   tags:
@@ -113,7 +113,7 @@
   loop:
     - /etc/profile.d/pipx.sh
     - "{{ lookup('env', 'HOME') }}/.bashrc"
-  register: pipx_path_configs
+  register: python_pipx_path_configs
   tags:
     - python
     - test
@@ -121,7 +121,7 @@
 - name: Check for PATH duplicates in bashrc
   ansible.builtin.shell: |
     grep -c "\.local/bin" {{ lookup('env', 'HOME') }}/.bashrc || echo "0"
-  register: path_count
+  register: python_path_count
   changed_when: false
   become: false
   tags:
@@ -137,7 +137,7 @@
     - yamllint
     - pylint
     - black
-  register: pipx_tools
+  register: python_pipx_tools
   changed_when: false
   failed_when: false
   become: false
@@ -149,11 +149,11 @@
   ansible.builtin.debug:
     msg:
       - "Python version: {{ python_version.stdout }}"
-      - "PATH entries in .bashrc: {{ path_count.stdout }}"
-      - "pre-commit accessible: {{ pipx_tools.results[0].rc == 0 }}"
-      - "yamllint accessible: {{ pipx_tools.results[1].rc == 0 }}"
-      - "pylint accessible: {{ pipx_tools.results[2].rc == 0 }}"
-      - "black accessible: {{ pipx_tools.results[3].rc == 0 }}"
+      - "PATH entries in .bashrc: {{ python_path_count.stdout }}"
+      - "pre-commit accessible: {{ python_pipx_tools.results[0].rc == 0 }}"
+      - "yamllint accessible: {{ python_pipx_tools.results[1].rc == 0 }}"
+      - "pylint accessible: {{ python_pipx_tools.results[2].rc == 0 }}"
+      - "black accessible: {{ python_pipx_tools.results[3].rc == 0 }}"
   tags:
     - python
     - test

@@ -9,7 +9,7 @@ ansible_become_method: sudo
 
 # Configure sudo NOPASSWD (recommended for WSL/dev environments)
 # Change to 'no' if you want to disable automatic sudo configuration
-configure_nopasswd_sudo: yes
+common_configure_nopasswd_sudo: yes
 
 # Distribution info
 distro_codename: "{{ ansible_lsb.codename | default('focal') }}"

@@ -49,7 +49,7 @@
 
 - name: Find npm path
   ansible.builtin.command: which npm
-  register: npm_path
+  register: nodejs_npm_path
   changed_when: false
   failed_when: false
   environment:
@@ -63,7 +63,7 @@
     src: /usr/bin/npm
     dest: /usr/local/bin/npm
     state: link
-  when: npm_path.rc != 0
+  when: nodejs_npm_path.rc != 0
   failed_when: false
   tags:
     - nodejs
@@ -92,7 +92,7 @@
 
     - name: Check Node.js version
       ansible.builtin.command: node --version
-      register: node_version
+      register: nodejs_node_version
       changed_when: false
       environment:
         PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
@@ -102,7 +102,7 @@
 
     - name: Check npm version
       ansible.builtin.command: npm --version
-      register: npm_version
+      register: nodejs_npm_version
       changed_when: false
       environment:
         PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
@@ -115,7 +115,7 @@
       ansible.builtin.shell: |
         source /etc/profile.d/nodejs.sh
         which npm
-      register: npm_path
+      register: nodejs_npm_path_verify
       changed_when: false
       failed_when: false
       tags:
@@ -125,9 +125,9 @@
     - name: Display Node.js and npm versions
       ansible.builtin.debug:
         msg:
-          - "Node.js: {{ node_version.stdout }}"
-          - "npm: {{ npm_version.stdout | default('not found') }}"
-          - "npm path: {{ npm_path.stdout | default('not in PATH') }}"
+          - "Node.js: {{ nodejs_node_version.stdout }}"
+          - "npm: {{ nodejs_npm_version.stdout | default('not found') }}"
+          - "npm path: {{ nodejs_npm_path_verify.stdout | default('not in PATH') }}"
           - "PATH config exists: {{ nodejs_path_config.stat.exists }}"
       tags:
         - nodejs

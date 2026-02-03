@@ -13,7 +13,7 @@
   block:
     - name: Check buildah version
       ansible.builtin.command: buildah --version
-      register: buildah_version
+      register: containers_buildah_version
       changed_when: false
       tags:
         - containers
@@ -21,7 +21,7 @@
 
     - name: Check skopeo version
       ansible.builtin.command: skopeo --version
-      register: skopeo_version
+      register: containers_skopeo_version
       changed_when: false
       tags:
         - containers

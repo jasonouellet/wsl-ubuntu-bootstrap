@@ -66,7 +66,7 @@
 - name: Verify auto-update script is executable
   ansible.builtin.stat:
     path: /usr/local/bin/auto-update.sh
-  register: autoupdate_script
+  register: maintenance_autoupdate_script
   tags:
     - maintenance
     - test
@@ -76,7 +76,7 @@
     name: cron
     state: started
   check_mode: yes
-  register: cron_status
+  register: maintenance_cron_status
   changed_when: false
   failed_when: false
   tags:

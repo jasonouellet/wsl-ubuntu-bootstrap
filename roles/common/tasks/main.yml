@@ -51,7 +51,7 @@
     - git
     - curl
     - wget
-  register: package_check
+  register: common_package_check
   changed_when: false
   failed_when: false
   tags:

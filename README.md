@@ -147,7 +147,7 @@ command.
 **To disable this feature**, edit `group_vars/all.yml`:
 
 ```yaml
-configure_nopasswd_sudo: no
+common_configure_nopasswd_sudo: no
 ```
 
 ### Component Customization
