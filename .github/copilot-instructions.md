@@ -3,7 +3,7 @@
 ## Project Overview
 
 This is an **Ansible playbook** automating DevOps environment setup on
-WSL/Debian/Ubuntu systems. It orchestrates 9 independent roles that install
+WSL/Debian/Ubuntu systems. It orchestrates independent roles that install
 tools (Python, Node.js, .NET, Terraform, containers, Azure CLI, GitHub CLI,
 SSL/TLS, maintenance). The playbook is idempotent, follows Ansible best
 practices, and supports selective execution via tags and role enablement.
