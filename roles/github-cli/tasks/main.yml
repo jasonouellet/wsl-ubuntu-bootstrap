@@ -38,9 +38,11 @@
   register: gh_version
   tags:
     - github-cli
+    - test
 
 - name: Display GitHub CLI version
   ansible.builtin.debug:
     msg: "✓ GitHub CLI installed: {{ gh_version.stdout }}"
   tags:
     - github-cli
+    - test
