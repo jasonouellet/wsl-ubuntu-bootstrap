@@ -30,8 +30,8 @@
     - name: Display OCI tools versions
       ansible.builtin.debug:
         msg:
-          - "{{ buildah_version.stdout }}"
-          - "{{ skopeo_version.stdout }}"
+          - "{{ containers_buildah_version.stdout }}"
+          - "{{ containers_skopeo_version.stdout }}"
       tags:
         - containers
         - test
