@@ -19,6 +19,12 @@
     - nodejs
     - setup
 
+# WARNING: This script is downloaded from the internet and executed with elevated privileges
+# For better supply chain security, consider:
+# 1. Hosting the script internally and verifying with checksums
+# 2. Using apt_repository module with NodeSource GPG key validation
+# 3. Pinning specific Node.js versions
+
 - name: Run NodeSource setup script
   ansible.builtin.command: bash {{ nodejs_setup_script_dest }} {{ nodejs_setup_script_options }}
   args:
