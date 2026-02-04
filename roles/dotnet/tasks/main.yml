@@ -1,0 +1,35 @@
+---
+- name: Add .NET PPA repository
+  ansible.builtin.apt_repository:
+    repo: "{{ dotnet_ppa_repo }}"
+    filename: dotnet
+    state: present
+    update_cache: yes
+  tags:
+    - dotnet
+    - packages
+    - repository
+
+- name: Install .NET SDK
+  ansible.builtin.apt:
+    name: "{{ dotnet_packages }}"
+    state: present
+    update_cache: yes
+  tags:
+    - dotnet
+    - packages
+
+- name: Verify .NET installation
+  ansible.builtin.command: dotnet --version
+  register: dotnet_version
+  changed_when: false
+  tags:
+    - dotnet
+    - test
+
+- name: Display .NET version
+  ansible.builtin.debug:
+    msg: "dotnet SDK version: {{ dotnet_version.stdout }}"
+  tags:
+    - dotnet
+    - test

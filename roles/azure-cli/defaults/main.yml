@@ -1,0 +1,3 @@
+---
+# Azure CLI role configuration
+# Enable via enable_azure_cli flag in group_vars/all.yml
