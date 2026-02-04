@@ -13,16 +13,25 @@
     - common
     - always
 
+- name: Capture invoking user for sudo configuration
+  ansible.builtin.set_fact:
+    common_sudo_target_user: "{{ lookup('env', 'SUDO_USER') | default(ansible_user_id) }}"
+  become: false
+  tags:
+    - common
+    - sudo
+    - security
+
 - name: Configure sudo NOPASSWD for current user
   ansible.builtin.lineinfile:
-    path: "/etc/sudoers.d/{{ ansible_user_id }}"
-    line: "{{ ansible_user_id }} ALL=(ALL) NOPASSWD:ALL"
+    path: "/etc/sudoers.d/{{ common_sudo_target_user }}"
+    line: "{{ common_sudo_target_user }} ALL=(ALL) NOPASSWD:ALL"
     create: true
     owner: root
     group: root
     mode: '0440'
     validate: 'visudo -cf %s'
-  when: configure_nopasswd_sudo | default(true)
+  when: common_configure_nopasswd_sudo | default(true)
   tags:
     - common
     - sudo
@@ -61,7 +70,7 @@
 - name: Display package verification results
   ansible.builtin.debug:
     msg: "Essential packages verified: git, curl, wget"
-  when: package_check is succeeded
+  when: common_package_check is succeeded
   tags:
     - common
     - test
