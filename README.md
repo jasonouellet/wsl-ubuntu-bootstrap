@@ -25,7 +25,9 @@ DevOps development environment, including:
 * **Languages & Runtimes**: Python 3, Node.js, .NET SDK
 * **Infrastructure as Code**: Terraform and complete Hashicorp suite
 * **Cloud Tools**: Azure CLI
+* **Development Tools**: GitHub CLI for GitHub automation
 * **Containers**: Buildah, Skopeo (OCI)
+* **Maintenance**: Automated system updates via cron
 * **Security**: CA certificates, SSL/TLS configuration
 * **Base system**: Essential packages, sudo configuration
 
@@ -61,6 +63,7 @@ wsl-ubuntu-bootstrap/
     ├── dotnet/                 # .NET SDK
     ├── nodejs/                 # Node.js runtime and npm
     ├── azure-cli/              # Azure CLI
+    ├── github-cli/             # GitHub CLI for automation
     └── maintenance/            # Automated maintenance (auto-update)
 ```
 
