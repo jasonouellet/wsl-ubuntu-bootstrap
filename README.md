@@ -16,6 +16,8 @@ distribution.
 * [Security Policy](SECURITY.md) - Security policy and vulnerability reporting
 * [Support](SUPPORT.md) - How to get help
 * [Changelog](CHANGELOG.md) - Version history and changes
+* [Security Hardening & Enhancements](HARDENING.md) - Optional security
+  hardening and tooling improvements
 
 ## 🎯 Objective
 
