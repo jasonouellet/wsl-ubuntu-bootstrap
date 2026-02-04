@@ -8,11 +8,12 @@
 set -e
 
 LOG_FILE="/var/log/auto-update.log"
-DATE=$(date '+%Y-%m-%d %H:%M:%S')
 
-# Function to log messages
+# Function to log messages with current timestamp
 log() {
-    echo "[$DATE] $1" | tee -a "$LOG_FILE"
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] $1" | tee -a "$LOG_FILE"
 }
 
 log "=========================================="
