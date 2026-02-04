@@ -71,6 +71,7 @@
     before: '^\['
     regexp: '^\s*Options\s*=.*$'
     replace: ''
+  when: ca_cert_provided
   tags:
     - ssl-config
     - certificates
@@ -80,6 +81,7 @@
     path: "{{ ssl_openssl_config_path }}"
     insertafter: '^\[system_default_sect\]'
     line: 'Options = UnsafeLegacyRenegotiation'
+  when: ca_cert_provided
   tags:
     - ssl-config
     - certificates
