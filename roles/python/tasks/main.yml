@@ -19,7 +19,7 @@
 - name: Install Python CLI tools via pipx
   ansible.builtin.shell: |
     export PATH="$PATH:~/.local/bin"
-    pipx install {{ item }} --force
+    pipx install "{{ item }}" --force
   loop: "{{ python_tools_pipx }}"
   environment:
     HOME: /root
@@ -31,7 +31,7 @@
 - name: Install Python CLI tools for current user
   ansible.builtin.shell: |
     export PATH="$PATH:$HOME/.local/bin"
-    pipx install {{ item }} --force
+    pipx install "{{ item }}" --force
   loop: "{{ python_tools_pipx }}"
   become: false
   changed_when: false

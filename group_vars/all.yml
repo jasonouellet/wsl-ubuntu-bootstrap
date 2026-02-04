@@ -38,9 +38,7 @@ common_packages_linux:
   # Python & CLI Tools
   - pipx                           # Install Python CLI applications in isolation
   # Linting & Validation Tools
-  - ansible-lint                   # Ansible playbook and role linting
   - shellcheck                     # Shell script static analysis and linting
-  - yamllint                       # YAML file linting
 
 # =========================================
 # Python Configuration
@@ -57,6 +55,8 @@ python_tools_pipx:
   - pylint                 # Python code analyzer
   - pre-commit             # Git hooks framework for code quality
   - yamllint               # YAML linter
+  - 'ansible-core>=2.16'   # Ansible core (required for ansible-lint)
+  - 'ansible-lint>=26.0'   # Ansible playbook and role linting (same version as CI)
 
 python_packages_pip:
   # Code Quality & Linting
