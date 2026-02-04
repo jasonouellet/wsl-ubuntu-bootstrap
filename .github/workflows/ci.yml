@@ -66,4 +66,4 @@ jobs:
 
       - name: Playbook dry-run (local connection)
         run: |
-          ansible-playbook main.yml --check -i localhost, --connection=local -K || true
+          ansible-playbook main.yml --check -i localhost, --connection=local
