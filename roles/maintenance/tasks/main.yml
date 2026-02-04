@@ -54,6 +54,17 @@
   tags:
     - maintenance
 
+- name: Display auto-update warning
+  ansible.builtin.debug:
+    msg:
+      - "⚠️  WARNING: Auto-update cron job is ENABLED"
+      - "This will run daily at 3:00 AM as root"
+      - "To disable: set maintenance_enable_auto_update: no in group_vars/custom.yml"
+      - "Or remove cron: sudo crontab -r -u root"
+  when: maintenance_enable_auto_update | default(true)
+  tags:
+    - maintenance
+
 - name: Display maintenance configuration
   ansible.builtin.debug:
     msg:
