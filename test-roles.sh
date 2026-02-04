@@ -29,16 +29,32 @@ echo "Testing Ansible Roles Individually"
 echo "=========================================="
 echo ""
 
-# Check if -K flag should be used
+# Parse arguments flexibly
 SUDO_FLAG=""
-if [[ "$1" == "-K" ]] || [[ "$1" == "--ask-become-pass" ]]; then
-    SUDO_FLAG="-K"
+MODE="check"
+
+# Parse all arguments
+for arg in "$@"; do
+    case "$arg" in
+        -K|--ask-become-pass)
+            SUDO_FLAG="-K"
+            ;;
+        run|execute)
+            MODE="run"
+            ;;
+        check|--check)
+            MODE="check"
+            ;;
+        *)
+            echo -e "${YELLOW}Warning: unknown argument: $arg${NC}"
+            ;;
+    esac
+done
+
+if [[ -n "$SUDO_FLAG" ]]; then
     echo -e "${YELLOW}Will prompt for sudo password${NC}"
-    echo ""
 fi
 
-# Mode: check or run
-MODE="${2:-check}"
 if [[ "$MODE" == "run" ]]; then
     MODE_FLAG=""
     echo -e "${BLUE}Running in EXECUTE mode${NC}"
