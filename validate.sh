@@ -39,7 +39,20 @@ else
 fi
 echo ""
 
-# Check playbook syntax
+# Check required files FIRST (before syntax check)
+echo "✓ Checking required files..."
+required_files=("main.yml" "ansible.cfg" "group_vars/all.yml" "hosts")
+for file in "${required_files[@]}"; do
+    if [[ -f "$file" ]]; then
+        echo -e "  ${GREEN}✓${NC} $file"
+    else
+        echo -e "  ${RED}✗${NC} $file"
+        exit 1
+    fi
+done
+echo ""
+
+# Check playbook syntax (now that required files exist)
 echo "✓ Validating playbook syntax..."
 ansible-playbook main.yml -i hosts --syntax-check
 echo ""
@@ -52,19 +65,6 @@ else
     echo -e "${RED}  ✗ Inventory file not found${NC}"
     exit 1
 fi
-echo ""
-
-# Check required files
-echo "✓ Checking required files..."
-required_files=("main.yml" "ansible.cfg" "group_vars/all.yml" "hosts")
-for file in "${required_files[@]}"; do
-    if [[ -f "$file" ]]; then
-        echo -e "  ${GREEN}✓${NC} $file"
-    else
-        echo -e "  ${RED}✗${NC} $file"
-        exit 1
-    fi
-done
 echo ""
 
 # Check roles structure
@@ -83,17 +83,29 @@ echo ""
 # Run ansible-lint if available
 if command -v ansible-lint &> /dev/null; then
     echo "✓ Running ansible-lint..."
-    ansible-lint main.yml roles/ --config-file .ansible-lint
+    if ! ansible-lint main.yml roles/ --config-file .ansible-lint; then
+        echo -e "${RED}✗ ansible-lint found errors${NC}"
+        exit 1
+    fi
     echo ""
 fi
 
-# Check ca certificate
-echo "✓ Checking CA certificate..."
-if [[ -f "ia-root-ca.crt" ]]; then
-    echo -e "  ${GREEN}✓${NC} CA certificate found (ia-root-ca.crt)"
+# Check CA certificate (if configured)
+echo "✓ Checking CA certificate configuration..."
+# Extract ssl_ca_cert_name from group_vars/all.yml
+if grep -q "ssl_ca_cert_name:" group_vars/all.yml; then
+    CERT_NAME=$(grep "^ssl_ca_cert_name:" group_vars/all.yml | sed 's/ssl_ca_cert_name: //;s/"//g;s/'"'"'//g' | xargs)
+    if [[ -z "$CERT_NAME" ]] || [[ "$CERT_NAME" == "null" ]] || [[ "$CERT_NAME" == "" ]]; then
+        echo -e "  ${YELLOW}⚠${NC} No CA certificate configured (ssl_ca_cert_name is empty)"
+        echo "     ssl-config role will be skipped"
+    elif [[ -f "$CERT_NAME" ]]; then
+        echo -e "  ${GREEN}✓${NC} CA certificate found ($CERT_NAME)"
+    else
+        echo -e "  ${RED}✗${NC} CA certificate not found ($CERT_NAME)"
+        exit 1
+    fi
 else
-    echo -e "  ${YELLOW}⚠${NC} CA certificate not found - ssl-config role will be skipped or fail"
-    echo "     Place your certificate as 'ia-root-ca.crt' in the project root"
+    echo -e "  ${YELLOW}⚠${NC} ssl_ca_cert_name not configured - ssl-config role will be skipped"
 fi
 echo ""
 
