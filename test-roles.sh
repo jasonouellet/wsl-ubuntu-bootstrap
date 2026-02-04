@@ -20,6 +20,8 @@ ROLES=(
     "dotnet"
     "nodejs"
     "azure-cli"
+    "maintenance"
+    "github-cli"
 )
 
 echo "=========================================="
