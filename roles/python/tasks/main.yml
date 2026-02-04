@@ -18,12 +18,11 @@
 
 - name: Install Python CLI tools via pipx
   ansible.builtin.shell: |
-    export PATH="$PATH:~/.local/bin"
-    pipx install "{{ item }}" --force
+    export PATH="$PATH:$HOME/.local/bin"
+    pipx install "{{ item }}"
   loop: "{{ python_tools_pipx }}"
   environment:
     HOME: /root
-  changed_when: false
   tags:
     - python
     - packages
@@ -31,10 +30,9 @@
 - name: Install Python CLI tools for current user
   ansible.builtin.shell: |
     export PATH="$PATH:$HOME/.local/bin"
-    pipx install "{{ item }}" --force
+    pipx install "{{ item }}"
   loop: "{{ python_tools_pipx }}"
   become: false
-  changed_when: false
   tags:
     - python
     - packages
@@ -112,7 +110,7 @@
     path: "{{ item }}"
   loop:
     - /etc/profile.d/pipx.sh
-    - "{{ lookup('env', 'HOME') }}/.bashrc"
+    - "/home/{{ python_real_user_home }}/.bashrc"
   register: python_pipx_path_configs
   tags:
     - python
@@ -120,7 +118,7 @@
 
 - name: Check for PATH duplicates in bashrc
   ansible.builtin.shell: |
-    grep -c "\.local/bin" {{ lookup('env', 'HOME') }}/.bashrc || echo "0"
+    grep -c "\.local/bin" "/home/{{ python_real_user_home }}/.bashrc" || echo "0"
   register: python_path_count
   changed_when: false
   become: false
