@@ -55,8 +55,8 @@ python_tools_pipx:
   - pylint                 # Python code analyzer
   - pre-commit             # Git hooks framework for code quality
   - yamllint               # YAML linter
-  - 'ansible-core>=2.16'   # Ansible core (required for ansible-lint)
-  - 'ansible-lint>=26.0'   # Ansible playbook and role linting (same version as CI)
+  - ansible-core           # Ansible core (required for ansible-lint)
+  - ansible-lint           # Ansible playbook and role linting (same version as CI)
 
 python_packages_pip:
   # Code Quality & Linting
