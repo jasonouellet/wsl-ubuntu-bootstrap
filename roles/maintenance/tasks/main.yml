@@ -23,9 +23,11 @@
 
 - name: Create log directory for auto-update
   ansible.builtin.file:
-    path: /var/log
+    path: /var/log/auto-update
     state: directory
     mode: '0755'
+    owner: root
+    group: root
   tags:
     - maintenance
 
@@ -57,7 +59,7 @@
     msg:
       - "Maintenance role configured successfully"
       - "Auto-update script: /usr/local/bin/auto-update.sh"
-      - "Log file: /var/log/auto-update.log"
+      - "Log file: /var/log/auto-update/auto-update.log"
       - "Schedule: Daily at 3:00 AM"
       - "Manual execution: sudo /usr/local/bin/auto-update.sh"
   tags:
