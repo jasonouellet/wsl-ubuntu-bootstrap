@@ -86,9 +86,9 @@
 - name: Display maintenance verification
   ansible.builtin.debug:
     msg:
-      - "Auto-update script exists: {{ autoupdate_script.stat.exists }}"
-      - "Auto-update script executable: {{ autoupdate_script.stat.executable | default(false) }}"
-      - "Cron service status: {{ cron_status.status.ActiveState | default('unknown') }}"
+      - "Auto-update script exists: {{ maintenance_autoupdate_script.stat.exists }}"
+      - "Auto-update script executable: {{ maintenance_autoupdate_script.stat.executable | default(false) }}"
+      - "Cron service status: {{ maintenance_cron_status.status.ActiveState | default('unknown') }}"
   tags:
     - maintenance
     - test
