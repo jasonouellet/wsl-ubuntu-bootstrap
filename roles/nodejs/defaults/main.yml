@@ -1,2 +1,3 @@
 ---
-nodejs_role_enabled: yes
+# Node.js role configuration
+# Enable via enable_nodejs flag in group_vars/all.yml

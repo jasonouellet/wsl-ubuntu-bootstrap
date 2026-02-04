@@ -1,2 +1,3 @@
 ---
-terraform_role_enabled: yes
+# Terraform role configuration
+# Enable via enable_terraform flag in group_vars/all.yml

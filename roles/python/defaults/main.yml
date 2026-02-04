@@ -1,2 +1,3 @@
 ---
-python_role_enabled: yes
+# Python role configuration
+# Enable via enable_python flag in group_vars/all.yml

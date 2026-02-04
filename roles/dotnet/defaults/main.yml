@@ -1,2 +1,3 @@
 ---
-dotnet_role_enabled: yes
+# .NET role configuration
+# Enable via enable_dotnet flag in group_vars/all.yml
