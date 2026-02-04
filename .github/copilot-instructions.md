@@ -44,7 +44,7 @@ boolean gates in [main.yml](main.yml):
 ```yaml
 - name: python
   tags: python
-  when: enable_python  # Variable: python_enable (in group_vars/all.yml)
+  when: enable_python  # Variable: enable_python (in group_vars/all.yml)
 
 ```
 
