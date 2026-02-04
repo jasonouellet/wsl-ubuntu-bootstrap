@@ -16,25 +16,29 @@
     - python
     - packages
 
-- name: Install Python CLI tools via pipx
+- name: Install Python CLI tools via pipx (root)
   ansible.builtin.shell: |
     export PATH="$PATH:$HOME/.local/bin"
-    pipx install "{{ item }}"
+    pipx install "{{ item }}" 2>&1
   loop: "{{ python_tools_pipx }}"
   environment:
     HOME: /root
-  changed_when: true
+  register: pipx_root_install
+  changed_when: "item not in pipx_root_install.stdout"
+  failed_when: false
   tags:
     - python
     - packages
 
-- name: Install Python CLI tools for current user
+- name: Install Python CLI tools via pipx (current user)
   ansible.builtin.shell: |
     export PATH="$PATH:$HOME/.local/bin"
-    pipx install "{{ item }}"
+    pipx install "{{ item }}" 2>&1
   loop: "{{ python_tools_pipx }}"
   become: false
-  changed_when: true
+  register: pipx_user_install
+  changed_when: "item not in pipx_user_install.stdout"
+  failed_when: false
   tags:
     - python
     - packages
