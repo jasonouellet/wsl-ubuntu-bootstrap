@@ -5,9 +5,12 @@
 # Updates APT packages, pip packages, and npm packages
 # Designed to run as a daily cron job
 
-set -e
+set -euo pipefail
 
-LOG_FILE="/var/log/auto-update.log"
+LOG_FILE="/var/log/auto-update/auto-update.log"
+
+# Ensure log directory exists
+mkdir -p "$(dirname "$LOG_FILE")"
 
 # Function to log messages with current timestamp
 log() {
@@ -31,11 +34,23 @@ log "Cleaning up APT cache..."
 apt-get autoremove -y -qq 2>&1 | tee -a "$LOG_FILE"
 apt-get autoclean -y -qq 2>&1 | tee -a "$LOG_FILE"
 
-# ⚠️  WARNING: Supply Chain Risk
-# The following pip/npm upgrade operations update to latest versions from public registries
-# without pinned versions. In development environments, this is acceptable for convenience.
-# For production systems, consider restricting to pinned versions or manual controlled updates
-# to reduce supply chain attack surface. See: https://docs.npmjs.com/cli/v10/commands/npm-update
+# ⚠️  CRITICAL: Supply Chain Risk Warning
+# ==================================================
+# This script automatically upgrades ALL pip and npm packages from public registries
+# to their LATEST versions WITHOUT pinned version constraints. This creates a HIGH
+# supply chain attack risk:
+#
+# - Compromised upstream packages will be auto-installed as root
+# - No version pinning means instant exposure to malicious updates
+# - Credentials and local state on this development host are at risk
+#
+# RECOMMENDATIONS:
+# 1. For development: Use this script ONLY if you trust all upstream package sources
+# 2. For production: NEVER use auto-upgrade without pinned versions
+# 3. Better approach: Pin package versions and update manually via code review
+#
+# See: https://docs.npmjs.com/cli/v10/commands/npm-update
+#      https://pip.pypa.io/en/latest/reference/pip_install/
 
 # Update pip packages (global)
 log "Updating global pip packages..."
