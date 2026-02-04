@@ -23,6 +23,7 @@
   loop: "{{ python_tools_pipx }}"
   environment:
     HOME: /root
+  changed_when: true
   tags:
     - python
     - packages
@@ -33,6 +34,7 @@
     pipx install "{{ item }}"
   loop: "{{ python_tools_pipx }}"
   become: false
+  changed_when: true
   tags:
     - python
     - packages
