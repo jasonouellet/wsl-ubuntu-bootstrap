@@ -69,7 +69,7 @@ echo ""
 
 # Check roles structure
 echo "✓ Checking roles structure..."
-required_roles=("common" "ssl-config" "python" "containers" "terraform" "dotnet" "nodejs" "azure-cli" "github-cli")
+required_roles=("common" "ssl-config" "python" "containers" "terraform" "dotnet" "nodejs" "azure-cli" "github-cli" "maintenance")
 for role in "${required_roles[@]}"; do
     if [[ -d "roles/$role/tasks" ]]; then
         echo -e "  ${GREEN}✓${NC} roles/$role/tasks"
