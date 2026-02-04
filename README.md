@@ -6,6 +6,8 @@ distribution.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ansible](https://img.shields.io/badge/Ansible-2.16%2B-red.svg)](https://www.ansible.com/)
+[![CI - Validate & Lint](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/ci.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/ci.yml)
+[![Release](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release.yml)
 
 ## 📚 Documentation
 
