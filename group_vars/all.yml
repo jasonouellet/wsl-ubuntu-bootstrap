@@ -132,6 +132,14 @@ azure_cli_apt_key: https://packages.microsoft.com/keys/microsoft.asc
 azure_cli_apt_repo_base: https://packages.microsoft.com/repos/azure-cli/
 
 # =========================================
+# GitHub CLI Configuration
+# =========================================
+github_cli_apt_key: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+github_cli_apt_repo: >-
+  deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg]
+  https://cli.github.com/packages stable main
+
+# =========================================
 # SSL/TLS Configuration
 # =========================================
 ssl_openssl_config_path: /etc/ssl/openssl.cnf
