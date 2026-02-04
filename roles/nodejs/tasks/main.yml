@@ -30,6 +30,17 @@
   args:
     creates: /etc/apt/sources.list.d/nodesource.list
   become: true
+  changed_when: true
+  tags:
+    - nodejs
+    - setup
+
+- name: Force NodeSource repo update if version changed
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/nodesource.list
+    state: absent
+  when: nodejs_version is defined
+  changed_when: false
   tags:
     - nodejs
     - setup
