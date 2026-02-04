@@ -31,6 +31,12 @@ log "Cleaning up APT cache..."
 apt-get autoremove -y -qq 2>&1 | tee -a "$LOG_FILE"
 apt-get autoclean -y -qq 2>&1 | tee -a "$LOG_FILE"
 
+# ⚠️  WARNING: Supply Chain Risk
+# The following pip/npm upgrade operations update to latest versions from public registries
+# without pinned versions. In development environments, this is acceptable for convenience.
+# For production systems, consider restricting to pinned versions or manual controlled updates
+# to reduce supply chain attack surface. See: https://docs.npmjs.com/cli/v10/commands/npm-update
+
 # Update pip packages (global)
 log "Updating global pip packages..."
 if command -v pip3 &> /dev/null; then
