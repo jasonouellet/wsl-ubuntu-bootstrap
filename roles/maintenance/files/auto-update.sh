@@ -52,17 +52,22 @@ apt-get autoclean -y -qq 2>&1 | tee -a "$LOG_FILE"
 # See: https://docs.npmjs.com/cli/v10/commands/npm-update
 #      https://pip.pypa.io/en/latest/reference/pip_install/
 
-# Update pip packages (global)
-log "Updating global pip packages..."
-if command -v pip3 &> /dev/null; then
-    pip3 list --outdated --format=freeze 2>/dev/null | grep -v '^\-e' | cut -d = -f 1 | xargs -r -n1 pip3 install -U 2>&1 | tee -a "$LOG_FILE" || log "No pip packages to update"
-fi
+# ⚠️  CRITICAL: Supply Chain Risk
+# These commands are DISABLED by default due to critical security risk
+# Uncomment ONLY if you understand the risks and trust all upstream packages
+# See: https://owasp.org/www-project-top-10/
+# log "Updating global pip packages..."
+# if command -v pip3 &> /dev/null; then
+#     pip3 list --outdated --format=freeze 2>/dev/null | grep -v '^\\-e' | cut -d = -f 1 | xargs -r -n1 pip3 install -U 2>&1 | tee -a "$LOG_FILE" || log "No pip packages to update"
+# fi
 
-# Update npm packages (global)
-log "Updating global npm packages..."
-if command -v npm &> /dev/null; then
-    npm update -g 2>&1 | tee -a "$LOG_FILE" || log "No npm packages to update"
-fi
+# log "Updating global npm packages..."
+# if command -v npm &> /dev/null; then
+#     npm update -g 2>&1 | tee -a "$LOG_FILE" || log "No npm packages to update"
+# fi
+
+log "⚠️  Global pip/npm updates are disabled (supply chain security)"
+log "To enable, edit /usr/local/bin/auto-update.sh and uncomment the pip/npm sections"
 
 # Update Hashicorp tools if available
 log "Checking for Hashicorp tools updates..."
