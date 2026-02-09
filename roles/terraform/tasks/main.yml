@@ -26,8 +26,8 @@
 - name: Convert and install Hashicorp GPG key
   ansible.builtin.shell: |
     gpg --dearmor < /tmp/hashicorp-archive-keyring.asc > /etc/apt/keyrings/hashicorp-archive-keyring.gpg
-  check_mode: no
-  changed_when: true
+  args:
+    creates: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
   tags:
     - terraform
     - hashicorp
