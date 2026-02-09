@@ -22,7 +22,7 @@ jobs:
         run: |
           # Get commits with conventional commit format (feat:, fix:, BREAKING CHANGE:)
           COMMITS=$(git log --oneline --all -E \
-            --grep="^feat:" --grep="^fix:" --grep="BREAKING CHANGE:" \
+            --grep="^feat(\([^)]*\))?:" --grep="^fix(\([^)]*\))?:" --grep="BREAKING CHANGE:" \
             2>/dev/null || true)
 
           if [ -z "$COMMITS" ]; then
