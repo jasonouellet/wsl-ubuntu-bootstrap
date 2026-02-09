@@ -380,17 +380,17 @@ Key settings that affect execution:
 inventory = hosts                    # Use local hosts file
 host_key_checking = True             # Verify SSH keys (safe for local)
 roles_path = roles                   # Find roles in ./roles/ directory
-remote_user = root                   # Connect as root (local execution)
-forks = 10                          # Run 10 parallel tasks (speeds up install)
-fact_caching = jsonfile             # Cache system facts for 24h
+# remote_user is intentionally not set (uses current local user)
+forks = 10                           # Run 10 parallel tasks (speeds up install)
+fact_caching = jsonfile              # Cache system facts for 24h
 fact_caching_connection = .ansible/facts
-fact_caching_timeout = 86400        # Prevents repeated fact gathering
-force_color = True                  # Colored output for readability
-display_skipped_hosts = True        # Show skipped tasks
-interpreter_python = auto_silent    # Auto-detect Python (no warnings)
+fact_caching_timeout = 86400         # Prevents repeated fact gathering
+force_color = True                   # Colored output for readability
+display_skipped_hosts = True         # Show skipped tasks
+interpreter_python = auto_silent     # Auto-detect Python (no warnings)
 
 [callbacks]
-stdout_callback = yaml              # Output format (readable)
+stdout_callback = default            # Default output format
 callbacks_enabled = profile_tasks    # Show task execution time
 
 ```
