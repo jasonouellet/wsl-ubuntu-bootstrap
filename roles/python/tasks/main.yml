@@ -44,9 +44,9 @@
     - python
     - packages
 
-- name: Get real user home directory
-  ansible.builtin.command:
-    cmd: "sh -c 'echo $HOME'"
+- name: Get real user home directory from system facts
+  ansible.builtin.shell:
+    cmd: "getent passwd {{ ansible_facts['env']['USER'] }} | cut -d':' -f6"
   register: python_user_home_result
   become: false
   changed_when: false
