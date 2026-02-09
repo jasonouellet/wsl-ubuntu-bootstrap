@@ -33,7 +33,19 @@
     - packages
     - pipx
 
-- name: Build exact installed pipx package name list
+- name: Get real user home directory from system facts
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && getent passwd {{ ansible_facts['env']['USER'] }} | cut -d':' -f6"
+  args:
+    executable: /bin/bash
+  register: python_user_home_result
+  become: false
+  changed_when: false
+  tags:
+    - python
+    - packages
+
+- name: Set python real user home fact
   ansible.builtin.set_fact:
     python_pipx_installed_names: >-
       {{
