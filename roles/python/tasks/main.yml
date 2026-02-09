@@ -46,7 +46,9 @@
 
 - name: Get real user home directory from system facts
   ansible.builtin.shell:
-    cmd: "getent passwd {{ ansible_facts['env']['USER'] }} | cut -d':' -f6"
+    cmd: "set -o pipefail && getent passwd {{ ansible_facts['env']['USER'] }} | cut -d':' -f6"
+  args:
+    executable: /bin/bash
   register: python_user_home_result
   become: false
   changed_when: false
