@@ -47,6 +47,16 @@
     - packages
     - repository
 
+- name: Update APT cache after adding Hashicorp repository
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 0
+  tags:
+    - terraform
+    - hashicorp
+    - packages
+    - repository
+
 - name: Install Hashicorp tools
   ansible.builtin.apt:
     name: "{{ hashicorp_packages }}"

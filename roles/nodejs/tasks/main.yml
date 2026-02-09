@@ -34,6 +34,16 @@
   tags:
     - nodejs
     - setup
+
+- name: Update APT cache after NodeSource repository setup
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 0
+  tags:
+    - nodejs
+    - packages
+    - repository
+
 - name: Install Node.js runtime
   ansible.builtin.apt:
     name:

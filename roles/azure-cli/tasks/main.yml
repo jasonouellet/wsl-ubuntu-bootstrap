@@ -52,6 +52,15 @@
     - packages
     - repository
 
+- name: Update APT cache after adding Azure CLI repository
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 0
+  tags:
+    - azure-cli
+    - packages
+    - repository
+
 - name: Install Azure CLI
   ansible.builtin.apt:
     name: azure-cli
