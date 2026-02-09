@@ -2,25 +2,33 @@
 - name: Check if system is Ubuntu/Debian
   ansible.builtin.fail:
     msg: "This playbook is only supported on Debian-based systems."
-  when: ansible_os_family != "Debian"
+  when: ansible_facts["os_family"] != "Debian"
   tags:
     - always
 
 - name: Gather OS distribution facts
   ansible.builtin.setup:
-    filter: ansible_lsb
+    filter: ansible_facts["lsb"]
   tags:
     - common
     - always
 
 - name: Capture invoking user for sudo configuration
   ansible.builtin.set_fact:
-    common_sudo_target_user: "{{ lookup('env', 'SUDO_USER') | default(ansible_user_id) }}"
+    # Prioritize: SUDO_USER, then USER, then LOGNAME
+    common_sudo_target_user: "{{ ansible_facts['env'].get('SUDO_USER') or ansible_facts['env'].get('USER', '') }}"
   become: false
   tags:
     - common
     - sudo
     - security
+
+- name: Display sudo target user
+  ansible.builtin.debug:
+    msg: "Configuring sudo for user: {{ common_sudo_target_user }}"
+  tags:
+    - common
+    - sudo
 
 - name: Configure sudo NOPASSWD for current user
   ansible.builtin.lineinfile:
@@ -31,7 +39,9 @@
     group: root
     mode: '0440'
     validate: 'visudo -cf %s'
-  when: common_configure_nopasswd_sudo | default(true)
+  when:
+    - common_configure_nopasswd_sudo | default(true)
+    - common_sudo_target_user != "root"
   tags:
     - common
     - sudo

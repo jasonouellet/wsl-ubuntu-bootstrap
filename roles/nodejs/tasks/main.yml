@@ -70,7 +70,7 @@
   changed_when: false
   failed_when: false
   environment:
-    PATH: "/usr/bin:{{ ansible_env.PATH }}"
+    PATH: "/usr/bin:{{ ansible_facts['env']['PATH'] }}"
   tags:
     - nodejs
     - packages
@@ -90,7 +90,7 @@
   ansible.builtin.command: npm install -g {{ item }}
   loop: "{{ nodejs_global_npm_packages }}"
   environment:
-    PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+    PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
   changed_when: false
   failed_when: false
   tags:
@@ -112,7 +112,7 @@
       register: nodejs_node_version
       changed_when: false
       environment:
-        PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+        PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
       tags:
         - nodejs
         - test
@@ -122,7 +122,7 @@
       register: nodejs_npm_version
       changed_when: false
       environment:
-        PATH: "/usr/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+        PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
       ignore_errors: true
       tags:
         - nodejs

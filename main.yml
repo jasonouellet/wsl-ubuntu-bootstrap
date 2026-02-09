@@ -32,8 +32,8 @@
           - "WSL Bootstrapping Playbook"
           - "======================="
           - "Target: {{ inventory_hostname }}"
-          - "OS: {{ ansible_os_family }}"
-          - "Distro: {{ ansible_lsb.description | default('Unknown') }}"
+          - "OS: {{ ansible_facts[\"os_family\"] }}"
+          - "Distro: {{ ansible_facts[\"lsb\"][\"description\"] | default('Unknown') }}"
       tags:
         - always
 
@@ -100,8 +100,9 @@
           - ""
           - "Next steps:"
           - "1. Configure git: git config --global user.email 'you@example.com'"
-          - "2. Setup ssh keys: ssh-keygen -t ed25519"
-          - "3. Test terraform: terraform version"
-          - "4. Test azure cli: az login"
+          - "2. Authenticate with Azure: az login"
+          - "3. Authenticate with GitHub: gh auth login"
+          - ""
+          - "Note: Terraform version and Azure CLI version were already verified above."
       tags:
         - always

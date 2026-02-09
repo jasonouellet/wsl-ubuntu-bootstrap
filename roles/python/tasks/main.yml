@@ -23,8 +23,8 @@
   loop: "{{ python_tools_pipx }}"
   environment:
     HOME: /root
-  register: pipx_root_install
-  changed_when: "item not in pipx_root_install.stdout"
+  register: python_pipx_root_install
+  changed_when: "item not in python_pipx_root_install.stdout"
   failed_when: false
   tags:
     - python
@@ -36,8 +36,8 @@
     pipx install "{{ item }}" 2>&1
   loop: "{{ python_tools_pipx }}"
   become: false
-  register: pipx_user_install
-  changed_when: "item not in pipx_user_install.stdout"
+  register: python_pipx_user_install
+  changed_when: "item not in python_pipx_user_install.stdout"
   failed_when: false
   tags:
     - python
@@ -54,7 +54,7 @@
 
 - name: Get real user home directory
   ansible.builtin.set_fact:
-    python_real_user_home: "{{ lookup('env', 'SUDO_USER') | default(ansible_user_id, true) }}"
+    python_real_user_home: "{{ ansible_facts['env']['SUDO_USER'] | default(ansible_facts['env']['USER']) }}"
   become: false
   tags:
     - python

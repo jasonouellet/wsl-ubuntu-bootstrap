@@ -12,7 +12,7 @@ ansible_become_method: sudo
 common_configure_nopasswd_sudo: yes
 
 # Distribution info
-distro_codename: "{{ ansible_lsb.codename | default('focal') }}"
+distro_codename: "{{ ansible_facts[\"lsb\"][\"codename\"] | default('focal') }}"
 
 # =========================================
 # Common / Base System Packages
@@ -101,12 +101,12 @@ hashicorp_apt_key: https://apt.releases.hashicorp.com/gpg
 hashicorp_apt_repo_url: "https://apt.releases.hashicorp.com"
 
 # =========================================
-# .NET Configuration
+# .NET SDK Configuration
 # =========================================
+# .NET is available in Ubuntu 24.04 official repositories
+# https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 dotnet_packages:
   - dotnet-sdk-8.0         # .NET 8 SDK for development and compilation
-
-dotnet_ppa_repo: ppa:dotnet/backports
 
 # =========================================
 # Node.js Configuration
