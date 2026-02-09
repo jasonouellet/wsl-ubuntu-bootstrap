@@ -147,11 +147,17 @@ ansible-lint main.yml roles/
 
 ### Automatic sudo Configuration
 
-The `common` role automatically configures sudo NOPASSWD for the current user
-during first execution. This avoids having to enter the sudo password for each
-command.
+**⚠️ Security Warning**: By default, the `common` role configures sudo with `NOPASSWD:ALL` for the current user.
+This allows passwordless privilege elevation, which weakens privilege separation:
 
-**To disable this feature**, edit `group_vars/all.yml`:
+* Any compromise of your user account (e.g., through a vulnerable tool or malicious script) grants full root access
+  without requiring a password
+* This feature is **intended for WSL/local dev environments only** where security trade-offs are acceptable
+* **Recommended for production/shared systems**: Set `common_configure_nopasswd_sudo: no` to require a password for
+  every sudo command
+
+During first execution, this avoids having to enter the sudo password repeatedly. To disable this feature entirely,
+edit `group_vars/all.yml`:
 
 ```yaml
 common_configure_nopasswd_sudo: no

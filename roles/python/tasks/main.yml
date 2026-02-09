@@ -8,14 +8,6 @@
     - python
     - packages
 
-- name: Install pipx for CLI tools
-  ansible.builtin.apt:
-    name: pipx
-    state: present
-  tags:
-    - python
-    - packages
-
 - name: Install Python CLI tools via pipx (root)
   ansible.builtin.shell: |
     export PATH="$PATH:$HOME/.local/bin"
@@ -53,22 +45,31 @@
     - packages
 
 - name: Get real user home directory
-  ansible.builtin.set_fact:
-    python_real_user_home: "{{ ansible_facts['env']['SUDO_USER'] | default(ansible_facts['env']['USER']) }}"
+  ansible.builtin.command:
+    cmd: "sh -c 'echo $HOME'"
+  register: python_user_home_result
   become: false
+  changed_when: false
+  tags:
+    - python
+    - packages
+
+- name: Set python real user home fact
+  ansible.builtin.set_fact:
+    python_real_user_home: "{{ python_user_home_result.stdout | trim }}"
   tags:
     - python
     - packages
 
 - name: Add pipx to user PATH in .bashrc
   ansible.builtin.lineinfile:
-    path: "/home/{{ python_real_user_home }}/.bashrc"
+    path: "{{ python_real_user_home }}/.bashrc"
     line: 'export PATH="$HOME/.local/bin:$PATH"'
     create: true
     mode: '0644'
-    owner: "{{ python_real_user_home }}"
+    owner: "{{ ansible_facts['env']['USER'] }}"
     state: present
-  become: true
+  become: false
   tags:
     - python
     - packages

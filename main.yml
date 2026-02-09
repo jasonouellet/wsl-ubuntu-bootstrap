@@ -38,10 +38,9 @@
         - always
 
   roles:
-    # Base system setup
+    # Base system setup (always required - other roles depend on this)
     - name: common
       tags: common
-      when: enable_common
 
     # SSL/TLS configuration
     - name: ssl-config

@@ -34,16 +34,6 @@
   tags:
     - nodejs
     - setup
-
-- name: Force NodeSource repo update if version changed
-  ansible.builtin.file:
-    path: /etc/apt/sources.list.d/nodesource.list
-    state: absent
-  when: nodejs_version is defined
-  changed_when: false
-  tags:
-    - nodejs
-    - setup
 - name: Install Node.js runtime
   ansible.builtin.apt:
     name:
