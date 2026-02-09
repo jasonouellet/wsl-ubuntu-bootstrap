@@ -4,7 +4,8 @@ Purpose: install .NET SDK.
 
 * Feature flag: `enable_dotnet` (default: yes)
 * Tags: `dotnet`
-* Key vars: `dotnet_packages`, `dotnet_ppa_repo`
+* Key vars: `dotnet_packages`
+* Reference: <https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install>
 
 Usage:
 

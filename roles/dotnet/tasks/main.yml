@@ -1,14 +1,5 @@
 ---
-- name: Add .NET PPA repository
-  ansible.builtin.apt_repository:
-    repo: "{{ dotnet_ppa_repo }}"
-    filename: dotnet
-    state: present
-    update_cache: yes
-  tags:
-    - dotnet
-    - packages
-    - repository
+# Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 
 - name: Install .NET SDK
   ansible.builtin.apt:
