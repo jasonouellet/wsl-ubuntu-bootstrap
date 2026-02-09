@@ -8,10 +8,10 @@ tooling enhancements for the WSL Ubuntu Bootstrap development environment.
 As a development environment bootstrap, this playbook prioritizes ease of setup
 and functionality. This guide provides optional enhancements for:
 
-- **Security Hardening**: Production-grade security controls
-- **Developer Tools**: Quality-of-life improvements
-- **Compliance**: Audit and logging capabilities
-- **Secret Management**: Secure credential handling
+* **Security Hardening**: Production-grade security controls
+* **Developer Tools**: Quality-of-life improvements
+* **Compliance**: Audit and logging capabilities
+* **Secret Management**: Secure credential handling
 
 ---
 
@@ -304,10 +304,10 @@ ssh localhost "echo 'SSH still works'"
 
 ### 3. Gradual Rollout
 
-- Test in non-critical environment first
-- Enable one hardening measure at a time
-- Monitor logs for unexpected behavior
-- Document any application-specific exceptions
+* Test in non-critical environment first
+* Enable one hardening measure at a time
+* Monitor logs for unexpected behavior
+* Document any application-specific exceptions
 
 ---
 
@@ -315,31 +315,31 @@ ssh localhost "echo 'SSH still works'"
 
 ### SSH Key Generation
 
-- Use **ed25519** (modern, compact, secure)
-- Avoid RSA unless legacy compatibility needed
-- Protect private keys with strong passphrases
-- Store public keys in `~/.ssh/authorized_keys`
+* Use **ed25519** (modern, compact, secure)
+* Avoid RSA unless legacy compatibility needed
+* Protect private keys with strong passphrases
+* Store public keys in `~/.ssh/authorized_keys`
 
 ### Firewall Rules
 
-- Default to **deny**, explicitly allow what's needed
-- Use **source IP restrictions** when possible
-- Log firewall drops for debugging
-- Test connectivity before deploying broadly
+* Default to **deny**, explicitly allow what's needed
+* Use **source IP restrictions** when possible
+* Log firewall drops for debugging
+* Test connectivity before deploying broadly
 
 ### Secret Management
 
-- **Never** store secrets in git (even encrypted)
-- Use environment variables or secret managers
-- Rotate secrets regularly
-- Audit secret access logs
+* **Never** store secrets in git (even encrypted)
+* Use environment variables or secret managers
+* Rotate secrets regularly
+* Audit secret access logs
 
 ### Auditing
 
-- Retain logs for **minimum 30 days**
-- Monitor for unusual sudo activity
-- Alert on failed SSH login attempts
-- Track file modifications in `/etc/ssh/` and other sensitive paths
+* Retain logs for **minimum 30 days**
+* Monitor for unusual sudo activity
+* Alert on failed SSH login attempts
+* Track file modifications in `/etc/ssh/` and other sensitive paths
 
 ---
 
@@ -347,21 +347,21 @@ ssh localhost "echo 'SSH still works'"
 
 ### Security Standards
 
-- [CIS Benchmarks](https://www.cisecurity.org/benchmarks/)
-- [OWASP DevSecOps](https://owasp.org/www-project-devsecops-guideline/)
-- [NSA/CISA Cybersecurity Guidance](https://www.nsa.gov/cybersecurity/support-tools-and-services/security-advisories/)
+* [CIS Benchmarks](https://www.cisecurity.org/benchmarks/)
+* [OWASP DevSecOps](https://owasp.org/www-project-devsecops-guideline/)
+* [NSA/CISA Cybersecurity Guidance](https://www.nsa.gov/cybersecurity/support-tools-and-services/security-advisories/)
 
 ### Ansible Security
 
-- [Ansible Security Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html#security)
-- [Ansible vault for secrets](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
+* [Ansible Security Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html#security)
+* [Ansible vault for secrets](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
 
 ### Tools
 
-- [SSH Hardening Guide](https://man.openbsd.org/sshd_config)
-- [UFW Documentation](https://help.ubuntu.com/community/UFW)
-- [Pre-commit Framework](https://pre-commit.com/)
-- [Gitleaks](https://github.com/gitleaks/gitleaks)
+* [SSH Hardening Guide](https://man.openbsd.org/sshd_config)
+* [UFW Documentation](https://help.ubuntu.com/community/UFW)
+* [Pre-commit Framework](https://pre-commit.com/)
+* [Gitleaks](https://github.com/gitleaks/gitleaks)
 
 ---
 
