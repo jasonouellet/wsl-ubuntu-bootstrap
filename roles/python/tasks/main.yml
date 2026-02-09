@@ -17,7 +17,6 @@
     HOME: /root
   register: python_pipx_root_install
   changed_when: "item not in python_pipx_root_install.stdout"
-  failed_when: false
   tags:
     - python
     - packages
@@ -30,7 +29,6 @@
   become: false
   register: python_pipx_user_install
   changed_when: "item not in python_pipx_user_install.stdout"
-  failed_when: false
   tags:
     - python
     - packages

@@ -92,20 +92,24 @@ fi
 
 # Check CA certificate (if configured)
 echo "✓ Checking CA certificate configuration..."
-# Extract ssl_ca_cert_name from group_vars/all.yml
-if grep -q "ssl_ca_cert_name:" group_vars/all.yml; then
+# Extract ssl_ca_cert_name from group_vars/all.yml or group_vars/custom.yml (custom overrides all)
+CERT_NAME=""
+if [[ -f "group_vars/custom.yml" ]] && grep -q "ssl_ca_cert_name:" group_vars/custom.yml; then
+    CERT_NAME=$(grep "^ssl_ca_cert_name:" group_vars/custom.yml | sed 's/ssl_ca_cert_name: //;s/"//g;s/'"'"'//g' | xargs)
+elif grep -q "ssl_ca_cert_name:" group_vars/all.yml; then
     CERT_NAME=$(grep "^ssl_ca_cert_name:" group_vars/all.yml | sed 's/ssl_ca_cert_name: //;s/"//g;s/'"'"'//g' | xargs)
-    if [[ -z "$CERT_NAME" ]] || [[ "$CERT_NAME" == "null" ]] || [[ "$CERT_NAME" == "" ]]; then
-        echo -e "  ${YELLOW}⚠${NC} No CA certificate configured (ssl_ca_cert_name is empty)"
-        echo "     ssl-config role will be skipped"
-    elif [[ -f "$CERT_NAME" ]]; then
+fi
+
+if [[ -n "$CERT_NAME" && "$CERT_NAME" != "null" && "$CERT_NAME" != "''" ]]; then
+    if [[ -f "$CERT_NAME" ]]; then
         echo -e "  ${GREEN}✓${NC} CA certificate found ($CERT_NAME)"
     else
         echo -e "  ${RED}✗${NC} CA certificate not found ($CERT_NAME)"
         exit 1
     fi
 else
-    echo -e "  ${YELLOW}⚠${NC} ssl_ca_cert_name not configured - ssl-config role will be skipped"
+    echo -e "  ${YELLOW}⚠${NC} No CA certificate configured (ssl_ca_cert_name is empty)"
+    echo "     ssl-config role will be skipped"
 fi
 echo ""
 
