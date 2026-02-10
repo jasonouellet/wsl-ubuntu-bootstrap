@@ -1,4 +1,13 @@
 ---
+- name: Get distribution codename
+  ansible.builtin.command: lsb_release -cs
+  register: terraform_distro_codename_result
+  changed_when: false
+  check_mode: false
+  tags:
+    - terraform
+    - always
+
 - name: Create APT keyrings directory
   ansible.builtin.file:
     path: /etc/apt/keyrings
@@ -28,6 +37,25 @@
     gpg --dearmor < /tmp/hashicorp-archive-keyring.asc > /etc/apt/keyrings/hashicorp-archive-keyring.gpg
   args:
     creates: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+  register: terraform_gpg_dearmor_result
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
+- name: Verify Hashicorp GPG key file exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+  register: terraform_gpg_file_stat
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
+- name: Fail if GPG key file is missing
+  ansible.builtin.fail:
+    msg: "Hashicorp GPG key file not found at /etc/apt/keyrings/hashicorp-archive-keyring.gpg"
+  when: not terraform_gpg_file_stat.stat.exists
   tags:
     - terraform
     - hashicorp
@@ -37,7 +65,7 @@
   ansible.builtin.apt_repository:
     repo: >
       deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg]
-      {{ hashicorp_apt_repo_url }} {{ distro_codename }} main
+      {{ hashicorp_apt_repo_url }} {{ terraform_distro_codename_result.stdout }} main
     filename: hashicorp
     state: present
     update_cache: yes
