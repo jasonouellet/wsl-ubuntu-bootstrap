@@ -8,6 +8,7 @@
 # - Base system packages
 # - Python & pip packages
 # - Container tools (OCI)
+# - Security scanning (Trivy, Syft, detect-secrets)
 # - Terraform & Hashicorp tools
 # - .NET SDK
 # - Node.js
@@ -77,6 +78,11 @@
     - name: containers
       tags: containers
       when: enable_containers
+
+    # Security scanning tools
+    - name: security
+      tags: security
+      when: security_enable
 
     # System maintenance
     - name: maintenance

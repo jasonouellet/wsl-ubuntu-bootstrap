@@ -83,6 +83,15 @@ container_packages:
   - skopeo                 # Inspect and copy container images
 
 # =========================================
+# Security Scanning Tools
+# =========================================
+security_scanning_packages:
+  - trivy                  # Vulnerability and secret scanner (installed from APT repository)
+
+syft_installer_url: https://get.anchore.io/syft
+trivy_apt_key: https://aquasecurity.github.io/trivy-repo/deb/public.key
+
+# =========================================
 # Hashicorp Tools
 # =========================================
 hashicorp_packages:
@@ -163,6 +172,7 @@ maintenance_enable_auto_update: yes
 enable_common: yes
 enable_python: yes
 enable_containers: yes
+security_enable: yes
 enable_ssl_config: yes
 enable_terraform: yes
 enable_dotnet: yes

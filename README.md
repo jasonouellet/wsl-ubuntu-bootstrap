@@ -16,8 +16,13 @@ distribution.
 * [Security Policy](SECURITY.md) - Security policy and vulnerability reporting
 * [Support](SUPPORT.md) - How to get help
 * [Changelog](CHANGELOG.md) - Version history and changes
-* [Security Hardening & Enhancements](HARDENING.md) - Optional security
-  hardening and tooling improvements
+* Technical documentation
+  * [Dependabot Configuration](docs/DEPENDABOT.md) - Automated dependency updates for GitHub Actions and Python packages
+  * [GitHub Actions Workflows](docs/WORKFLOWS.md) - CI/CD pipeline, automatic versioning, and release process
+  * [Security Hardening & Enhancements](docs/HARDENING.md) - Optional security
+    hardening and tooling improvements
+  * [Security Scanning](docs/SECURITY_SCANNING.md) - Vulnerability, secret, and code quality scanning tools (Trivy,
+    SonarCloud, detect-secrets)
 
 ## 🎯 Objective
 
@@ -29,6 +34,7 @@ DevOps development environment, including:
 * **Cloud Tools**: Azure CLI
 * **Development Tools**: GitHub CLI for GitHub automation
 * **Containers**: Buildah, Skopeo (OCI)
+* **Security Scanning**: Trivy, Syft, detect-secrets for vulnerability and secret detection
 * **Maintenance**: Automated system updates via cron
 * **Security**: CA certificates, SSL/TLS configuration
 * **Base system**: Essential packages, sudo configuration
@@ -61,6 +67,7 @@ wsl-ubuntu-bootstrap/
     ├── ssl-config/             # SSL/TLS configuration and CA certificates
     ├── python/                 # Python 3 and pip packages
     ├── containers/             # OCI tools (buildah, skopeo)
+    ├── security/               # Security scanning (Trivy, Syft, detect-secrets)
     ├── terraform/              # Terraform and Hashicorp tools
     ├── dotnet/                 # .NET SDK
     ├── nodejs/                 # Node.js runtime and npm
@@ -92,6 +99,9 @@ ansible-playbook main.yml -K
 
 # Subsequent executions (sudo NOPASSWD automatically configured)
 ansible-playbook main.yml
+
+# Excecution locally with custom values
+ansible-playbook main.yml -i hosts -e @group_vars/custom.yml
 ```
 
 ### Validation Before Installation
@@ -207,11 +217,12 @@ ansible-playbook main.yml -e @group_vars/custom.yml
 
 <!-- markdownlint-disable MD013 -->
 | Role | Description | Content |
-|------|-------------|------|
+| --- | --- | --- |
 | [**common**](roles/common/README.md) | Base system | Essential packages, OS checks, sudo configuration |
 | [**ssl-config**](roles/ssl-config/README.md) | SSL/TLS | CA certificates, OpenSSL configuration |
 | [**python**](roles/python/README.md) | Python | Python 3, pip, virtualenv, pre-commit, yamllint |
 | [**containers**](roles/containers/README.md) | OCI Containers | Buildah, Skopeo |
+| [**security**](roles/security/README.md) | Security Scanning | Trivy, Syft, detect-secrets for vulnerability and secret detection |
 | [**terraform**](roles/terraform/README.md) | Hashicorp | Terraform, Packer, Vault, Consul, Boundary, Nomad |
 | [**dotnet**](roles/dotnet/README.md) | .NET | .NET SDK 8.0 |
 | [**nodejs**](roles/nodejs/README.md) | Node.js | Node.js 22 LTS, npm, compilation toolchain |
