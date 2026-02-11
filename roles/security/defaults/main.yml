@@ -1,0 +1,6 @@
+---
+# =========================================
+# Security Scanning Role Variables
+# =========================================
+# Enable/disable this role
+security_enable: yes

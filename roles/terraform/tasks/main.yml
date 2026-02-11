@@ -1,0 +1,141 @@
+---
+- name: Get distribution codename
+  ansible.builtin.command: lsb_release -cs
+  register: terraform_distro_codename_result
+  changed_when: false
+  check_mode: false
+  tags:
+    - terraform
+    - always
+
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
+- name: Add Hashicorp GPG key
+  ansible.builtin.get_url:
+    url: "{{ hashicorp_apt_key }}"
+    dest: /tmp/hashicorp-archive-keyring.asc
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
+- name: Convert and install Hashicorp GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /tmp/hashicorp-archive-keyring.asc > /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+  register: terraform_gpg_dearmor_result
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
+- name: Verify Hashicorp GPG key file exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+  register: terraform_gpg_file_stat
+  when: not ansible_check_mode
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
+- name: Fail if GPG key file is missing
+  ansible.builtin.fail:
+    msg: "Hashicorp GPG key file not found at /etc/apt/keyrings/hashicorp-archive-keyring.gpg"
+  when:
+    - not ansible_check_mode
+    - not terraform_gpg_file_stat.stat.exists
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
+- name: Set Hashicorp GPG key permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - not ansible_check_mode
+    - terraform_gpg_file_stat.stat.exists
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
+- name: Add Hashicorp APT repository (modern method)
+  ansible.builtin.apt_repository:
+    repo: >
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg]
+      {{ hashicorp_apt_repo_url }} {{ hashicorp_repo_codename }} main
+    filename: hashicorp
+    state: present
+    update_cache: yes
+  tags:
+    - terraform
+    - hashicorp
+    - packages
+    - repository
+
+- name: Update APT cache after adding Hashicorp repository
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 0
+  tags:
+    - terraform
+    - hashicorp
+    - packages
+    - repository
+
+- name: Install Hashicorp tools
+  ansible.builtin.apt:
+    name: "{{ hashicorp_packages }}"
+    state: present
+    update_cache: yes
+  when: not ansible_check_mode
+  tags:
+    - terraform
+    - hashicorp
+    - packages
+
+- name: Check Terraform installation
+  ansible.builtin.command: terraform version
+  register: terraform_version
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - terraform
+    - test
+
+- name: Display Terraform version
+  ansible.builtin.debug:
+    msg: "{{ terraform_version.stdout_lines }}"
+  when: not ansible_check_mode
+  tags:
+    - terraform
+    - test
+
+- name: Enable Terraform autocomplete (bash)
+  ansible.builtin.command: terraform -install-autocomplete
+  args:
+    creates: /etc/bash_completion.d/terraform
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - terraform
+    - autocomplete

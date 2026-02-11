@@ -12,10 +12,10 @@ assignees: ''
 
 ## Environment
 
-- **OS**: Ubuntu 24.04 / 22.04 / WSL2
-- **Ansible Version**: [Run `ansible --version`]
-- **WSL Version** (if applicable): [Run `wsl --version` in PowerShell]
-- **Playbook Version**: [e.g., 0.1.0]
+* **OS**: Ubuntu 24.04 / 22.04 / WSL2
+* **Ansible Version**: [Run `ansible --version`]
+* **WSL Version** (if applicable): [Run `wsl --version` in PowerShell]
+* **Playbook Version**: [e.g., 0.1.0]
 
 ## Steps to Reproduce
 
@@ -66,11 +66,11 @@ ansible-playbook main.yml -vvv
 
 <!-- List troubleshooting steps you've already taken -->
 
-- [ ] Ran `./validate.sh`
-- [ ] Tested with `--check` mode
-- [ ] Checked existing issues
-- [ ] Reviewed documentation
-- [ ] Tried with fresh installation
+* [ ] Ran `./validate.sh`
+* [ ] Tested with `--check` mode
+* [ ] Checked existing issues
+* [ ] Reviewed documentation
+* [ ] Tried with fresh installation
 
 ## Additional Context
 

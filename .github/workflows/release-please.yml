@@ -1,0 +1,32 @@
+name: Release Please - Auto Version & Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    name: Create Release PR
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Create Release PR
+        uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: simple
+          package-name: wsl-ubuntu-bootstrap
+          changelog-types: |
+            [
+              {"type": "feat", "section": "Features", "hidden": false},
+              {"type": "fix", "section": "Bug Fixes", "hidden": false},
+              {"type": "docs", "section": "Documentation", "hidden": false},
+              {"type": "ci", "section": "CI/CD", "hidden": false},
+              {"type": "refactor", "section": "Code Refactoring", "hidden": false},
+              {"type": "perf", "section": "Performance", "hidden": false},
+              {"type": "test", "section": "Tests", "hidden": false},
+              {"type": "chore", "section": "Miscellaneous", "hidden": true}
+            ]

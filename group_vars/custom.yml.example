@@ -1,0 +1,52 @@
+---
+# =========================================
+# Example Custom Variables Configuration
+# =========================================
+# Copier ce fichier à group_vars/custom.yml
+# pour customiser votre installation
+#
+# Exemple d'utilisation :
+# ansible-playbook main.yml -i hosts -e @group_vars/custom.yml
+
+# =========================================
+# CA Certificate Configuration (Optional)
+# =========================================
+# If your organization uses an internal CA certificate:
+# 1. Set the filename below
+# 2. Place the certificate file in the playbook root directory
+# ssl_ca_cert_name: "your-company-root-ca.crt"
+
+# Désactiver les composants non-nécessaires
+# enable_dotnet: no
+# enable_containers: no
+
+# Personnaliser les versions
+# nodejs_version: "20"
+# dotnet_packages:
+#   - dotnet-sdk-7.0
+
+# Ajouter des packages Python supplémentaires
+# python_packages_pip:
+#   - pre-commit
+#   - yamllint
+#   - black
+#   - pytest
+#   - requests
+#   - numpy
+
+# Ajouter des packages Linux supplémentaires
+# common_packages_linux:
+#   - ca-certificates
+#   - curl
+#   - git
+#   - lsb-release
+#   - software-properties-common
+#   - apt-transport-https
+#   - gnupg
+#   - unzip
+#   - zip
+#   - jq
+#   - wget
+#   - htop
+#   - vim
+#   - tmux

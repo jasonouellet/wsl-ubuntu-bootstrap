@@ -1,0 +1,11 @@
+# ansible-lint configuration file
+kinds:
+  - playbook: main.yml
+
+skip_list:
+  - '406'  # git checksum changed
+  - '204'  # lines too long
+  - schema
+
+warn_list:
+  - '306'  # id and name variables shadowing play name

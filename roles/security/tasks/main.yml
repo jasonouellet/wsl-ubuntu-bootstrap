@@ -1,0 +1,182 @@
+---
+# =========================================
+# Security Scanning Tools Installation
+# =========================================
+
+- name: Install Trivy GPG key prerequisites
+  ansible.builtin.apt:
+    name:
+      - gnupg
+    state: present
+    update_cache: yes
+  tags:
+    - security
+    - gpg
+
+- name: Download Trivy GPG key
+  ansible.builtin.get_url:
+    url: "{{ trivy_apt_key }}"
+    dest: /tmp/trivy-keyring.asc
+    mode: '0644'
+    owner: root
+    group: root
+  tags:
+    - security
+    - gpg
+
+- name: Convert and install Trivy GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /tmp/trivy-keyring.asc > /usr/share/keyrings/trivy.gpg
+  args:
+    creates: /usr/share/keyrings/trivy.gpg
+  tags:
+    - security
+    - gpg
+
+- name: Verify Trivy GPG key file exists
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/trivy.gpg
+  register: security_trivy_gpg_file_stat
+  when: not ansible_check_mode
+  tags:
+    - security
+    - gpg
+
+- name: Fail if Trivy GPG key file is missing
+  ansible.builtin.fail:
+    msg: "Trivy GPG key file not found at /usr/share/keyrings/trivy.gpg"
+  when:
+    - not ansible_check_mode
+    - not security_trivy_gpg_file_stat.stat.exists
+  tags:
+    - security
+    - gpg
+
+- name: Set Trivy GPG key permissions
+  ansible.builtin.file:
+    path: /usr/share/keyrings/trivy.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - not ansible_check_mode
+    - security_trivy_gpg_file_stat.stat.exists
+  tags:
+    - security
+    - gpg
+
+- name: Add Trivy APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main"
+    filename: trivy
+    state: present
+    update_cache: yes
+  tags:
+    - security
+    - packages
+    - repository
+
+- name: Install Trivy from APT repository
+  ansible.builtin.apt:
+    name:
+      - trivy
+    state: present
+    update_cache: yes
+  when: not ansible_check_mode
+  tags:
+    - security
+    - packages
+
+# Note: Syft uses official installer script (recommended method by Anchore)
+# The script handles architecture detection, version selection, and installation
+# Using shell here is appropriate as it's the upstream-recommended approach
+- name: Install Syft using official installer script
+  ansible.builtin.shell: |
+    set -o pipefail
+    curl -sSfL https://get.anchore.io/syft | \
+      sudo sh -s -- -b /usr/local/bin
+  args:
+    creates: /usr/local/bin/syft
+    executable: /bin/bash
+  environment:
+    PATH: "{{ ansible_facts['env']['PATH'] }}"
+  when: not ansible_check_mode
+  tags:
+    - security
+    - packages
+
+# Note: detect-secrets installation
+# The python role dependency ensures pipx is available
+# We install detect-secrets here to ensure it's available when using --tags security
+- name: Get real user information
+  ansible.builtin.shell: |
+    echo "$(logname 2>/dev/null || echo $SUDO_USER)"
+  register: security_real_user
+  changed_when: false
+  tags:
+    - security
+    - packages
+
+- name: Ensure detect-secrets is installed for current user
+  ansible.builtin.shell: |
+    export PATH="$PATH:$HOME/.local/bin"
+    pipx install detect-secrets 2>&1 || pipx upgrade detect-secrets 2>&1
+  become: true
+  become_user: "{{ security_real_user.stdout }}"
+  register: security_detect_secrets_install
+  changed_when: "'installed' in security_detect_secrets_install.stdout"
+  failed_when: >
+    security_detect_secrets_install.rc != 0 and
+    'already installed' not in security_detect_secrets_install.stdout
+  when: not ansible_check_mode
+  tags:
+    - security
+    - packages
+
+- name: Ensure pipx path is configured for current user
+  ansible.builtin.command: pipx ensurepath --force
+  become: true
+  become_user: "{{ security_real_user.stdout }}"
+  changed_when: false
+  failed_when: false
+  tags:
+    - security
+    - packages
+
+- name: Verify security tools installation
+  when: not ansible_check_mode
+  block:
+    - name: Check Trivy version
+      ansible.builtin.command: trivy --version
+      register: security_trivy_version
+      changed_when: false
+      tags:
+        - security
+        - test
+
+    - name: Check Syft version
+      ansible.builtin.command: syft --version
+      register: security_syft_version
+      changed_when: false
+      tags:
+        - security
+        - test
+
+    - name: Check detect-secrets version
+      ansible.builtin.command: detect-secrets --version
+      register: security_detect_secrets_version
+      changed_when: false
+      environment:
+        PATH: "{{ ansible_facts['env']['PATH'] }}:/root/.local/bin:{{ ansible_facts['env']['HOME'] }}/.local/bin"
+      tags:
+        - security
+        - test
+
+    - name: Display security tools versions
+      ansible.builtin.debug:
+        msg: |
+          ✓ Trivy: {{ security_trivy_version.stdout }}
+          ✓ Syft: {{ security_syft_version.stdout }}
+          ✓ detect-secrets: {{ security_detect_secrets_version.stdout }}
+      tags:
+        - security

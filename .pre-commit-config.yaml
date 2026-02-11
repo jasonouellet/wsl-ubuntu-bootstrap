@@ -1,0 +1,51 @@
+ci:
+  # This section is specific to pre-commit.ci, telling it to create a pull request
+  # to update the linter version tag every month.
+  autoupdate_schedule: monthly
+  # If you have other Ansible collection dependencies (requirements.yml)
+  # `pre-commit.ci` will not be able to install them because it runs in offline mode,
+  # and you will need to tell it to skip the hook.
+  skip:
+    - ansible-lint
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: ['--unsafe']
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: mixed-line-ending
+
+  # NOTE: ansible-lint must be run manually due to dependency resolution issues
+  # in pre-commit isolated environments. Run: ansible-lint main.yml
+  # - repo: https://github.com/ansible/ansible-lint
+  #   rev: v6.22.2
+  #   hooks:
+  #     - id: ansible-lint
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        args: ['-c', '.yamllint']
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+        args: ['--severity=warning']
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.47.0
+    hooks:
+      - id: markdownlint

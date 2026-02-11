@@ -1,0 +1,37 @@
+---
+- name: Install OCI/Container tools
+  ansible.builtin.apt:
+    name: "{{ container_packages }}"
+    state: present
+    update_cache: yes
+  tags:
+    - containers
+    - packages
+    - oci
+
+- name: Verify OCI tools installation
+  block:
+    - name: Check buildah version
+      ansible.builtin.command: buildah --version
+      register: containers_buildah_version
+      changed_when: false
+      tags:
+        - containers
+        - test
+
+    - name: Check skopeo version
+      ansible.builtin.command: skopeo --version
+      register: containers_skopeo_version
+      changed_when: false
+      tags:
+        - containers
+        - test
+
+    - name: Display OCI tools versions
+      ansible.builtin.debug:
+        msg:
+          - "{{ containers_buildah_version.stdout }}"
+          - "{{ containers_skopeo_version.stdout }}"
+      tags:
+        - containers
+        - test

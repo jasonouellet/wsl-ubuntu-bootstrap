@@ -1,0 +1,111 @@
+name: CI - Validate & Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  lint-and-validate:
+    runs-on: ubuntu-latest
+    name: Linting and Pre-commit
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect releasable commits and guard CHANGELOG
+        run: |
+          # Get commits with conventional commit format (feat:, fix:, BREAKING CHANGE:)
+          COMMITS=$(git log --oneline --all -E \
+            --grep="^feat(\([^)]*\))?:" --grep="^fix(\([^)]*\))?:" --grep="BREAKING CHANGE:" \
+            2>/dev/null || true)
+
+          if [ -z "$COMMITS" ]; then
+            echo "No releasable commits found - skipping CHANGELOG check"
+            exit 0
+          fi
+
+          # Check if CHANGELOG mentions "Unreleased" section
+          if grep -q "## \[Unreleased\]" CHANGELOG.md; then
+            echo "✓ CHANGELOG has Unreleased section"
+            exit 0
+          elif grep -q "## \[.*\]" CHANGELOG.md; then
+            echo "⚠ CHANGELOG exists but no Unreleased section found"
+            echo "If you added feat: or fix: commits, please update CHANGELOG.md"
+            exit 0
+          else
+            echo "✗ CHANGELOG.md not found or improperly formatted"
+            exit 1
+          fi
+
+      - name: Set up Python for linting
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Ansible and lint dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible-core>=2.16 ansible-lint
+
+      - name: Run pre-commit hooks (all files)
+        uses: pre-commit/action@v3.0.1
+
+      - name: Lint Ansible playbooks and roles (ansible-lint)
+        run: |
+          ansible-lint main.yml -v
+
+      - name: Ansible syntax check (main playbook)
+        run: |
+          ansible-playbook main.yml --syntax-check
+
+      - name: Playbook dry-run (local connection)
+        run: |
+          ansible-playbook main.yml --check -i localhost, --connection=local
+
+      - name: Validate SonarCloud project version matches CHANGELOG
+        run: |
+          chmod +x .github/scripts/validate-sonar-version.sh
+          .github/scripts/validate-sonar-version.sh
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Run Trivy vulnerability and secret scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          scanners: 'vuln,secret,config'
+          exclude-dirs: '.git,.github,node_modules,.ansible'
+
+      - name: Upload Trivy SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: 'trivy'
+
+      - name: Generate SBOM with syft
+        uses: anchore/sbom-action@v0
+        with:
+          path: '.'
+          format: 'spdx-json'
+          output-file: 'sbom.spdx.json'
+
+      - name: Upload SBOM as workflow artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 'sbom'
+          path: 'sbom.spdx.json'
+          retention-days: 30

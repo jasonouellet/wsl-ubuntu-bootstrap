@@ -1,0 +1,184 @@
+---
+# =========================================
+# Global Variables for DevOps Bootstrap
+# =========================================
+
+# System
+ansible_become: yes
+ansible_become_method: sudo
+
+# Configure sudo NOPASSWD (recommended for WSL/dev environments)
+# Change to 'no' if you want to disable automatic sudo configuration
+common_configure_nopasswd_sudo: yes
+
+# Distribution info
+distro_codename: "{{ ansible_facts[\"lsb\"][\"codename\"] | default('focal') }}"
+
+# =========================================
+# Common / Base System Packages
+# =========================================
+common_packages_linux:
+  # System & Repository Management
+  - lsb-release                    # Linux Standard Base and distribution information
+  - software-properties-common     # Manage software repositories and PPAs
+  - apt-transport-https            # HTTPS support for APT package manager
+  - ca-certificates                # SSL/TLS certificate authorities
+  # Development Tools
+  - git                            # Version control system
+  # Networking & Download
+  - curl                           # HTTP client for downloading files and APIs
+  - wget                           # Download files from the web
+  # Security & Encryption
+  - gnupg                          # GPG encryption and digital signatures
+  - pinentry-gtk2                  # GTK+ PIN entry dialog for GnuPG
+  # Archives & Data Processing
+  - zip                            # Create compressed ZIP archives
+  - unzip                          # Decompress ZIP archives
+  - jq                             # Command-line JSON processor
+  # Python & CLI Tools
+  - pipx                           # Install Python CLI applications in isolation
+  # Linting & Validation Tools
+  - shellcheck                     # Shell script static analysis and linting
+
+# =========================================
+# Python Configuration
+# =========================================
+python_packages_apt:
+  - python3-full           # Complete Python 3 environment with development files
+  - python3-pip            # Package installer for Python
+  - python3-setuptools     # Python package development tools
+  - python3-virtualenv     # Isolated Python environments
+
+python_tools_pipx:
+  # Code Quality & Linting
+  - black                  # Python code formatter
+  - pylint                 # Python code analyzer
+  - pre-commit             # Git hooks framework for code quality
+  - yamllint               # YAML linter
+  - ansible-core           # Ansible core (required for ansible-lint)
+  - ansible-lint           # Ansible playbook and role linting (same version as CI)
+
+python_packages_pip:
+  # Code Quality & Linting
+  - black                              # Python code formatter
+  - pylint                             # Python code analyzer
+  - pre-commit                         # Git hooks framework for code quality
+  - yamllint                           # YAML linter (alternative to apt version)
+  # Documentation Tools
+  - mkdocs                             # Static site generator for documentation
+  - mkdocs-material                    # Material design theme for MkDocs
+  - mkdocs-techdocs-core               # TechDocs core plugins for Backstage
+  - mkdocs-macros-plugin               # Macro support in Markdown
+  - mkdocs-include-markdown-plugin     # Include external Markdown files
+  - mkdocs-redirects                   # Redirect support for moved pages
+  - mkdocs-monorepo-plugin             # Multi-repository support
+  - plantuml-markdown                  # PlantUML diagram support
+  - markdown-graphviz-inline           # Inline Graphviz diagrams in Markdown
+
+# =========================================
+# OCI / Container Tools
+# =========================================
+container_packages:
+  - buildah                # Build OCI images without requiring a running daemon
+  - skopeo                 # Inspect and copy container images
+
+# =========================================
+# Security Scanning Tools
+# =========================================
+security_scanning_packages:
+  - trivy                  # Vulnerability and secret scanner (installed from APT repository)
+
+syft_installer_url: https://get.anchore.io/syft
+trivy_apt_key: https://aquasecurity.github.io/trivy-repo/deb/public.key
+
+# =========================================
+# Hashicorp Tools
+# =========================================
+hashicorp_packages:
+  # Infrastructure as Code
+  - terraform              # Infrastructure provisioning and management
+  - packer                 # Machine image builder
+  # Security & Secrets
+  - vault                  # Secrets management and encryption
+  # Service Mesh & Networking
+  - consul                 # Service mesh and service discovery
+  - boundary               # Secure remote access to infrastructure
+  # Orchestration
+  - nomad                  # Flexible workload scheduler and orchestrator
+
+hashicorp_apt_key: https://apt.releases.hashicorp.com/gpg
+hashicorp_apt_repo_url: "https://apt.releases.hashicorp.com"
+# Hashicorp repo may lag new Ubuntu codenames; map to a supported fallback.
+hashicorp_repo_codename: "{{ 'jammy' if distro_codename in ['noble'] else distro_codename }}"
+
+# =========================================
+# .NET SDK Configuration
+# =========================================
+# .NET is available in Ubuntu 24.04 official repositories
+# https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
+dotnet_packages:
+  - dotnet-sdk-8.0         # .NET 8 SDK for development and compilation
+
+# =========================================
+# Node.js Configuration
+# =========================================
+nodejs_version: "22"  # LTS version
+nodejs_setup_script_url: "https://deb.nodesource.com/setup_{{ nodejs_version }}.x"
+nodejs_setup_script_dest: /tmp/node-setup.x
+nodejs_setup_script_options: "--yes"  # Automatic yes to prompts
+
+nodejs_packages:
+  - build-essential        # Essential packages for compiling C/C++ from source
+  - gcc                    # GNU C compiler
+  - g++                    # GNU C++ compiler
+  - make                   # Build automation tool
+
+nodejs_global_npm_packages:
+  - markdownlint-cli2      # Markdown linting CLI tool (v2 - latest)
+
+# =========================================
+# Azure CLI Configuration
+# =========================================
+azure_cli_apt_key: https://packages.microsoft.com/keys/microsoft.asc
+azure_cli_apt_repo_base: https://packages.microsoft.com/repos/azure-cli/
+
+# =========================================
+# GitHub CLI Configuration
+# =========================================
+github_cli_apt_key: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+github_cli_apt_repo: >-
+  deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg]
+  https://cli.github.com/packages stable main
+
+# =========================================
+# SSL/TLS Configuration
+# =========================================
+ssl_openssl_config_path: /etc/ssl/openssl.cnf
+ssl_ca_cert_path: /usr/local/share/ca-certificates
+# Organization CA certificate filename (optional)
+# Set this variable to your organization's CA certificate filename
+# Example: ssl_ca_cert_name: company-root-ca.crt
+# Leave empty or undefined to skip certificate installation
+ssl_ca_cert_name: ""
+ssl_ca_cert_full_path: "{{ ssl_ca_cert_path }}/{{ ssl_ca_cert_name }}"
+ssl_ca_cert_pem_path: "/etc/ssl/certs/{{ ssl_ca_cert_name }}"
+
+# =========================================
+# Maintenance Configuration
+# =========================================
+maintenance_enable_auto_update: yes
+
+# =========================================
+# Features Flags (enable/disable components)
+# =========================================
+enable_common: yes
+enable_python: yes
+enable_containers: yes
+security_enable: yes
+enable_ssl_config: yes
+enable_terraform: yes
+enable_dotnet: yes
+enable_nodejs: yes
+enable_azure_cli: yes
+enable_github_cli: yes
+enable_maintenance: yes

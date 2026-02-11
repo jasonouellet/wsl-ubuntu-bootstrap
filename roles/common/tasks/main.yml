@@ -1,0 +1,94 @@
+---
+- name: Check if system is Ubuntu/Debian
+  ansible.builtin.fail:
+    msg: "This playbook is only supported on Debian-based systems."
+  when: ansible_facts["os_family"] != "Debian"
+  tags:
+    - always
+
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  tags:
+    - common
+    - packages
+
+- name: Install lsb-release (required for ansible_lsb facts)
+  ansible.builtin.apt:
+    name: lsb-release
+    state: present
+  tags:
+    - common
+    - packages
+
+- name: Gather OS distribution facts
+  ansible.builtin.setup:
+    filter: ansible_lsb*
+  tags:
+    - common
+    - always
+
+- name: Capture invoking user for sudo configuration
+  ansible.builtin.set_fact:
+    # Prioritize: SUDO_USER, then USER, then LOGNAME
+    common_sudo_target_user: "{{ ansible_facts['env'].get('SUDO_USER') or ansible_facts['env'].get('USER', '') }}"
+  become: false
+  tags:
+    - common
+    - sudo
+    - security
+
+- name: Display sudo target user
+  ansible.builtin.debug:
+    msg: "Configuring sudo for user: {{ common_sudo_target_user }}"
+  tags:
+    - common
+    - sudo
+
+- name: Configure sudo NOPASSWD for current user
+  ansible.builtin.lineinfile:
+    path: "/etc/sudoers.d/{{ common_sudo_target_user }}"
+    line: "{{ common_sudo_target_user }} ALL=(ALL) NOPASSWD:ALL"
+    create: true
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  when:
+    - common_configure_nopasswd_sudo | default(true)
+    - common_sudo_target_user != "root"
+  tags:
+    - common
+    - sudo
+    - security
+
+- name: Install base Linux packages
+  ansible.builtin.apt:
+    name: "{{ common_packages_linux }}"
+    state: present
+    autoclean: true
+  tags:
+    - common
+    - packages
+
+- name: Verify essential packages are installed
+  ansible.builtin.command: "dpkg -l {{ item }}"
+  loop:
+    - git
+    - curl
+    - wget
+  register: common_package_check
+  changed_when: false
+  failed_when: false
+  tags:
+    - common
+    - test
+
+- name: Display package verification results
+  ansible.builtin.debug:
+    msg: "Essential packages verified: git, curl, wget"
+  when: common_package_check is succeeded
+  tags:
+    - common
+    - test
