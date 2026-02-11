@@ -112,6 +112,7 @@
     - packages
 
 - name: Verify security tools installation
+  when: not ansible_check_mode
   block:
     - name: Check Trivy version
       ansible.builtin.command: trivy --version
@@ -147,4 +148,3 @@
           ✓ detect-secrets: {{ security_detect_secrets_version.stdout }}
       tags:
         - security
-  when: not ansible_check_mode
