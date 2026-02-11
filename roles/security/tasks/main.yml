@@ -33,6 +33,16 @@
     - security
     - gpg
 
+- name: Set Trivy GPG key permissions
+  ansible.builtin.file:
+    path: /usr/share/keyrings/trivy.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - security
+    - gpg
+
 - name: Add Trivy APT repository
   ansible.builtin.apt_repository:
     repo: "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main"

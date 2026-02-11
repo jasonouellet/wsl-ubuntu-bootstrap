@@ -39,6 +39,16 @@
     - azure-cli
     - gpg
 
+- name: Set Microsoft GPG key permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/microsoft-azure-cli.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - azure-cli
+    - gpg
+
 - name: Add Azure CLI APT repository
   ansible.builtin.apt_repository:
     repo: >

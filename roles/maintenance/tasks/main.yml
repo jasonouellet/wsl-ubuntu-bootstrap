@@ -15,7 +15,7 @@
   ansible.builtin.copy:
     src: auto-update.sh
     dest: /usr/local/bin/auto-update.sh
-    mode: '0755'
+    mode: '0750'
     owner: root
     group: root
   tags:
@@ -25,7 +25,7 @@
   ansible.builtin.file:
     path: /var/log/auto-update
     state: directory
-    mode: '0755'
+    mode: '0750'
     owner: root
     group: root
   tags:

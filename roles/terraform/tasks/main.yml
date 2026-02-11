@@ -43,6 +43,17 @@
     - hashicorp
     - gpg
 
+- name: Set Hashicorp GPG key permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - terraform
+    - hashicorp
+    - gpg
+
 - name: Verify Hashicorp GPG key file exists
   ansible.builtin.stat:
     path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
