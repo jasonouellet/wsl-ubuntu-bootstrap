@@ -47,6 +47,7 @@
   ansible.builtin.stat:
     path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
   register: terraform_gpg_file_stat
+  when: not ansible_check_mode
   tags:
     - terraform
     - hashicorp
@@ -55,7 +56,9 @@
 - name: Fail if GPG key file is missing
   ansible.builtin.fail:
     msg: "Hashicorp GPG key file not found at /etc/apt/keyrings/hashicorp-archive-keyring.gpg"
-  when: not terraform_gpg_file_stat.stat.exists
+  when:
+    - not ansible_check_mode
+    - not terraform_gpg_file_stat.stat.exists
   tags:
     - terraform
     - hashicorp
