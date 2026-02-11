@@ -27,7 +27,7 @@ jobs:
 
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             # Tag event: Get the tag name and find the previous tag
-            CURRENT_TAG="${{ github.ref #refs/tags/ }}"
+            CURRENT_TAG="${GITHUB_REF_NAME}"
             PREVIOUS_TAG=$(git describe --tags --abbrev=0 "${CURRENT_TAG}^" 2>/dev/null || echo "")
 
             if [ -z "$PREVIOUS_TAG" ]; then
