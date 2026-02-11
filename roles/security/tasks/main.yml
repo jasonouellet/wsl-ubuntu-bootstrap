@@ -50,6 +50,7 @@
       - trivy
     state: present
     update_cache: yes
+  when: not ansible_check_mode
   tags:
     - security
     - packages
@@ -67,6 +68,7 @@
     executable: /bin/bash
   environment:
     PATH: "{{ ansible_facts['env']['PATH'] }}"
+  when: not ansible_check_mode
   tags:
     - security
     - packages
@@ -94,6 +96,7 @@
   failed_when: >
     security_detect_secrets_install.rc != 0 and
     'already installed' not in security_detect_secrets_install.stdout
+  when: not ansible_check_mode
   tags:
     - security
     - packages
@@ -144,3 +147,4 @@
           ✓ detect-secrets: {{ security_detect_secrets_version.stdout }}
       tags:
         - security
+  when: not ansible_check_mode
