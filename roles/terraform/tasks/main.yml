@@ -93,6 +93,7 @@
     name: "{{ hashicorp_packages }}"
     state: present
     update_cache: yes
+  when: not ansible_check_mode
   tags:
     - terraform
     - hashicorp
@@ -102,6 +103,7 @@
   ansible.builtin.command: terraform version
   register: terraform_version
   changed_when: false
+  when: not ansible_check_mode
   tags:
     - terraform
     - test
@@ -109,6 +111,7 @@
 - name: Display Terraform version
   ansible.builtin.debug:
     msg: "{{ terraform_version.stdout_lines }}"
+  when: not ansible_check_mode
   tags:
     - terraform
     - test
@@ -118,6 +121,7 @@
   args:
     creates: /etc/bash_completion.d/terraform
   failed_when: false
+  when: not ansible_check_mode
   tags:
     - terraform
     - autocomplete
