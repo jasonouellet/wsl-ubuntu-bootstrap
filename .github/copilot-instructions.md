@@ -145,8 +145,8 @@ Every task must have **at least one tag**. Tags enable selective execution and f
 **Tag Categories**:
 
 | Category | Purpose | Examples |
-|----------|---------|----------|
-| **Role Tags** | Execute entire role | `common`, `python`, `nodejs`, `terraform`, `dotnet`, `azure-cli`, `github-cli`, `containers`,`ssl-config`, `maintenance` |
+| -------- | ------- | -------- |
+| **Role Tags** | Execute entire role | `common`, `python`, `nodejs`, `terraform`, `dotnet`, `azure-cli`, `github-cli`, `containers`, `ssl-config`, `maintenance` |
 | **Cross-cutting** | Shared operations | `packages`, `repository`, `gpg`, `setup` |
 | **Security** | Sensitive operations | `security`, `sudo`, `ssl` |
 | **Testing** | Verification/diagnostics | `test`, `verify` |
@@ -790,7 +790,7 @@ gh auth login
 ## File References
 
 | File | Purpose |
-|------|---------|
+| ---- | ------- |
 | [main.yml](main.yml) | Playbook entry point - orchestrates all 9 roles |
 | [group_vars/all.yml](group_vars/all.yml) | Global variables (packages, URLs, enable flags) |
 | [group_vars/custom.yml.example](group_vars/custom.yml.example) | Customization template (copy to custom.yml) |
@@ -806,7 +806,7 @@ gh auth login
 ## Role Directory Reference
 
 | Role | Purpose | Key Variables |
-|------|---------|----------------|
+| ---- | ------- | ------------- |
 | `common` | Base system, sudo, validation | common_packages_linux |
 | `python` | Python 3, pipx, pip tools | python_packages_apt, pipx |
 | `nodejs` | Node.js, build tools | nodejs_version, nodejs_packages |
