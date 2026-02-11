@@ -88,6 +88,13 @@ sudo apt-get update && sudo apt-get install -y ansible
 sudo apt-get install -y ansible-lint
 ```
 
+If pipx installs fail with a message like "Unknown metadata version 0.5",
+upgrade pipx before running the playbook:
+
+```bash
+sudo python3 -m pip install --upgrade pipx
+```
+
 ### Complete Installation
 
 ```bash
