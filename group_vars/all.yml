@@ -108,6 +108,8 @@ hashicorp_packages:
 
 hashicorp_apt_key: https://apt.releases.hashicorp.com/gpg
 hashicorp_apt_repo_url: "https://apt.releases.hashicorp.com"
+# Hashicorp repo may lag new Ubuntu codenames; map to a supported fallback.
+hashicorp_repo_codename: "{{ 'jammy' if distro_codename in ['noble'] else distro_codename }}"
 
 # =========================================
 # .NET SDK Configuration

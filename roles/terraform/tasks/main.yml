@@ -68,7 +68,7 @@
   ansible.builtin.apt_repository:
     repo: >
       deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg]
-      {{ hashicorp_apt_repo_url }} {{ terraform_distro_codename_result.stdout }} main
+      {{ hashicorp_apt_repo_url }} {{ hashicorp_repo_codename }} main
     filename: hashicorp
     state: present
     update_cache: yes
