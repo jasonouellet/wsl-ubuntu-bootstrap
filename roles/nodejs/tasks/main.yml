@@ -1,0 +1,151 @@
+---
+- name: Install build toolchain for Node.js
+  ansible.builtin.apt:
+    name: "{{ nodejs_packages }}"
+    state: present
+    update_cache: true
+  tags:
+    - nodejs
+    - build
+    - packages
+
+- name: Download NodeSource setup script
+  ansible.builtin.get_url:
+    url: "{{ nodejs_setup_script_url }}"
+    dest: "{{ nodejs_setup_script_dest }}"
+    mode: '0644'
+    backup: true
+  tags:
+    - nodejs
+    - setup
+
+# WARNING: This script is downloaded from the internet and executed with elevated privileges
+# For better supply chain security, consider:
+# 1. Hosting the script internally and verifying with checksums
+# 2. Using apt_repository module with NodeSource GPG key validation
+# 3. Pinning specific Node.js versions
+
+- name: Run NodeSource setup script
+  ansible.builtin.command: bash {{ nodejs_setup_script_dest }} {{ nodejs_setup_script_options }}
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+  become: true
+  changed_when: true
+  tags:
+    - nodejs
+    - setup
+
+- name: Update APT cache after NodeSource repository setup
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 0
+  tags:
+    - nodejs
+    - packages
+    - repository
+
+- name: Install Node.js runtime
+  ansible.builtin.apt:
+    name:
+      - nodejs
+    state: present
+    update_cache: true
+  tags:
+    - nodejs
+    - packages
+
+- name: Add Node.js binaries to system PATH
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/nodejs.sh
+    line: 'export PATH="/usr/bin:$PATH"'
+    create: true
+    mode: '0644'
+  tags:
+    - nodejs
+    - packages
+
+- name: Find npm path
+  ansible.builtin.command: which npm
+  register: nodejs_npm_path
+  changed_when: false
+  failed_when: false
+  environment:
+    PATH: "/usr/bin:{{ ansible_facts['env']['PATH'] }}"
+  tags:
+    - nodejs
+    - packages
+
+- name: Create npm symlink if needed
+  ansible.builtin.file:
+    src: /usr/bin/npm
+    dest: /usr/local/bin/npm
+    state: link
+  when: nodejs_npm_path.rc != 0
+  failed_when: false
+  tags:
+    - nodejs
+    - packages
+
+- name: Install global npm packages
+  ansible.builtin.command: npm install -g {{ item }}
+  loop: "{{ nodejs_global_npm_packages }}"
+  environment:
+    PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+  changed_when: false
+  failed_when: false
+  tags:
+    - nodejs
+    - packages
+
+- name: Verify Node.js installation
+  block:
+    - name: Verify Node.js PATH configuration exists
+      ansible.builtin.stat:
+        path: /etc/profile.d/nodejs.sh
+      register: nodejs_path_config
+      tags:
+        - nodejs
+        - test
+
+    - name: Check Node.js version
+      ansible.builtin.command: node --version
+      register: nodejs_node_version
+      changed_when: false
+      environment:
+        PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+      tags:
+        - nodejs
+        - test
+
+    - name: Check npm version
+      ansible.builtin.command: npm --version
+      register: nodejs_npm_version
+      changed_when: false
+      environment:
+        PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+      ignore_errors: true
+      tags:
+        - nodejs
+        - test
+
+    - name: Verify npm is in PATH
+      ansible.builtin.shell: |
+        source /etc/profile.d/nodejs.sh
+        which npm
+      register: nodejs_npm_path_verify
+      changed_when: false
+      failed_when: false
+      tags:
+        - nodejs
+        - test
+
+    - name: Display Node.js and npm versions
+      ansible.builtin.debug:
+        msg:
+          - "Node.js: {{ nodejs_node_version.stdout }}"
+          - "npm: {{ nodejs_npm_version.stdout | default('not found') }}"
+          - "npm path: {{ nodejs_npm_path_verify.stdout | default('not in PATH') }}"
+          - "PATH config exists: {{ nodejs_path_config.stat.exists }}"
+      tags:
+        - nodejs
+        - test

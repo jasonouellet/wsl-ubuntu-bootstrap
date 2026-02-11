@@ -1,0 +1,4 @@
+---
+# Configure sudo without password (recommended for WSL/dev environments)
+# Set to 'no' in production environments
+common_configure_nopasswd_sudo: yes

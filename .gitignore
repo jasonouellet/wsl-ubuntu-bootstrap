@@ -1,5 +1,6 @@
 # Ansible runtime files
 .ansible/
+.ansible/facts/localhost
 *.retry
 
 # Ansible cache and temporary files

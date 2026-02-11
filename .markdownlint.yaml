@@ -1,0 +1,16 @@
+line-length:
+  line_length: 120
+  code_blocks: false
+  code_lines: false
+  tables: false
+  headers: false
+ul-style:
+  style: asterisk
+no-hard-tabs: false
+ul-indent:
+  indent: 2
+no-multiple-blanks:
+  maximum: 1
+no-trailing-punctuation: false
+fenced-code-language: false
+first-line-heading: false

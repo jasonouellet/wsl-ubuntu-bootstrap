@@ -1,0 +1,26 @@
+---
+# Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
+
+- name: Install .NET SDK
+  ansible.builtin.apt:
+    name: "{{ dotnet_packages }}"
+    state: present
+    update_cache: yes
+  tags:
+    - dotnet
+    - packages
+
+- name: Verify .NET installation
+  ansible.builtin.command: dotnet --version
+  register: dotnet_version
+  changed_when: false
+  tags:
+    - dotnet
+    - test
+
+- name: Display .NET version
+  ansible.builtin.debug:
+    msg: "dotnet SDK version: {{ dotnet_version.stdout }}"
+  tags:
+    - dotnet
+    - test

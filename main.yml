@@ -1,0 +1,113 @@
+---
+# =========================================
+# WSL Bootstrap - Main Playbook
+# =========================================
+# This playbook sets up a complete WSL
+# environment with all necessary tools
+# including:
+# - Base system packages
+# - Python & pip packages
+# - Container tools (OCI)
+# - Security scanning (Trivy, Syft, detect-secrets)
+# - Terraform & Hashicorp tools
+# - .NET SDK
+# - Node.js
+# - Azure CLI
+# - SSL/TLS configuration
+#
+# Usage:
+#   ansible-playbook main.yml
+#   ansible-playbook main.yml --tags nodejs
+#   ansible-playbook main.yml --check
+
+- name: WSL Bootstrap Playbook
+  hosts: localhost
+  connection: local
+  become: yes
+  gather_facts: yes
+
+  pre_tasks:
+    - name: Display playbook information
+      ansible.builtin.debug:
+        msg:
+          - "WSL Bootstrapping Playbook"
+          - "======================="
+          - "Target: {{ inventory_hostname }}"
+          - "OS: {{ ansible_facts[\"os_family\"] }}"
+          - "Distro: {{ ansible_facts[\"lsb\"][\"description\"] | default('Unknown') }}"
+      tags:
+        - always
+
+  roles:
+    # Base system setup (always required - other roles depend on this)
+    - name: common
+      tags: common
+
+    # SSL/TLS configuration
+    - name: ssl-config
+      tags: ssl-config
+      when: enable_ssl_config
+
+    # Programming languages & runtimes
+    - name: python
+      tags: python
+      when: enable_python
+
+    - name: nodejs
+      tags: nodejs
+      when: enable_nodejs
+
+    - name: dotnet
+      tags: dotnet
+      when: enable_dotnet
+
+    # Infrastructure as Code & DevOps tools
+    - name: terraform
+      tags: terraform
+      when: enable_terraform
+
+    - name: azure-cli
+      tags: azure-cli
+      when: enable_azure_cli
+
+    - name: github-cli
+      tags: github-cli
+      when: enable_github_cli
+
+    # Container tools
+    - name: containers
+      tags: containers
+      when: enable_containers
+
+    # Security scanning tools
+    - name: security
+      tags: security
+      when: security_enable
+
+    # System maintenance
+    - name: maintenance
+      tags: maintenance
+      when: enable_maintenance
+
+  post_tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg:
+          - "==========================================="
+          - "WSL Bootstrapping Completed Successfully!"
+          - "==========================================="
+      tags:
+        - always
+
+    - name: Suggest next steps
+      ansible.builtin.debug:
+        msg:
+          - ""
+          - "Next steps:"
+          - "1. Configure git: git config --global user.email 'you@example.com'"
+          - "2. Authenticate with Azure: az login"
+          - "3. Authenticate with GitHub: gh auth login"
+          - ""
+          - "Note: Terraform version and Azure CLI version were already verified above."
+      tags:
+        - always
