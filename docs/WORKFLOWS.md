@@ -6,8 +6,7 @@ Cette documentation explique les workflows GitHub Actions du projet wsl-ubuntu-b
 
 ```
 .github/workflows/
-├── ci.yml                 # Pipeline de validation (commit)
-├── codeql.yml             # CodeQL security analysis
+├── ci.yml                 # Pipeline de validation (commit) + CodeQL
 ├── release-please.yml     # Détection des changements sémantiques
 └── release.yml            # Création des releases
 ```
@@ -144,9 +143,11 @@ Cette documentation explique les workflows GitHub Actions du projet wsl-ubuntu-b
 
 **Total** : ~5-6 minutes
 
-## 2. CodeQL Workflow (codeql.yml)
+## 2. CodeQL Security Analysis (intégré dans ci.yml)
 
-**Trigger** : À chaque push sur main, PR, schedule hebdomadaire (lundi 6h30 UTC), ou déclenchement manuel
+**Job** : `codeql-analysis` (s'exécute en parallèle avec `lint-and-validate`)
+
+**Trigger** : Identique au workflow CI - à chaque push sur main, PR, ou déclenchement manuel
 
 ### Objectif
 
@@ -179,9 +180,10 @@ Analyse statique de sécurité du code source avec CodeQL (GitHub Advanced Secur
 
 | Paramètre | Valeur | Description |
 | --- | --- | --- |
-| `languages` | `python`, `javascript-typescript` | Langages à analyser |
+| `languages` | `python`, `javascript-typescript` | Langages à analyser via matrix strategy |
 | `queries` | `security-and-quality` | Pack de requêtes (sécurité + qualité) |
 | `timeout-minutes` | `360` | Timeout de 6 heures maximum |
+| `fail-fast` | `false` | Continue l'analyse même si un langage échoue |
 
 ### Résultats
 
@@ -189,16 +191,18 @@ Analyse statique de sécurité du code source avec CodeQL (GitHub Advanced Secur
 * **PR Checks** : Bloque le merge si vulnérabilités critiques détectées
 * **Historique** : Suivi des alertes dans le temps
 
-### Schedule
+### Exécution parallèle
 
-* **Hebdomadaire** : Lundi 6h30 UTC
-* **À chaque PR** : Analyse incrémentale
-* **À chaque push sur main** : Analyse complète
+Le job CodeQL s'exécute **en parallèle** avec le job `lint-and-validate`, ce qui permet :
+* Gain de temps (pas d'attente séquentielle)
+* Résultats de sécurité disponibles rapidement
+* Isolation des échecs (un job peut réussir pendant que l'autre échoue)
 
 ### Durée typique
 
-* **Analyse initiale** : 3-5 minutes
-* **Analyse incrémentale (PR)** : 2-3 minutes
+* **Analyse Python** : 2-3 minutes
+* **Analyse JavaScript/TypeScript** : 2-3 minutes
+* **Total (parallèle)** : ~3 minutes maximum
 
 ## 3. Release Please Workflow (release-please.yml)
 

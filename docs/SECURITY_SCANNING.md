@@ -12,7 +12,7 @@ Ce projet utilise plusieurs outils pour assurer la qualité et la sécurité du 
   * Code quality issues
 * 🎯 **Langages** : Python, JavaScript/TypeScript
 * 📊 **Résultats** : GitHub Security → Code scanning alerts
-* ⏱️ **Exécution** : À chaque PR, push sur main, et hebdomadaire (lundi)
+* ⏱️ **Exécution** : À chaque PR et push sur main (intégré dans workflow CI)
 * 🔐 **Query Pack** : `security-and-quality` (GitHub Advanced Security)
 
 ### 2. **Trivy** (Filesystem Scanner)
@@ -68,7 +68,9 @@ Ce projet utilise plusieurs outils pour assurer la qualité et la sécurité du 
 
 ### Exécution (GitHub Actions)
 
-Le workflow `ci.yml` exécute tous les outils dans cet ordre :
+Le workflow `ci.yml` contient deux jobs qui s'exécutent **en parallèle** :
+
+**Job 1 : lint-and-validate**
 
 1. ✅ Pre-commit hooks (yamllint, shellcheck, markdownlint, detect-secrets)
 2. ✅ Ansible-lint
@@ -79,10 +81,11 @@ Le workflow `ci.yml` exécute tous les outils dans cet ordre :
 7. 🔍 Trivy scan (vulnerabilities + secrets)
 8. 📦 SBOM generation
 
-Le workflow `codeql.yml` exécute en parallèle :
+**Job 2 : codeql-analysis**
 
-1. 🔬 CodeQL analysis (Python + JavaScript/TypeScript)
-2. 📊 Upload vers GitHub Security → Code scanning
+1. 🔬 CodeQL analysis (Python)
+2. 🔬 CodeQL analysis (JavaScript/TypeScript)
+3. 📊 Upload vers GitHub Security → Code scanning
 
 ### Résultats
 
