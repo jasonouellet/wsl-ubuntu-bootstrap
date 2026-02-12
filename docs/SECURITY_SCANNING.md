@@ -32,24 +32,31 @@ Ce projet utilise plusieurs outils pour assurer la qualité et la sécurité du 
 * 🔬 **Analyse** : Qualité de code, code smells, duplications
 * ⚡ **Couverture** : Ansible, Shell, YAML, Python, Markdown
 * 📊 **Dashboard** : <https://sonarcloud.io/project/overview?id=jasonouellet_wsl-ubuntu-bootstrap>
+* 🧩 **Imports** : SARIF via `sonar.sarifReportPaths` (répertoire `ci-results`)
 
-### 5. **Ansible-lint**
+### 5. **CodeQL**
+
+* 🧭 **Analyse** : Moteur de sécurité GitHub
+* 📄 **Sortie** : SARIF
+* 📊 **Résultats** : GitHub Security → Code Scanning
+
+### 6. **Ansible-lint**
 
 * ✅ **Valide** : Syntax Ansible, best practices
 * ⚙️ **Config** : `.ansible-lint`
 * 🏷️ **Profil** : production (strict)
 
-### 6. **Yamllint**
+### 7. **Yamllint**
 
 * 💯 **Format** : 120 chars max, indentation, etc.
 * ⚙️ **Config** : `.yamllint`
 
-### 7. **Shellcheck**
+### 8. **Shellcheck**
 
 * 🐚 **Scripts** : Détecte les bugs shell courants
 * 📊 **Sévérité** : Warning et au-dessus
 
-### 8. **Markdownlint**
+### 9. **Markdownlint**
 
 * 📝 **Markup** : Markdown bien formé
 
@@ -64,14 +71,16 @@ Le workflow `ci.yml` exécute tous les outils dans cet ordre :
 3. ✅ Playbook syntax check
 4. ✅ Playbook dry-run
 5. ✅ Sonar version validation
-6. ✅ SonarCloud scan
-7. 🔍 Trivy scan (vulnerabilities + secrets)
-8. 📦 SBOM generation
+6. ✅ CodeQL scan (SARIF)
+7. ✅ SonarCloud scan
+8. 🔍 Trivy scan (vulnerabilities + secrets)
+9. 📦 SBOM generation
 
 ### Résultats
 
 | Outil | Emplacement |
 | --- | --- |
+| CodeQL | Security → Code Scanning |
 | Trivy | Security → Code Scanning |
 | SBOM | Artifacts (30 jours) |
 | SonarCloud | [View on SonarCloud](https://sonarcloud.io/project/jasonouellet_wsl-ubuntu-bootstrap) |
