@@ -90,7 +90,15 @@ Cette documentation explique les trois workflows GitHub Actions du projet wsl-ub
 
    Organisation : `jasonouellet`
 
-7. **Trivy Security Scan** 🔍
+7. **CodeQL Scan** 🧭
+
+   Analyse CodeQL et export SARIF
+
+   Résultats :
+   * Upload vers GitHub Code Scanning
+   * Import SARIF dans SonarCloud (external issues)
+
+8. **Trivy Security Scan** 🔍
 
    Scanne les vulnérabilités et les secrets
 
@@ -104,7 +112,7 @@ Cette documentation explique les trois workflows GitHub Actions du projet wsl-ub
    * Rapport SARIF (GitHub Security tab)
    * Sortie brute (logs)
 
-8. **SBOM Generation** 📋
+9. **SBOM Generation** 📋
 
    Génère un Bill of Materials (SBOM) avec Syft
 
@@ -117,7 +125,7 @@ Cette documentation explique les trois workflows GitHub Actions du projet wsl-ub
    * Stocké pendant 30 jours
    * Accessible dans Actions > Summary
 
-9. **Upload Artifacts**
+10. **Upload Artifacts**
 
    Stocke les SBOM pour inspection
 
@@ -137,6 +145,7 @@ Cette documentation explique les trois workflows GitHub Actions du projet wsl-ub
 * **Pre-commit checks** : 30-60 sec
 * **Ansible lint** : 10 sec
 * **Ansible check** : 1-2 min
+* **CodeQL scan** : 1-3 min
 * **SonarCloud scan** : 1-2 min
 * **Trivy scan** : 30 sec
 * **SBOM generation** : 15 sec
