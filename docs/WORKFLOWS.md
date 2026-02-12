@@ -129,9 +129,7 @@ Cette documentation explique les trois workflows GitHub Actions du projet wsl-ub
 
    Stocke les SBOM pour inspection
 
-   Artefacts disponibles :
-   * `sbom-cyclonedx.json` - Format CycloneDX
-   * `sbom-spdx-json.json` - Format SPDX
+   Artefacts disponibles : `sbom-cyclonedx.json` (Format CycloneDX), `sbom-spdx-json.json` (Format SPDX)
 
 ### Secrets requis
 
