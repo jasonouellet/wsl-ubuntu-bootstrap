@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
     types: [opened, synchronize, reopened]
   workflow_dispatch:
 
@@ -11,6 +12,9 @@ jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
     name: Linting and Pre-commit
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout repository
@@ -73,8 +77,30 @@ jobs:
           chmod +x .github/scripts/validate-sonar-version.sh
           .github/scripts/validate-sonar-version.sh
 
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: actions
+          build-mode: none
+
+      - name: Analyze with CodeQL
+        uses: github/codeql-action/analyze@v3
+        with:
+          output: ci-results
+          upload: false
+
+      - name: Upload CodeQL SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && hashFiles('ci-results/codeql.sarif') != ''
+        with:
+          sarif_file: 'ci-results/codeql.sarif'
+          category: 'codeql'
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.sarifReportPaths=ci-results
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -84,15 +110,15 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'sarif'
-          output: 'trivy-results.sarif'
+          output: 'ci-results/trivy.sarif'
           scanners: 'vuln,secret,config'
-          exclude-dirs: '.git,.github,node_modules,.ansible'
+          skip-dirs: '.git,.github,node_modules,.ansible'
 
       - name: Upload Trivy SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() && hashFiles('ci-results/trivy.sarif') != ''
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: 'ci-results/trivy.sarif'
           category: 'trivy'
 
       - name: Generate SBOM with syft
