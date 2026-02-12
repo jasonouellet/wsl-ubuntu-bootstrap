@@ -1,12 +1,13 @@
 # GitHub Actions Workflows
 
-Cette documentation explique les trois workflows GitHub Actions du projet wsl-ubuntu-bootstrap.
+Cette documentation explique les workflows GitHub Actions du projet wsl-ubuntu-bootstrap.
 
 ## Structure générale
 
 ```
 .github/workflows/
 ├── ci.yml                 # Pipeline de validation (commit)
+├── codeql.yml             # CodeQL security analysis
 ├── release-please.yml     # Détection des changements sémantiques
 └── release.yml            # Création des releases
 ```
@@ -143,7 +144,63 @@ Cette documentation explique les trois workflows GitHub Actions du projet wsl-ub
 
 **Total** : ~5-6 minutes
 
-## 2. Release Please Workflow (release-please.yml)
+## 2. CodeQL Workflow (codeql.yml)
+
+**Trigger** : À chaque push sur main, PR, schedule hebdomadaire (lundi 6h30 UTC), ou déclenchement manuel
+
+### Objectif
+
+Analyse statique de sécurité du code source avec CodeQL (GitHub Advanced Security)
+
+### Langages analysés
+
+* **Python** : Scripts et configurations Python
+* **JavaScript/TypeScript** : Outils Node.js et dépendances
+
+### Processus
+
+1. **Initialisation CodeQL**
+
+   Configure l'analyse avec query pack `security-and-quality`
+
+2. **Autobuild**
+
+   Détecte et construit automatiquement le code (non requis pour langages interprétés)
+
+3. **Analyse**
+
+   Exécute les requêtes de sécurité et qualité CodeQL
+
+4. **Upload des résultats**
+
+   Envoie les résultats SARIF vers GitHub Security → Code Scanning
+
+### Configuration
+
+| Paramètre | Valeur | Description |
+| --- | --- | --- |
+| `languages` | `python`, `javascript-typescript` | Langages à analyser |
+| `queries` | `security-and-quality` | Pack de requêtes (sécurité + qualité) |
+| `timeout-minutes` | `360` | Timeout de 6 heures maximum |
+
+### Résultats
+
+* **Onglet Security** → Code scanning alerts
+* **PR Checks** : Bloque le merge si vulnérabilités critiques détectées
+* **Historique** : Suivi des alertes dans le temps
+
+### Schedule
+
+* **Hebdomadaire** : Lundi 6h30 UTC
+* **À chaque PR** : Analyse incrémentale
+* **À chaque push sur main** : Analyse complète
+
+### Durée typique
+
+* **Analyse initiale** : 3-5 minutes
+* **Analyse incrémentale (PR)** : 2-3 minutes
+
+## 3. Release Please Workflow (release-please.yml)
 
 **Trigger** : À chaque push sur main (si changements détectés)
 
@@ -205,7 +262,7 @@ PR générée automatiquement :
 - fix: Terraform APT cache issue (#43)
 ```
 
-## 3. Release Workflow (release.yml)
+## 4. Release Workflow (release.yml)
 
 **Trigger** : Création d'une release (tag avec format `v*`)
 
