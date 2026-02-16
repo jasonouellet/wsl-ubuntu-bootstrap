@@ -106,37 +106,59 @@
     - packages
 
 # Note: detect-secrets installation
-# The python role dependency ensures pipx is available
-# We install detect-secrets here to ensure it's available when using --tags security
-- name: Get real user information
-  ansible.builtin.shell: |
-    echo "$(logname 2>/dev/null || echo $SUDO_USER)"
-  register: security_real_user
-  changed_when: false
+# Debian 13 (PEP 668) enforces virtual environments for Python packages
+# Use pipx to install in isolated environments
+
+- name: Get current user for detect-secrets installation
+  ansible.builtin.set_fact:
+    security_current_user: "{{ ansible_user_id }}"
   tags:
     - security
     - packages
 
-- name: Ensure detect-secrets is installed for current user
-  ansible.builtin.shell: |
-    export PATH="$PATH:$HOME/.local/bin"
-    pipx install detect-secrets 2>&1 || pipx upgrade detect-secrets 2>&1
+- name: Ensure detect-secrets is installed for current user via pipx
+  ansible.builtin.command:
+    cmd: pipx install detect-secrets
   become: true
-  become_user: "{{ security_real_user.stdout }}"
-  register: security_detect_secrets_install
-  changed_when: "'installed' in security_detect_secrets_install.stdout"
+  become_user: "{{ security_current_user }}"
+  register: security_detect_secrets_current_install
+  changed_when: "'installed' in security_detect_secrets_current_install.stdout"
   failed_when: >
-    security_detect_secrets_install.rc != 0 and
-    'already installed' not in security_detect_secrets_install.stdout
+    security_detect_secrets_current_install.rc != 0 and
+    'already installed' not in security_detect_secrets_current_install.stderr
+  when: not ansible_check_mode
+  tags:
+    - security
+    - packages
+
+- name: Ensure detect-secrets is installed for root user via pipx
+  ansible.builtin.command:
+    cmd: pipx install detect-secrets
+  register: security_detect_secrets_root_install
+  changed_when: "'installed' in security_detect_secrets_root_install.stdout"
+  failed_when: >
+    security_detect_secrets_root_install.rc != 0 and
+    'already installed' not in security_detect_secrets_root_install.stderr
+  when: not ansible_check_mode
+  tags:
+    - security
+    - packages
+
+- name: Create symlink for detect-secrets in global bin
+  ansible.builtin.file:
+    src: /root/.local/bin/detect-secrets
+    dest: /usr/local/bin/detect-secrets
+    state: link
+    force: yes
   when: not ansible_check_mode
   tags:
     - security
     - packages
 
 - name: Ensure pipx path is configured for current user
-  ansible.builtin.command: pipx ensurepath --force
+  ansible.builtin.command: pipx ensurepath
   become: true
-  become_user: "{{ security_real_user.stdout }}"
+  become_user: "{{ security_current_user }}"
   changed_when: false
   failed_when: false
   tags:
@@ -166,8 +188,8 @@
       ansible.builtin.command: detect-secrets --version
       register: security_detect_secrets_version
       changed_when: false
-      environment:
-        PATH: "{{ ansible_facts['env']['PATH'] }}:/root/.local/bin:{{ ansible_facts['env']['HOME'] }}/.local/bin"
+      become: true
+      become_user: "{{ security_current_user }}"
       tags:
         - security
         - test
