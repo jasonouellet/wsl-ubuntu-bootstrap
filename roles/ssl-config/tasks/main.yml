@@ -5,6 +5,7 @@
   tags:
     - ssl-config
     - certificates
+    - ssl-verify
 
 - name: Display certificate info
   ansible.builtin.debug:
@@ -117,3 +118,49 @@
   tags:
     - ssl-config
     - test
+
+# Verify that the certificate actually works with HTTPS connections
+- name: Test HTTPS connectivity with curl
+  ansible.builtin.command: >
+    curl -sI https://github.com
+  register: curl_https_test
+  changed_when: false
+  failed_when: curl_https_test.rc != 0
+  when: 
+    - ca_cert_provided is defined
+    - ca_cert_provided | bool
+  tags:
+    - ssl-config
+    - test
+    - ssl-verify
+
+- name: Test HTTPS connectivity with Python
+  ansible.builtin.command: >
+    python3 -c "import urllib.request; urllib.request.urlopen('https://github.com').read(1)"
+  register: python_https_test
+  changed_when: false
+  failed_when: python_https_test.rc != 0
+  become: no
+  when:
+    - ca_cert_provided is defined
+    - ca_cert_provided | bool
+  tags:
+    - ssl-config
+    - test
+    - ssl-verify
+
+- name: Display HTTPS verification status
+  ansible.builtin.debug:
+    msg:
+      - "✓ curl HTTPS test: Success"
+      - "✓ Python HTTPS test: Success"
+      - "✓ CA certificate is working correctly"
+  when:
+    - ca_cert_provided is defined
+    - ca_cert_provided | bool
+    - curl_https_test.rc is defined and curl_https_test.rc == 0
+    - python_https_test.rc is defined and python_https_test.rc == 0
+  tags:
+    - ssl-config
+    - test
+    - ssl-verify
