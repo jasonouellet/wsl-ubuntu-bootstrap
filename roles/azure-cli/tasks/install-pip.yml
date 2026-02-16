@@ -1,0 +1,71 @@
+---
+# ==========================================
+# Azure CLI Installation for Debian 13 (Trixie)
+# ==========================================
+# Microsoft does not provide APT repository for Debian 13 yet
+# Using pip installation method as recommended by Microsoft
+# Reference: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?view=azure-cli-latest&pivots=pip
+
+- name: Display Debian 13 installation method
+  ansible.builtin.debug:
+    msg:
+      - "INFO: Azure CLI is not available via APT for Debian 13 Trixie"
+      - "Using pipx installation method instead (recommended by Microsoft for non-supported distributions)"
+      - "Reference: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?view=azure-cli-latest&pivots=pip"
+  tags:
+    - azure-cli
+    - packages
+
+- name: Install Azure CLI dependencies
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+      - pipx
+      - libffi-dev
+      - python3-dev
+      - build-essential
+    state: present
+    update_cache: yes
+  tags:
+    - azure-cli
+    - packages
+
+- name: Get current user for pipx installation
+  ansible.builtin.set_fact:
+    azure_cli_user: "{{ ansible_facts['env'].get('SUDO_USER') or ansible_facts['env'].get('USER', ansible_user_id) }}"
+  become: no
+  tags:
+    - azure-cli
+    - packages
+
+- name: Check if Azure CLI is already installed via pipx
+  ansible.builtin.command: pipx list
+  become: yes
+  become_user: "{{ azure_cli_user }}"
+  register: azure_cli_pipx_list
+  changed_when: false
+  failed_when: false
+  tags:
+    - azure-cli
+    - packages
+
+- name: Install Azure CLI via pipx for current user
+  ansible.builtin.command: pipx install azure-cli
+  become: yes
+  become_user: "{{ azure_cli_user }}"
+  when: "'azure-cli' not in azure_cli_pipx_list.stdout"
+  tags:
+    - azure-cli
+    - packages
+
+- name: Create symlink for az command in global bin
+  ansible.builtin.file:
+    src: "/home/{{ azure_cli_user }}/.local/bin/az"
+    dest: /usr/local/bin/az
+    state: link
+    force: yes
+  tags:
+    - azure-cli
+    - packages
