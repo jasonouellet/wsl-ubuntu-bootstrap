@@ -1,0 +1,75 @@
+---
+# ==========================================
+# .NET Installation for Debian 13 (Trixie)
+# ==========================================
+# Microsoft does not provide APT repository for Debian 13 yet
+# Using official installation script as recommended by Microsoft
+# Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install
+
+- name: Display Debian 13 installation method
+  ansible.builtin.debug:
+    msg:
+      - "INFO: .NET SDK is not available via APT for Debian 13 Trixie"
+      - "Using official installation script method instead"
+      - "Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install"
+  tags:
+    - dotnet
+    - packages
+
+- name: Install ICU library dependencies for .NET
+  ansible.builtin.apt:
+    name:
+      - libicu76
+      - libc6
+      - libgcc-s1
+      - libgssapi-krb5-2
+      - libssl3t64
+      - libstdc++6
+      - zlib1g
+    state: present
+    update_cache: yes
+  tags:
+    - dotnet
+    - packages
+
+- name: Download .NET installation script
+  ansible.builtin.get_url:
+    url: https://dot.net/v1/dotnet-install.sh
+    dest: /tmp/dotnet-install.sh
+    mode: '0755'
+    owner: root
+    group: root
+  tags:
+    - dotnet
+    - packages
+
+- name: Install .NET SDK 8.0 via script
+  ansible.builtin.shell: |
+    /tmp/dotnet-install.sh --channel 8.0 --install-dir /usr/local/dotnet --version latest
+  args:
+    creates: /usr/local/dotnet/sdk
+  tags:
+    - dotnet
+    - packages
+
+- name: Create symlink for dotnet binary
+  ansible.builtin.file:
+    src: /usr/local/dotnet/dotnet
+    dest: /usr/local/bin/dotnet
+    state: link
+    force: yes
+  tags:
+    - dotnet
+    - packages
+
+- name: Add dotnet to PATH for all users
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/dotnet.sh
+    line: 'export PATH="/usr/local/dotnet:$PATH"'
+    create: yes
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - dotnet
+    - packages

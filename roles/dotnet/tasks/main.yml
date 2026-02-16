@@ -1,19 +1,58 @@
 ---
-# Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
+# ==========================================
+# .NET SDK Installation - Main Orchestrator
+# ==========================================
+# This role installs .NET SDK 8.0 using different methods
+# depending on the Linux distribution:
+#
+# - Debian 13 (Trixie): Official Microsoft installation script
+# - Debian 12 (Bookworm) & Ubuntu: Microsoft APT repository
+#
+# Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-debian
 
-- name: Install .NET SDK
-  ansible.builtin.apt:
-    name: "{{ dotnet_packages }}"
-    state: present
-    update_cache: yes
+- name: Get distribution codename
+  ansible.builtin.command: lsb_release -cs
+  register: dotnet_distro_codename_result
+  changed_when: false
+  check_mode: false
+  tags:
+    - dotnet
+    - always
+
+- name: Detect distribution version
+  ansible.builtin.set_fact:
+    dotnet_is_debian_13: "{{ ansible_facts['distribution'] == 'Debian' and ansible_facts['lsb']['major_release'] == '13' }}"
+    dotnet_is_debian_12: "{{ ansible_facts['distribution'] == 'Debian' and ansible_facts['lsb']['major_release'] == '12' }}"
+  tags:
+    - dotnet
+    - always
+
+# ==========================================
+# Installation Methods by Distribution
+# ==========================================
+- name: Install .NET SDK for Debian 13 (script method)
+  ansible.builtin.include_tasks: install-debian-13.yml
+  when: dotnet_is_debian_13
   tags:
     - dotnet
     - packages
 
+- name: Install .NET SDK for Debian 12/Ubuntu (APT repository)
+  ansible.builtin.include_tasks: install-apt-repo.yml
+  when: not dotnet_is_debian_13
+  tags:
+    - dotnet
+    - packages
+
+# ==========================================
+# Verification (all distributions)
+# ==========================================
 - name: Verify .NET installation
   ansible.builtin.command: dotnet --version
   register: dotnet_version
   changed_when: false
+  environment:
+    PATH: "/usr/local/dotnet:/usr/local/bin:{{ ansible_env.PATH }}"
   tags:
     - dotnet
     - test
