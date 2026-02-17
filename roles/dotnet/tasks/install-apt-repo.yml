@@ -64,7 +64,7 @@
 
 - name: Add Microsoft .NET APT repository
   ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/{{ dotnet_repo_path }}/{{ ansible_facts['lsb']['major_release'] }}/prod {{ dotnet_distro_codename_result.stdout }} main"
+    repo: "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/{{ dotnet_repo_path }}/{{ ansible_facts['lsb']['release'] if ansible_facts['distribution'] == 'Ubuntu' else ansible_facts['lsb']['major_release'] }}/prod {{ dotnet_distro_codename_result.stdout }} main"
     filename: microsoft-dotnet-prod
     state: present
     update_cache: no
