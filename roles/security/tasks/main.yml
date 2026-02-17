@@ -111,7 +111,8 @@
 
 - name: Get current user for detect-secrets installation
   ansible.builtin.set_fact:
-    security_current_user: "{{ ansible_user_id }}"
+    security_current_user: "{{ ansible_env.SUDO_USER | default(ansible_user_id, true) }}"
+  become: false
   tags:
     - security
     - packages
