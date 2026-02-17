@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* **Debian 13 (Trixie) Support**: Full compatibility with Debian 13 including distribution-specific installation methods
+* **Modular Role Architecture**: Split `dotnet` and `azure-cli` roles into separate task files for better maintainability
+  * `main.yml`: Distribution detection and orchestration
+  * `install-<method>.yml`: Method-specific implementations
+
+### Changed
+
+* **.NET SDK Installation**: Dual installation paths based on distribution
+  * **Debian 13**: Microsoft installation script method with ICU library dependencies
+  * **Debian 12/Ubuntu**: APT repository method (existing)
+* **Azure CLI Installation**: Dual installation paths based on distribution
+  * **Debian 13**: Python pipx method (PEP 668 compliant)
+  * **Debian 12/Ubuntu**: APT repository method (existing)
+* **APT Keyrings**: Centralized `/etc/apt/keyrings/` directory creation in `common` role
+
+### Fixed
+
+* Corrected ICU library dependency for .NET on Debian 13 (`libicu76` instead of `libicu72`)
+* Fixed user detection in sudo context for pipx installations (`SUDO_USER` environment variable)
+* Resolved Microsoft package repository unavailability for Debian 13 with alternative methods
+
 ## [0.1.0] - 2026-01-30
 
 ### Initial Release
