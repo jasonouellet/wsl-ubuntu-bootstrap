@@ -4,8 +4,7 @@
 
 This is an **Ansible playbook** automating DevOps environment setup on
 WSL/Debian/Ubuntu systems. It orchestrates independent roles that install
-tools (Python, Node.js, .NET, Terraform, containers, Azure CLI, GitHub CLI,
-SSL/TLS, maintenance). The playbook is idempotent, follows Ansible best
+development environment tools. The playbook is idempotent, follows Ansible best
 practices, and supports selective execution via tags and role enablement.
 
 ## Architecture & Key Patterns
@@ -133,10 +132,14 @@ All roles follow this execution sequence:
 **Important Patterns**:
 
 * Use `update_cache: true` when adding repositories
+* Prefer specific modules (apt, pip) over shell commands for package management
+* Always ensure idempotency - tasks should not report "changed" if the desired state is already achieved
 * Use `changed_when: false` for verification/status checks
+* Minimise use of `ansible.builtin.shell` and `ansible.builtin.command` - prefer specific modules when possible
 * Use `args: creates: /path` to prevent re-running shell commands
 * Always tag verification tasks with `test` tag
 * Avoid deprecated `apt_key` module - use modern `signed-by=` method
+* Minimise privilege escalation only to tasks that require it
 
 ### 4. Tag System
 
@@ -431,6 +434,142 @@ sudo visudo -cf /etc/sudoers.d/$(whoami)  # Check validity
 sudo cat /etc/sudoers.d/$(whoami)        # View current config
 
 ```
+
+### Privilege Elevation with Become
+
+The playbook implements **granular privilege escalation**: tasks run as root ONLY
+when necessary, otherwise as the current user. This improves security and
+performance.
+
+**Global Configuration** (in [main.yml](main.yml)):
+
+```yaml
+- name: WSL Bootstrap Playbook
+  hosts: localhost
+  connection: local
+  become: yes                    # Run ALL tasks as root by default
+  gather_facts: yes
+
+```
+
+This sets the **default privilege level to root** for all subsequent tasks.
+Individual tasks override this as needed.
+
+**Three Privilege Patterns**:
+
+1. **Root Operations** (use inherited `become: yes` or explicit):
+   * Package installation: `ansible.builtin.apt`
+   * System configuration: `/etc/` files
+   * Global tool installation: `/usr/local/bin`, `/opt/`
+
+2. **User Operations** (use `become: false`):
+   * File existence checks: `ansible.builtin.stat`
+   * User configuration reads
+   * Current user environment checks
+
+3. **Specific User Operations** (use `become_user`):
+   * User tool configuration (pipx, npm)
+   * User-specific environment setup
+   * Running tools as a particular user
+
+**Practical Examples**:
+
+```yaml
+# ✅ CORRECT: Use default `become: yes` for root operations
+- name: Install system packages
+  ansible.builtin.apt:
+    name: python3
+    state: present
+  tags: [python, packages]
+  # Implicitly uses: become: yes
+
+# ✅ CORRECT: Disable elevation for read-only checks
+- name: Check if user config exists
+  ansible.builtin.stat:
+    path: "{{ ansible_user_home }}/.bashrc"
+  become: false                  # Don't need root for stat
+  register: bashrc_exists
+  tags: [python, setup]
+
+# ✅ CORRECT: Use become_user for user-specific actions
+- name: Install tool for current user via pipx
+  ansible.builtin.shell: |
+    pipx install "{{ tool_name }}" --force
+  become_user: "{{ ansible_user_id }}"  # Run as logged-in user, not root
+  tags: [python, packages]
+
+# ✅ CORRECT: Detect user in sudo context
+- name: Get actual user in sudo context
+  ansible.builtin.set_fact:
+    target_user: "{{ ansible_env.get('SUDO_USER') or ansible_user_id }}"
+  become: false
+  tags: [setup]
+
+# ✅ CORRECT: Use detected user for installations
+- name: Install per-user tool
+  ansible.builtin.shell: |
+    pipx install azure-cli
+  become_user: "{{ target_user }}"
+  tags: [azure-cli]
+```
+
+**With vs Without Become**:
+
+| Operation | Requires Root? | Ansible Setting | Example |
+|-----------|----------------|-----------------|---------|
+| Install APT package | ✅ Yes | (default) `become: yes` | `ansible.builtin.apt` |
+| Check file existence | ❌ No | `become: false` | `ansible.builtin.stat` |
+| Create `/etc/` config | ✅ Yes | (default) `become: yes` | `ansible.builtin.lineinfile` on `/etc/*` |
+| Read user config | ❌ No | `become: false` | `ansible.builtin.stat` on `~/.bashrc` |
+| Configure user tool | ⚠️ User | `become_user: "{{ user }}"` | pipx, npm for specific user |
+| Verify installation | ❌ No | `become: false` | `ansible.builtin.command` for version check |
+
+**Critical Pattern - User Context in Sudo**:
+
+When running with `ansible-playbook main.yml -K`, Ansible runs as root via sudo,
+but we need to preserve the **original user identity** for user-specific operations:
+
+```yaml
+# ❌ WRONG: This installs for root user (not desired)
+- name: WRONG - Install tool (uses root context)
+  ansible.builtin.shell: |
+    pipx install cli-tool --force
+  tags: [python]
+
+# ✅ CORRECT: This installs for the actual user
+- name: CORRECT - Install tool (preserves user context)
+  ansible.builtin.shell: |
+    pipx install cli-tool --force
+  become_user: "{{ ansible_env.get('SUDO_USER') or ansible_user_id }}"
+  environment:
+    HOME: /home/{{ ansible_env.get('SUDO_USER') or ansible_user_id }}
+  tags: [python]
+```
+
+**Verification** - Check what user runs tasks:
+
+```bash
+# Add task to display running user
+- name: Display currently running as
+  ansible.builtin.command: whoami
+  register: current_user
+  changed_when: false
+  tags: [test]
+
+- name: Show running user
+  ansible.builtin.debug:
+    msg: "Task running as: {{ current_user.stdout }}"
+  tags: [test]
+```
+
+**Key Takeaways**:
+
+* ✅ Default `become: yes` at playbook level (all tasks run as root initially)
+* ✅ Use `become: false` for non-privileged operations (saves overhead)
+* ✅ Use `become_user: "{{ user }}"` for user-specific configuration
+* ✅ Preserve user identity with `{{ ansible_env.get('SUDO_USER') }}` in sudo context
+* ✅ Always set `HOME` environment variable when using `become_user`
+* ❌ Never run user tools (pipx, npm) as root unless explicitly necessary
 
 ### Distribution Compatibility
 
@@ -1033,7 +1172,7 @@ All tasks must be idempotent (safe to run multiple times):
   ansible.builtin.<module>:
     [module-specific parameters]
   [when: condition]                  # Optional: conditional execution
-  [become: yes/no]                   # Optional: privilege elevation
+  [become: yes/no]                   # Optional: privilege elevation (see "Privilege Elevation" section)
   changed_when: [condition]          # For read-only operations: false
   failed_when: [condition]           # Optional: custom failure detection
   register: [variable_name]          # Optional: capture output
@@ -1042,6 +1181,7 @@ All tasks must be idempotent (safe to run multiple times):
     - secondary-tag
   [loop: "{{ list }}"]              # Optional: iterate
   [environment: ...]                 # Optional: set env vars
+  [become_user: user]               # Optional: run as specific user (see "Privilege Elevation" section)
 
 ```
 

@@ -1,0 +1,89 @@
+---
+# ==========================================
+# Azure CLI Installation for Debian 12 & Ubuntu
+# ==========================================
+# Uses official Microsoft APT repository
+# Reference: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?view=azure-cli-latest&pivots=apt
+
+- name: Add Microsoft GPG key for Azure CLI
+  ansible.builtin.get_url:
+    url: "{{ azure_cli_apt_key }}"
+    dest: /tmp/microsoft-azure-cli.asc
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Convert and install Microsoft GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /tmp/microsoft-azure-cli.asc > /etc/apt/keyrings/microsoft-azure-cli.gpg
+  args:
+    creates: /etc/apt/keyrings/microsoft-azure-cli.gpg
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Verify Microsoft GPG key file exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/microsoft-azure-cli.gpg
+  register: azure_cli_gpg_file_stat
+  when: not ansible_check_mode
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Fail if Microsoft GPG key file is missing
+  ansible.builtin.fail:
+    msg: "Microsoft GPG key file not found at /etc/apt/keyrings/microsoft-azure-cli.gpg"
+  when:
+    - not ansible_check_mode
+    - not azure_cli_gpg_file_stat.stat.exists
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Set Microsoft GPG key permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/microsoft-azure-cli.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - not ansible_check_mode
+    - azure_cli_gpg_file_stat.stat.exists
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Add Azure CLI APT repository
+  ansible.builtin.apt_repository:
+    repo: >
+      deb [signed-by=/etc/apt/keyrings/microsoft-azure-cli.gpg]
+      {{ azure_cli_apt_repo_base }} {{ azure_cli_distro_codename_result.stdout }} main
+    filename: azure-cli
+    state: present
+    update_cache: no
+  tags:
+    - azure-cli
+    - packages
+    - repository
+
+- name: Update APT cache after adding Azure CLI repository
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 0
+  tags:
+    - azure-cli
+    - packages
+    - repository
+
+- name: Install Azure CLI via APT
+  ansible.builtin.apt:
+    name: azure-cli
+    state: present
+    update_cache: yes
+  tags:
+    - azure-cli
+    - packages

@@ -38,6 +38,30 @@
       tags:
         - always
 
+    # ==========================================
+    # SSL Certificate Pre-requisites
+    # ==========================================
+    - name: Check if CA certificate file exists
+      ansible.builtin.stat:
+        path: "{{ ssl_ca_cert_name }}"
+      register: playbook_ssl_cert_file
+      become: no
+      when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+      tags:
+        - always
+        - ssl-config
+
+    - name: Display CA certificate setup information
+      ansible.builtin.debug:
+        msg:
+          - "CA Certificate Setup:"
+          - "  Configured: {{ ssl_ca_cert_name if ssl_ca_cert_name else 'Not configured' }}"
+          - "  File exists: {{ playbook_ssl_cert_file.stat.exists | default(false) }}"
+      when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+      tags:
+        - always
+        - ssl-config
+
   roles:
     # Base system setup (always required - other roles depend on this)
     - name: common

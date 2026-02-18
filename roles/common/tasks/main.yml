@@ -92,3 +92,14 @@
   tags:
     - common
     - test
+
+- name: Create APT keyrings directory for GPG keys
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - common
+    - gpg

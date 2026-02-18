@@ -17,10 +17,10 @@ distro_codename: "{{ ansible_facts[\"lsb\"][\"codename\"] | default('focal') }}"
 # =========================================
 # Common / Base System Packages
 # =========================================
-common_packages_linux:
+# Base packages for all distributions
+common_packages_linux_base:
   # System & Repository Management
   - lsb-release                    # Linux Standard Base and distribution information
-  - software-properties-common     # Manage software repositories and PPAs
   - apt-transport-https            # HTTPS support for APT package manager
   - ca-certificates                # SSL/TLS certificate authorities
   # Development Tools
@@ -39,6 +39,13 @@ common_packages_linux:
   - pipx                           # Install Python CLI applications in isolation
   # Linting & Validation Tools
   - shellcheck                     # Shell script static analysis and linting
+
+# Ubuntu-specific packages
+common_packages_linux_ubuntu:
+  - software-properties-common     # Manage software repositories and PPAs (Ubuntu only)
+
+# Combined list for all systems (handled conditionally in tasks)
+common_packages_linux: "{{ common_packages_linux_base + (common_packages_linux_ubuntu if ansible_facts['distribution'] == 'Ubuntu' else []) }}"
 
 # =========================================
 # Python Configuration

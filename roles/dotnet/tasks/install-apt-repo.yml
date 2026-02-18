@@ -1,0 +1,90 @@
+---
+# ==========================================
+# .NET Installation for Debian 12 & Ubuntu
+# ==========================================
+# Uses official Microsoft APT repository
+# Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-debian
+
+- name: Add Microsoft GPG key for .NET
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /tmp/microsoft-dotnet-prod.asc
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - dotnet
+    - gpg
+
+- name: Convert and install Microsoft GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /tmp/microsoft-dotnet-prod.asc > /etc/apt/keyrings/microsoft-archive-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/microsoft-archive-keyring.gpg
+  register: dotnet_gpg_dearmor_result
+  tags:
+    - dotnet
+    - gpg
+
+- name: Verify Microsoft GPG key file exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/microsoft-archive-keyring.gpg
+  register: dotnet_gpg_file_stat
+  when: not ansible_check_mode
+  tags:
+    - dotnet
+    - gpg
+
+- name: Fail if GPG key file is missing
+  ansible.builtin.fail:
+    msg: "Microsoft GPG key file not found at /etc/apt/keyrings/microsoft-archive-keyring.gpg"
+  when:
+    - not ansible_check_mode
+    - not dotnet_gpg_file_stat.stat.exists
+  tags:
+    - dotnet
+    - gpg
+
+- name: Set Microsoft GPG key permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/microsoft-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - dotnet
+    - gpg
+
+- name: Set Microsoft repository path based on distribution
+  ansible.builtin.set_fact:
+    dotnet_repo_path: "{{ 'ubuntu' if ansible_facts['distribution'] == 'Ubuntu' else 'debian' }}"
+  tags:
+    - dotnet
+    - packages
+
+- name: Add Microsoft .NET APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/{{ dotnet_repo_path }}/{{ ansible_facts['lsb']['release'] if ansible_facts['distribution'] == 'Ubuntu' else ansible_facts['lsb']['major_release'] }}/prod {{ dotnet_distro_codename_result.stdout }} main"
+    filename: microsoft-dotnet-prod
+    state: present
+    update_cache: no
+  tags:
+    - dotnet
+    - packages
+
+- name: Update APT cache after adding .NET repository
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 0
+  tags:
+    - dotnet
+    - packages
+
+- name: Install .NET SDK via APT
+  ansible.builtin.apt:
+    name: "{{ dotnet_packages }}"
+    state: present
+    update_cache: yes
+  tags:
+    - dotnet
+    - packages

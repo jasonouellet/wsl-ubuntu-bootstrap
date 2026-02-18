@@ -56,8 +56,8 @@ When asking for help, please provide:
 
 **Environment:**
 
-* OS: Ubuntu 24.04 LTS
-* Ansible version: 2.16.3
+* OS: Ubuntu 24.04 LTS, Debian 13 (Trixie), or compatible Debian-based distribution
+* Ansible version: 2.16.3 or higher
 * WSL version: WSL2 (if applicable)
 
 **Problem:**

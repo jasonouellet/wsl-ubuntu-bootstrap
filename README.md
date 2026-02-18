@@ -2,12 +2,28 @@
 
 Ansible playbook to automate the complete configuration of a development
 environment on WSL (Windows Subsystem for Linux) or any Debian/Ubuntu
-distribution.
+distributions.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ansible](https://img.shields.io/badge/Ansible-2.16%2B-red.svg)](https://www.ansible.com/)
+[![Release](https://img.shields.io/github/v/release/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/releases)
+
+![Debian](https://img.shields.io/badge/Debian-11%2B-red?logo=debian&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%2B-E95420?logo=ubuntu&logoColor=white)
+![WSL2](https://img.shields.io/badge/WSL-2-blue?logo=windows&logoColor=white)
+
 [![CI - Validate & Lint](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/ci.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/ci.yml)
 [![Release](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release.yml)
+[![Release Please](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release-please.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release-please.yml)
+[![GitHub issues](https://img.shields.io/github/issues/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/pulls)
+
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
 
 ## 📚 Documentation
 
@@ -21,8 +37,8 @@ distribution.
   * [GitHub Actions Workflows](docs/WORKFLOWS.md) - CI/CD pipeline, automatic versioning, and release process
   * [Security Hardening & Enhancements](docs/HARDENING.md) - Optional security
     hardening and tooling improvements
-  * [Security Scanning](docs/SECURITY_SCANNING.md) - Vulnerability, secret, and code quality scanning tools (Trivy,
-    SonarCloud, detect-secrets)
+  * [Security Scanning](docs/SECURITY_SCANNING.md) - Vulnerability, secret, and code quality scanning tools
+  * [AI Agent Instructions](.github/copilot-instructions.md) - Comprehensive guidelines for code generation and maintenance (GitHub Copilot)
 
 ## 🎯 Objective
 
