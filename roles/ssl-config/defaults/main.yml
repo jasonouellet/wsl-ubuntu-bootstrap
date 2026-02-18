@@ -1,0 +1,4 @@
+---
+# SSL Config Role - Defaults
+ssl_test_connectivity: yes  # Permet d'activer/désactiver les tests HTTPS
+ssl_test_url: "https://github.com"  # URL à tester pour la connectivité HTTPS

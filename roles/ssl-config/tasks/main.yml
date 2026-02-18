@@ -122,13 +122,14 @@
 # Verify that the certificate actually works with HTTPS connections
 - name: Test HTTPS connectivity with curl
   ansible.builtin.command: >
-    curl -sI https://github.com
+    curl -sI {{ ssl_test_url }}
   register: curl_https_test
   changed_when: false
   failed_when: curl_https_test.rc != 0
   when: 
     - ca_cert_provided is defined
     - ca_cert_provided | bool
+    - ssl_test_connectivity | bool
   tags:
     - ssl-config
     - test
@@ -136,7 +137,7 @@
 
 - name: Test HTTPS connectivity with Python
   ansible.builtin.command: >
-    python3 -c "import urllib.request; urllib.request.urlopen('https://github.com').read(1)"
+    python3 -c "import urllib.request; urllib.request.urlopen('{{ ssl_test_url }}').read(1)"
   register: python_https_test
   changed_when: false
   failed_when: python_https_test.rc != 0
@@ -144,6 +145,7 @@
   when:
     - ca_cert_provided is defined
     - ca_cert_provided | bool
+    - ssl_test_connectivity | bool
   tags:
     - ssl-config
     - test
