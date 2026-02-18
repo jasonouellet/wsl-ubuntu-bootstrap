@@ -40,29 +40,37 @@
     - azure-cli
     - packages
 
-- name: Check if Azure CLI is already installed via pipx
-  ansible.builtin.command: pipx list
-  become: yes
-  become_user: "{{ azure_cli_user }}"
-  register: azure_cli_pipx_list
+- name: Get home directory for azure_cli_user
+  ansible.builtin.command: |
+    getent passwd {{ azure_cli_user }} | cut -d: -f6
+  register: azure_cli_user_home
   changed_when: false
-  failed_when: false
+  become: false
   tags:
     - azure-cli
     - packages
 
-- name: Install Azure CLI via pipx for current user
+- name: Ensure Azure CLI is installed via pipx for current user
   ansible.builtin.command: pipx install azure-cli
   become: yes
   become_user: "{{ azure_cli_user }}"
-  when: "'azure-cli' not in azure_cli_pipx_list.stdout"
+  changed_when: false
+  tags:
+    - azure-cli
+    - packages
+
+- name: Upgrade Azure CLI via pipx for current user
+  ansible.builtin.command: pipx upgrade azure-cli
+  become: yes
+  become_user: "{{ azure_cli_user }}"
+  changed_when: false
   tags:
     - azure-cli
     - packages
 
 - name: Create symlink for az command in global bin
   ansible.builtin.file:
-    src: "/home/{{ azure_cli_user }}/.local/bin/az"
+    src: "{{ azure_cli_user_home.stdout | trim }}/.local/bin/az"
     dest: /usr/local/bin/az
     state: link
     force: yes
