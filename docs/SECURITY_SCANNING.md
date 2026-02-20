@@ -1,70 +1,70 @@
 # Security & Quality Scanning
 
-Ce projet utilise plusieurs outils pour assurer la qualité et la sécurité du code.
+This project uses multiple tools to ensure code quality and security.
 
 ## Scanning Tools
 
 ### 1. **Trivy** (Filesystem Scanner)
 
-* 🔍 **Scans** :
-  * Vulnérabilités (CVE database)
+* 🔍 **Scans**:
+  * Vulnerabilities (CVE database)
   * Secrets (API keys, tokens, credentials)
   * Misconfigurations
-* 📊 **Résultats** : Uploadés vers GitHub Code Scanning (onglet "Security" → "Code scanning")
-* 🎯 **Exclusions** : `.git`, `.github`, `node_modules`, `.ansible`
+* 📊 **Results**: Uploaded to GitHub Code Scanning (Security tab → Code scanning)
+* 🎯 **Exclusions**: `.git`, `.github`, `node_modules`, `.ansible`
 
 ### 2. **Detect-Secrets** (Pre-commit hook)
 
-* 🔐 **Prévient** : L'accidental commit de credentials
-* 📋 **Baseline** : `.secrets.baseline` liste les secrets connus/intentionnels
-* 🛑 **Bloque** : Tout type de tokens (AWS, Azure, GitHub, private keys, etc.)
-* ⚙️ **Plugins** : 25+ détecteurs de secrets activés
+* 🔐 **Prevents**: Accidental credential commits
+* 📋 **Baseline**: `.secrets.baseline` lists known/intentional secrets
+* 🛑 **Blocks**: All token types (AWS, Azure, GitHub, private keys, etc.)
+* ⚙️ **Plugins**: 25+ secret detectors enabled
 
 ### 3. **SBOM Generation** (Anchore Syft)
 
-* 📦 **Génère** : Software Bill of Materials (SPDX JSON)
-* 📥 **Stockage** : Artifact disponible 30 jours (onglet "Artifacts")
-* 🔗 **Utilité** : Traçabilité open source, audit de licence, inventory des composants
-* 📋 **Format** : SPDX 2.2 (standard industrie)
+* 📦 **Generates**: Software Bill of Materials (SPDX JSON)
+* 📥 **Storage**: Artifact available for 30 days (Artifacts tab)
+* 🔗 **Utility**: Open-source traceability, license audit, component inventory
+* 📋 **Format**: SPDX 2.2 (industry standard)
 
 ### 4. **SonarCloud**
 
-* 🔬 **Analyse** : Qualité de code, code smells, duplications
-* ⚡ **Couverture** : Ansible, Shell, YAML, Python, Markdown
-* 📊 **Dashboard** : <https://sonarcloud.io/project/overview?id=jasonouellet_wsl-ubuntu-bootstrap>
-* 🧩 **Imports** : SARIF via `sonar.sarifReportPaths` (répertoire `ci-results`)
+* 🔬 **Analysis**: Code quality, code smells, duplications
+* ⚡ **Coverage**: Ansible, Shell, YAML, Python, Markdown
+* 📊 **Dashboard**: <https://sonarcloud.io/project/overview?id=jasonouellet_wsl-ubuntu-bootstrap>
+* 🧩 **Imports**: SARIF via `sonar.sarifReportPaths` (`ci-results` directory)
 
 ### 5. **CodeQL**
 
-* 🧭 **Analyse** : Moteur de sécurité GitHub
-* 📄 **Sortie** : SARIF
-* 📊 **Résultats** : GitHub Security → Code Scanning
+* 🧭 **Analysis**: GitHub security engine
+* 📄 **Output**: SARIF
+* 📊 **Results**: GitHub Security → Code Scanning
 
 ### 6. **Ansible-lint**
 
-* ✅ **Valide** : Syntax Ansible, best practices
-* ⚙️ **Config** : `.ansible-lint`
-* 🏷️ **Profil** : production (strict)
+* ✅ **Validates**: Ansible syntax, best practices
+* ⚙️ **Config**: `.ansible-lint`
+* 🏷️ **Profile**: production (strict)
 
 ### 7. **Yamllint**
 
-* 💯 **Format** : 120 chars max, indentation, etc.
-* ⚙️ **Config** : `.yamllint`
+* 💯 **Format**: 120 chars max, indentation, etc.
+* ⚙️ **Config**: `.yamllint`
 
 ### 8. **Shellcheck**
 
-* 🐚 **Scripts** : Détecte les bugs shell courants
-* 📊 **Sévérité** : Warning et au-dessus
+* 🐚 **Scripts**: Detects common shell bugs
+* 📊 **Severity**: Warning and above
 
 ### 9. **Markdownlint**
 
-* 📝 **Markup** : Markdown bien formé
+* 📝 **Markup**: Well-formed Markdown
 
-## Workflow CI
+## CI Workflow
 
-### Exécution (GitHub Actions)
+### Execution (GitHub Actions)
 
-Le workflow `ci.yml` exécute tous les outils dans cet ordre :
+The `ci.yml` workflow runs all tools in this order:
 
 1. ✅ Pre-commit hooks (yamllint, shellcheck, markdownlint, detect-secrets)
 2. ✅ Ansible-lint
@@ -76,9 +76,9 @@ Le workflow `ci.yml` exécute tous les outils dans cet ordre :
 8. 🔍 Trivy scan (vulnerabilities + secrets)
 9. 📦 SBOM generation
 
-### Résultats
+### Results
 
-| Outil | Emplacement |
+| Tool | Location |
 | --- | --- |
 | CodeQL | Security → Code Scanning |
 | Trivy | Security → Code Scanning |
@@ -88,34 +88,34 @@ Le workflow `ci.yml` exécute tous les outils dans cet ordre :
 
 ## Secrets Management
 
-### Detected-Secrets Baseline
+### Detect-Secrets Baseline
 
-Si vous avez un secret intentionnel à ignorer :
+If you have an intentional secret to ignore:
 
 ```bash
-# Mettre en whitelist (après vérification)
+# Add to allowlist (after verification)
 detect-secrets audit .secrets.baseline
 ```
 
 ## Local Testing
 
-### Exécuter les validations localement
+### Run validations locally
 
 ```bash
-# Pre-commit (tous les hooks)
+# Pre-commit (all hooks)
 pre-commit run --all-files
 
 # Ansible-lint
 ansible-lint main.yml -v
 
-# Trivy (nécessite Trivy installé)
+# Trivy (requires Trivy installed)
 trivy fs . --severity HIGH,CRITICAL
 
 # Detect-secrets
 detect-secrets scan
 ```
 
-## Ressources
+## Resources
 
 * [Trivy Documentation](https://aquasecurity.github.io/trivy/)
 * [Detect-Secrets](https://github.com/Yelp/detect-secrets)
