@@ -1,28 +1,28 @@
 # Dependabot Configuration
 
-Dependabot automatise les mises à jour des dépendances du projet via GitHub.
+Dependabot automates project dependency updates via GitHub.
 
-## Vue d'ensemble
+## Overview
 
-Dependabot crée automatiquement des Pull Requests pour mettre à jour :
+Dependabot automatically creates pull requests to update:
 
 * **GitHub Actions** (workflows CI/CD)
 * **Python packages** (pip)
-* **Docker images** (futur, si containerisation)
+* **Docker images** (future, if containerization is added)
 
 ## Configuration
 
 ### Schedule
 
 ```yaml
-- Jour : Mercredi
-- Heure : 03:00 UTC (GitHub Actions), 03:15 UTC (Python)
-- Fréquence : Hebdomadaire
+- Day: Wednesday
+- Time: 03:00 UTC (GitHub Actions), 03:15 UTC (Python)
+- Frequency: Weekly
 ```
 
-### Stratégie de mise à jour
+### Update Strategy
 
-| Écosystème | Auto-merge | Limite PRs | Étiquettes |
+| Ecosystem | Auto-merge | PR Limit | Labels |
 | --- | --- | --- | --- |
 | **github-actions** | ✅ Auto (toutes versions) | 5 | `dependencies`, `github-actions` |
 | **pip** | ❌ Manuel | 5 | `dependencies`, `python` |
@@ -30,71 +30,71 @@ Dependabot crée automatiquement des Pull Requests pour mettre à jour :
 
 ## Workflow
 
-### Pour GitHub Actions
+### For GitHub Actions
 
-1. Dependabot **détecte** les nouvelles versions chaque mercredi
-2. Crée une **PR avec les mises à jour disponibles**
-3. **Auto-merge** des mises à jour mineures/patches (v1.2.3 → v1.2.4)
-4. PR reste **manuelle** pour les changements majeurs (v1.2.3 → v2.0.0)
+1. Dependabot **detects** new versions every Wednesday
+2. Creates a **PR with available updates**
+3. **Auto-merges** minor/patch updates (v1.2.3 → v1.2.4)
+4. PRs remain **manual** for major changes (v1.2.3 → v2.0.0)
 
-Exemple :
+Example:
 
 ```
 deps(github-actions): bump actions/checkout from v4.0.0 to v4.1.0
 deps(github-actions): bump aquasecurity/trivy-action from master to v0.16.0
 ```
 
-### Pour Python pip
+### For Python pip
 
-1. Dependabot **scanne** les dépendances Python
-2. Crée une **PR pour chaque mise à jour disponible**
-3. **Nécessite une revue manuelle** avant merge
-4. Utile pour futures dépendances (ansible-core, etc.)
+1. Dependabot **scans** Python dependencies
+2. Creates a **PR for each available update**
+3. **Requires manual review** before merge
+4. Useful for future dependencies (ansible-core, etc.)
 
-## GitHubUI - Vérifier l'état
+## GitHub UI - Check Status
 
-### Alertes de dépendances
+### Dependency Alerts
 
-Menu : **Security** → **Dependabot alerts**
+Menu: **Security** → **Dependabot alerts**
 
-Affiche :
+Shows:
 
-* ✅ Dépendances saines
-* ⚠️ Mises à jour disponibles
-* 🔴 Vulnérabilités détectées
+* ✅ Healthy dependencies
+* ⚠️ Updates available
+* 🔴 Vulnerabilities detected
 
-### Pull Requests générées
+### Generated Pull Requests
 
-Menu : **Pull requests** → Filtre `label:dependencies`
+Menu: **Pull requests** → Filter `label:dependencies`
 
-Affiche toutes les PR Dependabot
+Shows all Dependabot PRs
 
-## Configuration locale (optionnel)
+## Local Configuration (optional)
 
-### Désactiver Dependabot temporairement
+### Temporarily disable Dependabot
 
-Éditer `.github/dependabot.yml` et commenter les sections
+Edit `.github/dependabot.yml` and comment out sections
 
-### Tester la configuration
+### Test the configuration
 
-GitHub valide automatiquement la syntaxe. Erreurs affichées dans :
+GitHub automatically validates the syntax. Errors appear in:
 **Settings** → **Code security & analysis** → **Dependabot** → **Alerts**
 
-## Bonnes pratiques
+## Best Practices
 
-### À FAIRE
+### DO
 
-* Reviser les PRs Dependabot rapidement (détecte souvent des vulnérabilités)
-* Laisser les workflows CI/CD valider antes d'accepter
-* Grouper les mises à jour mineures si possible
+* Review Dependabot PRs quickly (they often catch vulnerabilities)
+* Let CI/CD workflows validate before accepting
+* Group minor updates when possible
 
-### À ÉVITER
+### AVOID
 
-* Désactiver Dependabot (sauf raison fondamentale)
-* Ignorer les alertes de sécurité
-* Fusionner sans passer les tests
+* Disabling Dependabot (unless there is a critical reason)
+* Ignoring security alerts
+* Merging without tests
 
-## Exemples de PR générées
+## Example Generated PRs
 
 ```
 [Dependabot] deps(github-actions): bump SonarSource/sonarcloud-github-action from v2.0.0 to v2.1.0
@@ -104,7 +104,7 @@ This PR updates the sonarcloud-github-action GitHub Action to v2.1.0.
 Release Notes: https://github.com/SonarSource/sonarcloud-github-action/releases/tag/v2.1.0
 ```
 
-## Ressources
+## Resources
 
 * [GitHub Dependabot Docs](https://docs.github.com/en/code-security/dependabot)
 * [Dependabot Configuration Docs](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-dependency-updates)

@@ -132,6 +132,29 @@ docs(readme): update installation instructions
 ./validate.sh
 ```
 
+## 🚀 Release Process
+
+Releases are automated and driven by Release Please and tags.
+
+### Prerequisites
+
+* Write access to the repository (merge to `main`)
+* Conventional Commits on merged PRs
+* CHANGELOG.md updated as part of the release PR
+
+### How to trigger a release
+
+1. Merge PRs into `main` using Conventional Commits
+2. Release Please creates or updates a release PR
+3. Review and merge the release PR
+4. On merge, Release Please creates tag `vX.Y.Z` and a GitHub release
+5. The tag triggers the release workflow, which validates CHANGELOG and finalizes the release
+
+### Manual release (fallback)
+
+If you need to run the release workflow manually, use the `workflow_dispatch`
+trigger in GitHub Actions, but the preferred path is to merge the release PR.
+
 ## 📤 Submitting Changes
 
 ### Pull Request Process
