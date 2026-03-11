@@ -128,6 +128,17 @@
         - nodejs
         - test
 
+    - name: Check specsmd version
+      ansible.builtin.command: specsmd --version
+      register: nodejs_specsmd_version
+      changed_when: false
+      environment:
+        PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+      ignore_errors: true
+      tags:
+        - nodejs
+        - test
+
     - name: Verify npm is in PATH
       ansible.builtin.shell: |
         source /etc/profile.d/nodejs.sh
@@ -144,6 +155,7 @@
         msg:
           - "Node.js: {{ nodejs_node_version.stdout }}"
           - "npm: {{ nodejs_npm_version.stdout | default('not found') }}"
+          - "specsmd: {{ nodejs_specsmd_version.stdout | default('not found') }}"
           - "npm path: {{ nodejs_npm_path_verify.stdout | default('not in PATH') }}"
           - "PATH config exists: {{ nodejs_path_config.stat.exists }}"
       tags:

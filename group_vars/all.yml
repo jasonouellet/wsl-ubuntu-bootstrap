@@ -135,6 +135,7 @@ nodejs_packages:
 
 nodejs_global_npm_packages:
   - markdownlint-cli2      # Markdown linting CLI tool (v2 - latest)
+  - specsmd                # specs.md CLI for AI-native development workflows
 
 # =========================================
 # Azure CLI Configuration
