@@ -206,6 +206,9 @@ enable_dotnet: no          # Disable .NET
 enable_containers: no      # Disable OCI tools
 enable_terraform: yes      # Enable Terraform
 
+# Disable external repository configuration (Microsoft, Hashicorp, GitHub, NodeSource, Trivy)
+enable_external_repositories: no
+
 # Modify versions
 nodejs_version: "20"       # Use Node.js 20 LTS instead of 22
 
@@ -225,6 +228,9 @@ common_packages_linux:
   - htop                # Additional package
   - vim                 # Additional package
 ```
+
+When `enable_external_repositories: no`, roles skip adding third-party APT repositories.
+Some tools may fall back to distro repositories or alternate installers depending on the role.
 
 ### Advanced Customization
 

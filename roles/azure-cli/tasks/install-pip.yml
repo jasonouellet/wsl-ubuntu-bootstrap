@@ -11,9 +11,9 @@
 - name: Display Debian 13 installation method
   ansible.builtin.debug:
     msg:
-      - "INFO: Azure CLI is not available via APT for Debian 13 Trixie"
-      - "Using pipx installation method instead (recommended by"
-      - "Microsoft for non-supported distributions)"
+      - "INFO: Azure CLI installation via pipx is selected"
+      - "Reason: Debian 13 is detected or external APT repositories are disabled"
+      - "Using pipx installation method instead (recommended by Microsoft for non-supported distributions)"
       - "Reference:"
       - "https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?view=azure-cli-latest&pivots=pip"
   tags:

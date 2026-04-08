@@ -36,14 +36,16 @@
 # ==========================================
 - name: Install Azure CLI for Debian 13 (pip method)
   ansible.builtin.include_tasks: install-pip.yml
-  when: azure_cli_is_debian_13
+  when: azure_cli_is_debian_13 or not (enable_external_repositories | default(true))
   tags:
     - azure-cli
     - packages
 
 - name: Install Azure CLI for Debian 12/Ubuntu (APT repository)
   ansible.builtin.include_tasks: install-apt-repo.yml
-  when: not azure_cli_is_debian_13
+  when:
+    - not azure_cli_is_debian_13
+    - enable_external_repositories | default(true)
   tags:
     - azure-cli
     - packages

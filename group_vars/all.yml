@@ -14,6 +14,10 @@ common_configure_nopasswd_sudo: yes
 # Distribution info
 distro_codename: "{{ ansible_facts[\"lsb\"][\"codename\"] | default('focal') }}"
 
+# Control whether roles can configure external package repositories
+# (Microsoft, HashiCorp, GitHub, NodeSource, Aqua Security, etc.)
+enable_external_repositories: yes
+
 # =========================================
 # Common / Base System Packages
 # =========================================

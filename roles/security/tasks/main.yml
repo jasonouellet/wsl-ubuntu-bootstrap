@@ -9,6 +9,7 @@
       - gnupg
     state: present
     update_cache: yes
+  when: enable_external_repositories | default(true)
   tags:
     - security
     - gpg
@@ -20,6 +21,7 @@
     mode: '0644'
     owner: root
     group: root
+  when: enable_external_repositories | default(true)
   tags:
     - security
     - gpg
@@ -29,6 +31,7 @@
     gpg --dearmor < /tmp/trivy-keyring.asc > /usr/share/keyrings/trivy.gpg
   args:
     creates: /usr/share/keyrings/trivy.gpg
+  when: enable_external_repositories | default(true)
   tags:
     - security
     - gpg
@@ -37,7 +40,9 @@
   ansible.builtin.stat:
     path: /usr/share/keyrings/trivy.gpg
   register: security_trivy_gpg_file_stat
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - security
     - gpg
@@ -47,6 +52,7 @@
     msg: "Trivy GPG key file not found at /usr/share/keyrings/trivy.gpg"
   when:
     - not ansible_check_mode
+    - enable_external_repositories | default(true)
     - not security_trivy_gpg_file_stat.stat.exists
   tags:
     - security
@@ -60,6 +66,7 @@
     mode: '0644'
   when:
     - not ansible_check_mode
+    - enable_external_repositories | default(true)
     - security_trivy_gpg_file_stat.stat.exists
   tags:
     - security
@@ -71,6 +78,7 @@
     filename: trivy
     state: present
     update_cache: yes
+  when: enable_external_repositories | default(true)
   tags:
     - security
     - packages
@@ -82,7 +90,19 @@
       - trivy
     state: present
     update_cache: yes
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+  tags:
+    - security
+    - packages
+
+- name: Skip Trivy repository and package installation when external repositories are disabled
+  ansible.builtin.debug:
+    msg:
+      - "External repositories are disabled (enable_external_repositories=no)."
+      - "Skipping Trivy repository and package installation."
+  when: not (enable_external_repositories | default(true))
   tags:
     - security
     - packages
@@ -173,6 +193,7 @@
       ansible.builtin.command: trivy --version
       register: security_trivy_version
       changed_when: false
+      when: enable_external_repositories | default(true)
       tags:
         - security
         - test
@@ -198,7 +219,11 @@
     - name: Display security tools versions
       ansible.builtin.debug:
         msg: |
-          ✓ Trivy: {{ security_trivy_version.stdout }}
+          ✓ Trivy: {{
+            security_trivy_version.stdout
+            if (enable_external_repositories | default(true))
+            else 'skipped (external repositories disabled)'
+          }}
           ✓ Syft: {{ security_syft_version.stdout }}
           ✓ detect-secrets: {{ security_detect_secrets_version.stdout }}
       tags:

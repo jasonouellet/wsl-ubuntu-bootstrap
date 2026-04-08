@@ -35,6 +35,7 @@
           - "Target: {{ inventory_hostname }}"
           - "OS: {{ ansible_facts[\"os_family\"] }}"
           - "Distro: {{ ansible_facts[\"lsb\"][\"description\"] | default('Unknown') }}"
+          - "External repositories enabled: {{ enable_external_repositories | default(true) }}"
       tags:
         - always
 

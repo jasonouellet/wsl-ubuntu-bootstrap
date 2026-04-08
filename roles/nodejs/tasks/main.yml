@@ -15,6 +15,7 @@
     dest: "{{ nodejs_setup_script_dest }}"
     mode: '0644'
     backup: true
+  when: enable_external_repositories | default(true)
   tags:
     - nodejs
     - setup
@@ -31,6 +32,7 @@
     creates: /etc/apt/sources.list.d/nodesource.list
   become: true
   changed_when: true
+  when: enable_external_repositories | default(true)
   tags:
     - nodejs
     - setup
@@ -39,6 +41,7 @@
   ansible.builtin.apt:
     update_cache: yes
     cache_valid_time: 0
+  when: enable_external_repositories | default(true)
   tags:
     - nodejs
     - packages

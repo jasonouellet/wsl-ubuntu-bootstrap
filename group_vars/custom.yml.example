@@ -20,6 +20,9 @@
 # enable_dotnet: no
 # enable_containers: no
 
+# Désactiver la configuration des dépôts externes (Microsoft, Hashicorp, GitHub, NodeSource, Trivy)
+# enable_external_repositories: no
+
 # Personnaliser les versions
 # nodejs_version: "20"
 # dotnet_packages:

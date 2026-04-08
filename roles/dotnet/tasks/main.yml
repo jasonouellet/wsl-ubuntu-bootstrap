@@ -43,7 +43,21 @@
 
 - name: Install .NET SDK for Debian 12/Ubuntu (APT repository)
   ansible.builtin.include_tasks: install-apt-repo.yml
-  when: not dotnet_is_debian_13
+  when:
+    - not dotnet_is_debian_13
+    - enable_external_repositories | default(true)
+  tags:
+    - dotnet
+    - packages
+
+- name: Install .NET SDK from distribution repositories when external repos are disabled
+  ansible.builtin.apt:
+    name: "{{ dotnet_packages }}"
+    state: present
+    update_cache: yes
+  when:
+    - not dotnet_is_debian_13
+    - not (enable_external_repositories | default(true))
   tags:
     - dotnet
     - packages

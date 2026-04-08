@@ -15,6 +15,7 @@
     owner: root
     group: root
     mode: '0644'
+  when: enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -26,6 +27,7 @@
   args:
     creates: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
   register: terraform_gpg_dearmor_result
+  when: enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -35,7 +37,9 @@
   ansible.builtin.stat:
     path: /etc/apt/keyrings/hashicorp-archive-keyring.gpg
   register: terraform_gpg_file_stat
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -46,6 +50,7 @@
     msg: "Hashicorp GPG key file not found at /etc/apt/keyrings/hashicorp-archive-keyring.gpg"
   when:
     - not ansible_check_mode
+    - enable_external_repositories | default(true)
     - not terraform_gpg_file_stat.stat.exists
   tags:
     - terraform
@@ -60,6 +65,7 @@
     mode: '0644'
   when:
     - not ansible_check_mode
+    - enable_external_repositories | default(true)
     - terraform_gpg_file_stat.stat.exists
   tags:
     - terraform
@@ -74,6 +80,7 @@
     filename: hashicorp
     state: present
     update_cache: yes
+  when: enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -84,6 +91,7 @@
   ansible.builtin.apt:
     update_cache: yes
     cache_valid_time: 0
+  when: enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -95,7 +103,20 @@
     name: "{{ hashicorp_packages }}"
     state: present
     update_cache: yes
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+  tags:
+    - terraform
+    - hashicorp
+    - packages
+
+- name: Skip Hashicorp tools when external repositories are disabled
+  ansible.builtin.debug:
+    msg:
+      - "External repositories are disabled (enable_external_repositories=no)."
+      - "Skipping Hashicorp repository and package installation."
+  when: not (enable_external_repositories | default(true))
   tags:
     - terraform
     - hashicorp
@@ -105,7 +126,9 @@
   ansible.builtin.command: terraform version
   register: terraform_version
   changed_when: false
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - test
@@ -113,7 +136,9 @@
 - name: Display Terraform version
   ansible.builtin.debug:
     msg: "{{ terraform_version.stdout_lines }}"
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - test
@@ -123,7 +148,9 @@
   args:
     creates: /etc/bash_completion.d/terraform
   failed_when: false
-  when: not ansible_check_mode
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - autocomplete
