@@ -44,6 +44,9 @@ common_packages_linux_base:
   # Linting & Validation Tools
   - shellcheck                     # Shell script static analysis and linting
 
+# Debian-specific base packages
+common_packages_linux_debian: []
+
 # Ubuntu-specific packages
 common_packages_linux_ubuntu:
   - software-properties-common     # Manage software repositories and PPAs (Ubuntu only)
@@ -174,6 +177,7 @@ ssl_ca_cert_pem_path: "/etc/ssl/certs/{{ ssl_ca_cert_name }}"
 # Maintenance Configuration
 # =========================================
 maintenance_enable_auto_update: yes
+maintenance_show_warning: yes
 
 # =========================================
 # Features Flags (enable/disable components)

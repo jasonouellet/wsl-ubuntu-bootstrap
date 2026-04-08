@@ -64,8 +64,26 @@
     - security
 
 - name: Install base Linux packages
+  ansible.builtin.set_fact:
+    common_packages_linux_effective: >-
+      {{
+        (
+          common_packages_linux
+          if (common_packages_linux is defined and (common_packages_linux | length) > 0)
+          else (
+            (common_packages_linux_common | default([]))
+            + ((common_packages_linux_debian | default([])) if ansible_facts['distribution'] == 'Debian' else [])
+            + ((common_packages_linux_ubuntu | default([])) if ansible_facts['distribution'] == 'Ubuntu' else [])
+          )
+        ) | unique
+      }}
+  tags:
+    - common
+    - packages
+
+- name: Install base Linux packages
   ansible.builtin.apt:
-    name: "{{ common_packages_linux }}"
+    name: "{{ common_packages_linux_effective }}"
     state: present
     autoclean: true
   tags:
