@@ -21,8 +21,12 @@
 
 - name: Detect distribution version
   ansible.builtin.set_fact:
-    azure_cli_is_debian_13: "{{ ansible_facts['distribution'] == 'Debian' and ansible_facts['lsb']['major_release'] == '13' }}"
-    azure_cli_is_debian_12: "{{ ansible_facts['distribution'] == 'Debian' and ansible_facts['lsb']['major_release'] == '12' }}"
+    azure_cli_is_debian_13: >-
+      {{ ansible_facts['distribution'] == 'Debian' and
+         ansible_facts['lsb']['major_release'] == '13' }}
+    azure_cli_is_debian_12: >-
+      {{ ansible_facts['distribution'] == 'Debian' and
+         ansible_facts['lsb']['major_release'] == '12' }}
   tags:
     - azure-cli
     - always

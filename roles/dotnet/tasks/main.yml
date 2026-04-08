@@ -21,8 +21,12 @@
 
 - name: Detect distribution version
   ansible.builtin.set_fact:
-    dotnet_is_debian_13: "{{ ansible_facts['distribution'] == 'Debian' and ansible_facts['lsb']['major_release'] == '13' }}"
-    dotnet_is_debian_12: "{{ ansible_facts['distribution'] == 'Debian' and ansible_facts['lsb']['major_release'] == '12' }}"
+    dotnet_is_debian_13: >
+      {{ ansible_facts['distribution'] == 'Debian' and
+         ansible_facts['lsb']['major_release'] == '13' }}
+    dotnet_is_debian_12: >
+      {{ ansible_facts['distribution'] == 'Debian' and
+         ansible_facts['lsb']['major_release'] == '12' }}
   tags:
     - dotnet
     - always
@@ -60,6 +64,15 @@
 - name: Display .NET version
   ansible.builtin.debug:
     msg: "dotnet SDK version: {{ dotnet_version.stdout }}"
+  when: not ansible_check_mode
+  tags:
+    - dotnet
+    - test
+
+- name: Display .NET version skipped in check mode
+  ansible.builtin.debug:
+    msg: "dotnet version verification skipped in check mode"
+  when: ansible_check_mode
   tags:
     - dotnet
     - test

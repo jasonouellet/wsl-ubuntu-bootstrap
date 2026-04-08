@@ -21,7 +21,7 @@ ROLES=(
     "nodejs"
     "azure-cli"
     "maintenance"
-    "github-cli"
+    "github"
 )
 
 echo "=========================================="
@@ -32,6 +32,7 @@ echo ""
 # Parse arguments flexibly
 SUDO_FLAG=""
 MODE="check"
+ROLE_TEST_SLEEP_SECONDS="${ROLE_TEST_SLEEP_SECONDS:-1}"
 
 # Parse all arguments
 for arg in "$@"; do
@@ -85,7 +86,9 @@ for role in "${ROLES[@]}"; do
         fi
     fi
 
-    sleep 1
+    if [[ "$ROLE_TEST_SLEEP_SECONDS" =~ ^[0-9]+$ ]] && (( ROLE_TEST_SLEEP_SECONDS > 0 )); then
+        sleep "$ROLE_TEST_SLEEP_SECONDS"
+    fi
 done
 
 echo "=========================================="

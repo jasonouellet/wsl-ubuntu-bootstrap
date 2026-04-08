@@ -61,7 +61,9 @@
       - "This will run daily at 3:00 AM as root"
       - "To disable: set maintenance_enable_auto_update: no in group_vars/custom.yml"
       - "Or remove cron: sudo crontab -r -u root"
-  when: maintenance_enable_auto_update | default(true)
+  when:
+    - maintenance_enable_auto_update | default(true)
+    - maintenance_show_warning | default(true)
   tags:
     - maintenance
 

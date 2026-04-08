@@ -94,8 +94,8 @@
       tags: azure-cli
       when: enable_azure_cli
 
-    - name: github-cli
-      tags: github-cli
+    - name: github
+      tags: github
       when: enable_github_cli
 
     # Container tools
