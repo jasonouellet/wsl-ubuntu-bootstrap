@@ -33,7 +33,7 @@ role-name/
 * `terraform` - Terraform and all Hashicorp tools
   (Vault, Consul, Nomad, Packer, Boundary)
 * `azure-cli` - Azure CLI with repository and GPG key
-* `github-cli` - GitHub CLI for automation
+* `github` - GitHub CLI and Copilot CLI
 * `containers` - OCI tools (buildah, skopeo)
 * `maintenance` - System updates and cron configuration
 
@@ -149,7 +149,7 @@ Every task must have **at least one tag**. Tags enable selective execution and f
 
 | Category | Purpose | Examples |
 | -------- | ------- | -------- |
-| **Role Tags** | Execute entire role | `common`, `python`, `nodejs`, `terraform`, `dotnet`, `azure-cli`, `github-cli`, `containers`, `ssl-config`, `maintenance` |
+| **Role Tags** | Execute entire role | `common`, `python`, `nodejs`, `terraform`, `dotnet`, `azure-cli`, `github`, `containers`, `ssl-config`, `maintenance` |
 | **Cross-cutting** | Shared operations | `packages`, `repository`, `gpg`, `setup` |
 | **Security** | Sensitive operations | `security`, `sudo`, `ssl` |
 | **Testing** | Verification/diagnostics | `test`, `verify` |
@@ -321,7 +321,7 @@ ansible-playbook main.yml -vvv # Maximum verbosity
 # - dotnet
 # - nodejs
 # - azure-cli
-# - github-cli
+# - github
 # - maintenance
 
 ```
@@ -952,7 +952,7 @@ gh auth login
 | `dotnet` | .NET SDK | dotnet_packages |
 | `terraform` | Terraform + Hashicorp suite | hashicorp_packages |
 | `azure-cli` | Azure CLI | azure_cli_apt_key |
-| `github-cli` | GitHub CLI | Minimal config (repo setup in task) |
+| `github` | GitHub CLI and Copilot CLI | `enable_github_cli`, `enable_copilot_cli` |
 | `containers` | OCI tools (buildah, skopeo) | `container_packages` |
 | `ssl-config` | SSL/TLS, CA certificates | `ssl_ca_cert_name`, `ssl_ca_cert_path` |
 | `maintenance` | System updates, cron | `maintenance_enable_auto_update` |
@@ -1098,7 +1098,7 @@ Configuration: [.ansible-lint](.ansible-lint)
 
 **Playbooks & Roles**:
 
-* Lowercase with hyphens: `ssl-config`, `azure-cli`, `github-cli`
+* Lowercase with hyphens: `ssl-config`, `azure-cli`
 * Match directory names exactly
 
 **Variables**:

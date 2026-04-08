@@ -88,7 +88,7 @@ wsl-ubuntu-bootstrap/
     ├── dotnet/                 # .NET SDK
     ├── nodejs/                 # Node.js runtime and npm
     ├── azure-cli/              # Azure CLI
-    ├── github-cli/             # GitHub CLI for automation
+    ├── github/                 # GitHub CLI and Copilot CLI
     └── maintenance/            # Automated maintenance (auto-update)
 ```
 
@@ -250,7 +250,7 @@ ansible-playbook main.yml -e @group_vars/custom.yml
 | [**dotnet**](roles/dotnet/README.md) | .NET | .NET SDK 8.0 |
 | [**nodejs**](roles/nodejs/README.md) | Node.js | Node.js 22 LTS, npm, compilation toolchain |
 | [**azure-cli**](roles/azure-cli/README.md) | Azure | Azure CLI for Microsoft Azure cloud management |
-| [**github-cli**](roles/github-cli/README.md) | GitHub | GitHub CLI for repository automation and management |
+| [**github**](roles/github/README.md) | GitHub | GitHub CLI (`gh`) and GitHub Copilot CLI (`copilot`) |
 | [**maintenance**](roles/maintenance/README.md) | Maintenance | Daily automatic updates (cron 3 AM) |
 <!-- markdownlint-enable MD013 -->
 
