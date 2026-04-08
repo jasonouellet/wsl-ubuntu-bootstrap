@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **Modular Role Architecture**: Split `dotnet` and `azure-cli` roles into separate task files for better maintainability
   * `main.yml`: Distribution detection and orchestration
   * `install-<method>.yml`: Method-specific implementations
+* **GitHub Copilot CLI Support**: Added `copilot` installation and verification to the GitHub tooling role
 
 ### Changed
 
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * **Debian 13**: Python pipx method (PEP 668 compliant)
   * **Debian 12/Ubuntu**: APT repository method (existing)
 * **APT Keyrings**: Centralized `/etc/apt/keyrings/` directory creation in `common` role
+* **GitHub Role Naming**: Renamed role and primary tag from `github-cli` to `github` to better reflect support for both `gh` and `copilot`
 
 ### Fixed
 
