@@ -13,7 +13,8 @@ Python CLI tools managed by `pipx` are installed **globally** for all users:
 * `PIPX_HOME=/opt/pipx`
 * `PIPX_BIN_DIR=/usr/local/bin`
 
-This makes tools like `pre-commit`, `ansible-lint`, and `yamllint` available from a shared system path instead of per-user `~/.local/bin`.
+This makes tools like `pre-commit`, `ansible-lint`, and `yamllint`
+available from a shared system path instead of per-user `~/.local/bin`.
 
 ## Verification
 

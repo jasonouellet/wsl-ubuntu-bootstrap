@@ -13,10 +13,11 @@ Usage:
 
 ## HTTPS Connectivity Test (Optional)
 
-By default, the role tests HTTPS connectivity after installing the CA certificate using both curl and Python. You can control this behavior:
+By default, the role tests HTTPS connectivity after installing the CA
+certificate using both curl and Python. You can control this behavior:
 
-- `ssl_test_connectivity`: Enable/disable HTTPS tests (default: yes)
-- `ssl_test_url`: URL to test (default: https://github.com)
+* `ssl_test_connectivity`: Enable/disable HTTPS tests (default: yes)
+* `ssl_test_url`: URL to test (default: <https://github.com>)
 
 Example to disable or change the test in your `group_vars/custom.yml`:
 

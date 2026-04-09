@@ -12,6 +12,7 @@ Purpose: install Azure CLI from Microsoft packages.
 This role supports multiple distributions with different installation methods:
 
 ### Debian 13 (Trixie)
+
 * **Method**: pipx installation (Python)
 * **Why**: Microsoft does not yet provide APT repository for Debian 13
 * **File**: `tasks/install-pip.yml`
@@ -20,6 +21,7 @@ This role supports multiple distributions with different installation methods:
 * **Global symlink**: `/usr/local/bin/az`
 
 ### Debian 12 (Bookworm) & Ubuntu
+
 * **Method**: Microsoft APT repository
 * **File**: `tasks/install-apt-repo.yml`
 * **Repository**: `packages.microsoft.com/repos/azure-cli`
@@ -64,4 +66,3 @@ After installation, verify with:
 az version  # Should display azure-cli version
 az login    # Authenticate with Azure (interactive)
 ```
-

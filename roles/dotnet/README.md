@@ -12,6 +12,7 @@ Purpose: install .NET SDK.
 This role supports multiple distributions with different installation methods:
 
 ### Debian 13 (Trixie)
+
 * **Method**: Official Microsoft installation script
 * **Why**: Microsoft does not yet provide APT repository for Debian 13
 * **File**: `tasks/install-debian-13.yml`
@@ -20,6 +21,7 @@ This role supports multiple distributions with different installation methods:
 * **Global PATH**: Configured via `/etc/profile.d/dotnet.sh`
 
 ### Debian 12 (Bookworm) & Ubuntu
+
 * **Method**: Microsoft APT repository
 * **File**: `tasks/install-apt-repo.yml`
 * **Repository**: `packages.microsoft.com/{debian|ubuntu}/<version>/prod`
@@ -63,4 +65,3 @@ After installation, verify with:
 ```bash
 dotnet --version  # Should display 8.0.x
 ```
-

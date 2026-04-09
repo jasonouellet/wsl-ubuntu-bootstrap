@@ -24,15 +24,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * **Debian 13**: Python pipx method (PEP 668 compliant)
   * **Debian 12/Ubuntu**: APT repository method (existing)
 * **APT Keyrings**: Centralized `/etc/apt/keyrings/` directory creation in `common` role
-* **GitHub Role Naming**: Renamed role and primary tag from `github-cli` to `github` to better reflect support for both `gh` and `copilot`
-* **Python Role (pipx scope)**: pipx-managed CLI tools are now installed globally for all users using shared paths (`/opt/pipx` and `/usr/local/bin`) instead of user-scoped locations
+* **GitHub Role Naming**: Renamed role and primary tag from `github-cli` to
+  `github` to better reflect support for both `gh` and `copilot`
+* **Python Role (pipx scope)**: pipx-managed CLI tools are now installed
+  globally for all users using shared paths (`/opt/pipx` and
+  `/usr/local/bin`) instead of user-scoped locations
 
 ### Fixed
 
 * Corrected ICU library dependency for .NET on Debian 13 (`libicu76` instead of `libicu72`)
 * Fixed user detection in sudo context for pipx installations (`SUDO_USER` environment variable)
 * Resolved Microsoft package repository unavailability for Debian 13 with alternative methods
-* Fixed `pre-commit` availability mismatch where tools were installed under root context only; tools are now exposed through shared global pipx bin path
+* Fixed `pre-commit` availability mismatch where tools were installed under
+  root context only; tools are now exposed through shared global pipx bin path
 
 ## [0.1.0] - 2026-01-30
 

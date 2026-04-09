@@ -18,7 +18,6 @@ distributions.
 [![GitHub issues](https://img.shields.io/github/issues/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/pulls)
 
-
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
@@ -38,7 +37,8 @@ distributions.
   * [Security Hardening & Enhancements](docs/HARDENING.md) - Optional security
     hardening and tooling improvements
   * [Security Scanning](docs/SECURITY_SCANNING.md) - Vulnerability, secret, and code quality scanning tools
-  * [AI Agent Instructions](.github/copilot-instructions.md) - Comprehensive guidelines for code generation and maintenance (GitHub Copilot)
+  * [AI Agent Instructions](.github/copilot-instructions.md) - Comprehensive
+    guidelines for code generation and maintenance (GitHub Copilot)
 
 ## 🎯 Objective
 

@@ -516,7 +516,7 @@ Individual tasks override this as needed.
 **With vs Without Become**:
 
 | Operation | Requires Root? | Ansible Setting | Example |
-|-----------|----------------|-----------------|---------|
+| ----------- | ---------------- | ----------------- | --------- |
 | Install APT package | ✅ Yes | (default) `become: yes` | `ansible.builtin.apt` |
 | Check file existence | ❌ No | `become: false` | `ansible.builtin.stat` |
 | Create `/etc/` config | ✅ Yes | (default) `become: yes` | `ansible.builtin.lineinfile` on `/etc/*` |
