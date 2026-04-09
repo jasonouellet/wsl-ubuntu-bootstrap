@@ -8,55 +8,66 @@
     - python
     - packages
 
-- name: Install Python tools via pipx (current user)
-  ansible.builtin.shell: |
-    export PATH="$PATH:$HOME/.local/bin"
-    pipx install "{{ item }}"
-  loop: "{{ python_tools_pipx }}"
-  become: false
-  register: python_pipx_user_install
-  changed_when: "item not in python_pipx_user_install.stdout"
+- name: Ensure global pipx shared directory exists
+  ansible.builtin.file:
+    path: /opt/pipx
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
   tags:
     - python
     - packages
+    - pipx
 
-- name: Ensure pipx path for current user
-  ansible.builtin.command: pipx ensurepath --force
-  become: false
+- name: Get globally installed pipx tools
+  ansible.builtin.command: pipx list --short
+  register: python_pipx_global_list
   changed_when: false
   failed_when: false
+  environment:
+    PIPX_HOME: /opt/pipx
+    PIPX_BIN_DIR: /usr/local/bin
   tags:
     - python
     - packages
+    - pipx
 
-- name: Get real user home directory from system facts
-  ansible.builtin.shell:
-    cmd: "set -o pipefail && getent passwd {{ ansible_facts['env']['USER'] }} | cut -d':' -f6"
-  args:
-    executable: /bin/bash
-  register: python_user_home_result
-  become: false
+- name: Install Python tools via pipx (global for all users)
+  ansible.builtin.command: pipx install "{{ item }}"
+  loop: "{{ python_tools_pipx }}"
+  when: item not in (python_pipx_global_list.stdout | default(''))
+  register: python_pipx_global_install
+  environment:
+    PIPX_HOME: /opt/pipx
+    PIPX_BIN_DIR: /usr/local/bin
+  tags:
+    - python
+    - packages
+    - pipx
+
+- name: Upgrade already installed global pipx tools
+  ansible.builtin.command: pipx upgrade "{{ item }}"
+  loop: "{{ python_tools_pipx }}"
+  when: item in (python_pipx_global_list.stdout | default(''))
   changed_when: false
+  failed_when: false
+  environment:
+    PIPX_HOME: /opt/pipx
+    PIPX_BIN_DIR: /usr/local/bin
   tags:
     - python
     - packages
+    - pipx
 
-- name: Set python real user home fact
-  ansible.builtin.set_fact:
-    python_real_user_home: "{{ python_user_home_result.stdout | trim }}"
-  tags:
-    - python
-    - packages
-
-- name: Add pipx to user PATH in .bashrc
+- name: Ensure pipx global binary path is present system-wide
   ansible.builtin.lineinfile:
-    path: "{{ python_real_user_home }}/.bashrc"
-    line: 'export PATH="$HOME/.local/bin:$PATH"'
+    path: /etc/profile.d/pipx.sh
+    line: 'export PATH="/usr/local/bin:$PATH"'
     create: true
     mode: '0644'
-    owner: "{{ ansible_facts['env']['USER'] }}"
-    state: present
-  become: false
+    owner: root
+    group: root
   tags:
     - python
     - packages
@@ -85,31 +96,17 @@
     path: "{{ item }}"
   loop:
     - /etc/profile.d/pipx.sh
-    - "/home/{{ python_real_user_home }}/.bashrc"
   register: python_pipx_path_configs
   tags:
     - python
     - test
 
-- name: Check for PATH duplicates in bashrc
-  ansible.builtin.shell: |
-    grep -c "\.local/bin" "/home/{{ python_real_user_home }}/.bashrc" || echo "0"
-  register: python_path_count
-  changed_when: false
-  become: false
-  tags:
-    - python
-    - test
-
 - name: Verify pipx tools are accessible
-  ansible.builtin.shell: |
-    export PATH="$HOME/.local/bin:$PATH"
-    which {{ item }}
+  ansible.builtin.command: which {{ item }}
   loop: "{{ python_tools_pipx }}"
   register: python_pipx_tools
   changed_when: false
   failed_when: false
-  become: false
   tags:
     - python
     - test
@@ -118,7 +115,6 @@
   ansible.builtin.debug:
     msg:
       - "Python version: {{ python_version.stdout }}"
-      - "PATH entries in .bashrc: {{ python_path_count.stdout }}"
       - "pre-commit accessible: {{ python_pipx_tools.results[0].rc == 0 }}"
       - "yamllint accessible: {{ python_pipx_tools.results[1].rc == 0 }}"
       - "pylint accessible: {{ python_pipx_tools.results[2].rc == 0 }}"

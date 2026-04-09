@@ -230,7 +230,19 @@ common_packages_linux:
 ```
 
 When `enable_external_repositories: no`, roles skip adding third-party APT repositories.
-Some tools may fall back to distro repositories or alternate installers depending on the role.
+Some tools may fall back to distro repositories or alternate installers
+depending on the role.
+
+The `python` role installs `pipx`-managed CLI tools globally for all users
+using shared paths:
+
+```yaml
+PIPX_HOME: /opt/pipx
+PIPX_BIN_DIR: /usr/local/bin
+```
+
+This means tools such as exemple `pre-commit`, `ansible-lint`, and `yamllint`
+are expected to be available system-wide.
 
 ### Advanced Customization
 
