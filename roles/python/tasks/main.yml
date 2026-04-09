@@ -34,7 +34,9 @@
     - pipx
 
 - name: Install Python tools via pipx (global for all users)
-  ansible.builtin.command: pipx install "{{ item }}"
+  ansible.builtin.command:
+    cmd: pipx install "{{ item }}"
+    creates: "/opt/pipx/venvs/{{ item }}"
   loop: "{{ python_tools_pipx }}"
   when: item not in (python_pipx_global_list.stdout | default(''))
   register: python_pipx_global_install

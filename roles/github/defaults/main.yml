@@ -1,4 +1,4 @@
 ---
 # GitHub CLI Role - Defaults
-enable_github_cli: yes
-enable_copilot_cli: yes
+github_enable_cli: "{{ enable_github_cli | default(true) }}"
+github_enable_copilot_cli: "{{ enable_copilot_cli | default(true) }}"

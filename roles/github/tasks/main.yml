@@ -35,14 +35,14 @@
   ansible.builtin.command:
     cmd: gh --version
   changed_when: false
-  register: gh_version
+  register: github_gh_version
   tags:
     - github
     - test
 
 - name: Display GitHub CLI version
   ansible.builtin.debug:
-    msg: "✓ GitHub CLI installed: {{ gh_version.stdout }}"
+    msg: "✓ GitHub CLI installed: {{ github_gh_version.stdout }}"
   tags:
     - github
     - test
@@ -53,7 +53,7 @@
     url: https://gh.io/copilot-install
     dest: /tmp/copilot-install.sh
     mode: '0755'
-  when: enable_copilot_cli | default(true)
+  when: github_enable_copilot_cli | bool
   tags:
     - github
     - copilot-cli
@@ -65,7 +65,7 @@
     creates: /usr/local/bin/copilot
   environment:
     PREFIX: /usr/local
-  when: enable_copilot_cli | default(true)
+  when: github_enable_copilot_cli | bool
   tags:
     - github
     - copilot-cli
@@ -77,8 +77,8 @@
   changed_when: false
   check_mode: false
   failed_when: false
-  register: copilot_cli_version
-  when: enable_copilot_cli | default(true)
+  register: github_copilot_cli_version
+  when: github_enable_copilot_cli | bool
   tags:
     - github
     - copilot-cli
@@ -86,8 +86,8 @@
 
 - name: Display GitHub Copilot CLI version
   ansible.builtin.debug:
-    msg: "✓ GitHub Copilot CLI installed: {{ copilot_cli_version.stdout | default('(version unavailable)') }}"
-  when: enable_copilot_cli | default(true)
+    msg: "✓ GitHub Copilot CLI installed: {{ github_copilot_cli_version.stdout | default('(version unavailable)') }}"
+  when: github_enable_copilot_cli | bool
   tags:
     - github
     - copilot-cli
