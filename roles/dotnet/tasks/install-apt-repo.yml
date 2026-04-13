@@ -74,14 +74,14 @@
       }}/prod {{ dotnet_distro_codename_result.stdout }} main
     filename: microsoft-dotnet-prod
     state: present
-    update_cache: no
+    update_cache: false
   tags:
     - dotnet
     - packages
 
 - name: Update APT cache after adding .NET repository
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
   tags:
     - dotnet
@@ -91,7 +91,7 @@
   ansible.builtin.apt:
     name: "{{ dotnet_packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
   tags:
     - dotnet
     - packages

@@ -31,7 +31,7 @@
       - python3-dev
       - build-essential
     state: present
-    update_cache: yes
+    update_cache: true
   tags:
     - azure-cli
     - packages
@@ -40,7 +40,7 @@
   ansible.builtin.set_fact:
     azure_cli_user: "{{ ansible_facts['env'].get('SUDO_USER') or
       ansible_facts['env'].get('USER', ansible_facts['user_id']) }}"
-  become: no
+  become: false
   tags:
     - azure-cli
     - packages
@@ -68,7 +68,7 @@
 
 - name: Ensure Azure CLI is installed via pipx for current user
   ansible.builtin.command: pipx install azure-cli
-  become: yes
+  become: true
   become_user: "{{ azure_cli_user }}"
   changed_when: false
   tags:
@@ -77,7 +77,7 @@
 
 - name: Upgrade Azure CLI via pipx for current user
   ansible.builtin.command: pipx upgrade azure-cli
-  become: yes
+  become: true
   become_user: "{{ azure_cli_user }}"
   changed_when: false
   tags:
@@ -89,7 +89,7 @@
     src: "{{ azure_cli_user_home }}/.local/bin/az"
     dest: /usr/local/bin/az
     state: link
-    force: yes
+    force: true
   tags:
     - azure-cli
     - packages

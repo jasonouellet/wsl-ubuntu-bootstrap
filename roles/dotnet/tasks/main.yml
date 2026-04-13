@@ -54,7 +54,7 @@
   ansible.builtin.apt:
     name: "{{ dotnet_packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
   when:
     - not dotnet_is_debian_13
     - not (enable_external_repositories | default(true))

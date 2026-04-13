@@ -8,7 +8,7 @@
     name:
       - gnupg
     state: present
-    update_cache: yes
+    update_cache: true
   when: enable_external_repositories | default(true)
   tags:
     - security
@@ -77,7 +77,7 @@
     repo: "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main"
     filename: trivy
     state: present
-    update_cache: yes
+    update_cache: true
   when: enable_external_repositories | default(true)
   tags:
     - security
@@ -89,7 +89,7 @@
     name:
       - trivy
     state: present
-    update_cache: yes
+    update_cache: true
   when:
     - not ansible_check_mode
     - enable_external_repositories | default(true)
@@ -170,7 +170,7 @@
     src: /root/.local/bin/detect-secrets
     dest: /usr/local/bin/detect-secrets
     state: link
-    force: yes
+    force: true
   when: not ansible_check_mode
   tags:
     - security

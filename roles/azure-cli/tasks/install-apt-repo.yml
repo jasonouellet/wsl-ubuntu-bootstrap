@@ -64,7 +64,7 @@
       {{ azure_cli_apt_repo_base }} {{ azure_cli_distro_codename_result.stdout }} main
     filename: azure-cli
     state: present
-    update_cache: no
+    update_cache: false
   tags:
     - azure-cli
     - packages
@@ -72,7 +72,7 @@
 
 - name: Update APT cache after adding Azure CLI repository
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 0
   tags:
     - azure-cli
@@ -83,7 +83,7 @@
   ansible.builtin.apt:
     name: azure-cli
     state: present
-    update_cache: yes
+    update_cache: true
   tags:
     - azure-cli
     - packages
