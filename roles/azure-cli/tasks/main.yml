@@ -58,7 +58,7 @@
   register: az_version
   changed_when: false
   environment:
-    PATH: "/home/{{ ansible_user_id }}/.local/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+    PATH: "/home/{{ ansible_facts['user_id'] }}/.local/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
   tags:
     - azure-cli
     - test

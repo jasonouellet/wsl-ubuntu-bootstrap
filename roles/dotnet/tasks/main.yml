@@ -70,7 +70,7 @@
   register: dotnet_version
   changed_when: false
   environment:
-    PATH: "/usr/local/dotnet:/usr/local/bin:{{ ansible_env.PATH }}"
+    PATH: "/usr/local/dotnet:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
   tags:
     - dotnet
     - test
