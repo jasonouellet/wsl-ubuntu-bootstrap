@@ -4,19 +4,19 @@
 # =========================================
 
 # System
-ansible_become: yes
+ansible_become: true
 ansible_become_method: sudo
 
 # Configure sudo NOPASSWD (recommended for WSL/dev environments)
 # Change to 'no' if you want to disable automatic sudo configuration
-common_configure_nopasswd_sudo: yes
+common_configure_nopasswd_sudo: true
 
 # Distribution info
 distro_codename: "{{ ansible_facts[\"lsb\"][\"codename\"] | default('focal') }}"
 
 # Control whether roles can configure external package repositories
 # (Microsoft, HashiCorp, GitHub, NodeSource, Aqua Security, etc.)
-enable_external_repositories: yes
+enable_external_repositories: true
 
 # =========================================
 # Common / Base System Packages
@@ -184,20 +184,20 @@ ssl_ca_cert_pem_path: "/etc/ssl/certs/{{ ssl_ca_cert_name }}"
 # =========================================
 # Maintenance Configuration
 # =========================================
-maintenance_enable_auto_update: yes
-maintenance_show_warning: yes
+maintenance_enable_auto_update: true
+maintenance_show_warning: true
 
 # =========================================
 # Features Flags (enable/disable components)
 # =========================================
-enable_common: yes
-enable_python: yes
-enable_containers: yes
-security_enable: yes
-enable_ssl_config: yes
-enable_terraform: yes
-enable_dotnet: yes
-enable_nodejs: yes
-enable_azure_cli: yes
-enable_github_cli: yes
-enable_maintenance: yes
+enable_common: true
+enable_python: true
+enable_containers: true
+security_enable: true
+enable_ssl_config: true
+enable_terraform: true
+enable_dotnet: true
+enable_nodejs: true
+enable_azure_cli: true
+enable_github_cli: true
+enable_maintenance: true

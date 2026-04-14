@@ -254,6 +254,9 @@ cp group_vars/custom.yml.example group_vars/custom.yml
 ansible-playbook main.yml -e @group_vars/custom.yml
 ```
 
+> `group_vars/custom.yml` is **not loaded automatically** by Ansible in this project.
+> Use `-e @group_vars/custom.yml` (optionally with `-i hosts`) when you want to apply these overrides.
+
 ## 📦 Available Roles
 
 <!-- markdownlint-disable MD013 -->
@@ -315,7 +318,13 @@ If your organization uses an internal CA certificate, you can configure it by:
 ssl_ca_cert_name: "your-company-root-ca.crt"
 ```
 
-1. **Place the certificate file** in the playbook root directory with the same name:
+1. **Place the certificate file** in one of these supported locations:
+
+  * playbook root directory (same name as `ssl_ca_cert_name`)
+  * `ssl_ca_cert_path` directory (default: `/usr/local/share/ca-certificates`)
+  * or set `ssl_ca_cert_name` to an explicit absolute/relative path
+
+  Example (playbook root):
 
 ```bash
 cp /path/to/your-company-root-ca.crt ./

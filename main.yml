@@ -42,11 +42,42 @@
     # ==========================================
     # SSL Certificate Pre-requisites
     # ==========================================
-    - name: Check if CA certificate file exists
+    - name: Build candidate CA certificate source paths
+      ansible.builtin.set_fact:
+        playbook_ssl_cert_source_candidates:
+          - "{{ ssl_ca_cert_name }}"
+          - "{{ playbook_dir }}/{{ ssl_ca_cert_name }}"
+          - "{{ ssl_ca_cert_path }}/{{ ssl_ca_cert_name }}"
+      when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+      tags:
+        - always
+        - ssl-config
+
+    - name: Check candidate CA certificate source paths
       ansible.builtin.stat:
-        path: "{{ ssl_ca_cert_name }}"
-      register: playbook_ssl_cert_file
-      become: no
+        path: "{{ item }}"
+      loop: "{{ playbook_ssl_cert_source_candidates }}"
+      register: playbook_ssl_cert_stats
+      become: false
+      changed_when: false
+      when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+      tags:
+        - always
+        - ssl-config
+
+    - name: Resolve CA certificate source path
+      ansible.builtin.set_fact:
+        playbook_ssl_cert_source_path: >-
+          {{
+            (
+              playbook_ssl_cert_stats.results
+              | selectattr('stat.exists')
+              | map(attribute='stat.path')
+              | list
+              | first
+            )
+            | default('')
+          }}
       when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
       tags:
         - always
@@ -57,7 +88,8 @@
         msg:
           - "CA Certificate Setup:"
           - "  Configured: {{ ssl_ca_cert_name if ssl_ca_cert_name else 'Not configured' }}"
-          - "  File exists: {{ playbook_ssl_cert_file.stat.exists | default(false) }}"
+          - "  File exists: {{ playbook_ssl_cert_source_path != '' }}"
+          - "  Resolved source: {{ playbook_ssl_cert_source_path if playbook_ssl_cert_source_path != '' else 'Not found' }}"
       when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
       tags:
         - always

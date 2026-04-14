@@ -23,19 +23,60 @@
     - ssl-config
     - certificates
 
-- name: Check if certificate file exists
-  ansible.builtin.stat:
-    path: "{{ ssl_ca_cert_name }}"
-  register: cert_file_stat
+- name: Build candidate certificate source paths
+  ansible.builtin.set_fact:
+    ssl_ca_cert_source_candidates:
+      - "{{ ssl_ca_cert_name }}"
+      - "{{ playbook_dir }}/{{ ssl_ca_cert_name }}"
+      - "{{ ssl_ca_cert_path }}/{{ ssl_ca_cert_name }}"
   when: ca_cert_provided
   tags:
     - ssl-config
     - certificates
 
-- name: Fail if certificate file not found
+- name: Check candidate certificate source paths
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop: "{{ ssl_ca_cert_source_candidates }}"
+  register: cert_source_stats
+  changed_when: false
+  when: ca_cert_provided
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Resolve certificate source path
+  ansible.builtin.set_fact:
+    ssl_ca_cert_source_path: >-
+      {{
+        (
+          cert_source_stats.results
+          | selectattr('stat.exists')
+          | map(attribute='stat.path')
+          | list
+          | first
+        )
+        | default('')
+      }}
+  when: ca_cert_provided
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Fail if certificate file is not found in any supported location
   ansible.builtin.fail:
-    msg: "CA certificate file '{{ ssl_ca_cert_name }}' not found in the playbook directory"
-  when: ca_cert_provided and not cert_file_stat.stat.exists
+    msg: >-
+      CA certificate file '{{ ssl_ca_cert_name }}' not found.
+      Checked: {{ ssl_ca_cert_source_candidates | join(', ') }}
+  when: ca_cert_provided and ssl_ca_cert_source_path == ''
+  tags:
+    - ssl-config
+    - certificates
+
+- name: Display resolved certificate source path
+  ansible.builtin.debug:
+    msg: "Using CA certificate source: {{ ssl_ca_cert_source_path }}"
+  when: ca_cert_provided and ssl_ca_cert_source_path != ''
   tags:
     - ssl-config
     - certificates
@@ -54,13 +95,13 @@
 
 - name: Install IA CA certificate
   ansible.builtin.copy:
-    src: "{{ ssl_ca_cert_name }}"
+    src: "{{ ssl_ca_cert_source_path }}"
     dest: "{{ ssl_ca_cert_full_path }}"
     owner: root
     group: root
     mode: '0644'
   notify: Update CA certificates
-  when: ca_cert_provided
+  when: ca_cert_provided and ssl_ca_cert_source_path != ''
   tags:
     - ssl-config
     - certificates
