@@ -7,33 +7,35 @@ Purpose: install Azure CLI from Microsoft packages.
 * Key vars: `azure_cli_apt_key`, `azure_cli_apt_repo_base`
 * Reference: <https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux>
 
-## Installation Methods
+## Installation Method
 
-This role supports multiple distributions with different installation methods:
-
-### Debian 13 (Trixie)
-
-* **Method**: pipx installation (Python)
-* **Why**: Microsoft does not yet provide APT repository for Debian 13
-* **File**: `tasks/install-pip.yml`
-* **Dependencies**: python3, python3-pip, python3-venv, pipx, libffi-dev, python3-dev, build-essential
-* **Location**: `~/.local/bin/az` (pipx venv)
-* **Global symlink**: `/usr/local/bin/az`
-
-### Debian 12 (Bookworm) & Ubuntu
+This role now uses a single installation method:
 
 * **Method**: Microsoft APT repository
 * **File**: `tasks/install-apt-repo.yml`
 * **Repository**: `packages.microsoft.com/repos/azure-cli`
 * **GPG Key**: Managed in `/etc/apt/keyrings/microsoft-azure-cli.gpg`
 
+## Distribution handling
+
+According to Microsoft Learn, Azure CLI APT packages are currently tested on:
+
+* **Debian**: 11 (Bullseye), 12 (Bookworm)
+* **Ubuntu**: 22.04 (Jammy), 24.04 (Noble)
+
+For newer Debian or Ubuntu releases where no package is yet published, the role keeps a version check and falls back to the latest documented repository suite:
+
+* newer **Debian** releases use `bookworm`
+* newer **Ubuntu** releases use `jammy`
+
+If `enable_external_repositories` is disabled, the role fails explicitly because the official Microsoft installation method requires the Microsoft package repository.
+
 ## Architecture
 
 ```
 roles/azure-cli/tasks/
-├── main.yml              # Orchestrator - detects distribution and delegates
-├── install-pip.yml       # pipx-based installation for Debian 13
-└── install-apt-repo.yml  # APT repository installation for Debian 12/Ubuntu
+├── main.yml              # Orchestrator - selects repository suite and validates prerequisites
+└── install-apt-repo.yml  # Microsoft APT repository installation
 ```
 
 ## Usage
@@ -55,7 +57,7 @@ Azure repo/key values live in `group_vars/all.yml`:
 
 ```yaml
 azure_cli_apt_key: "https://packages.microsoft.com/keys/microsoft.asc"
-azure_cli_apt_repo_base: "https://packages.microsoft.com/repos/azure-cli"
+azure_cli_apt_repo_base: "https://packages.microsoft.com/repos/azure-cli/"
 ```
 
 ## Verification

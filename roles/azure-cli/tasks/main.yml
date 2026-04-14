@@ -2,11 +2,10 @@
 # ==========================================
 # Azure CLI Installation - Main Orchestrator
 # ==========================================
-# This role installs Azure CLI using different methods
-# depending on the Linux distribution:
-#
-# - Debian 13 (Trixie): pip installation (Microsoft recommended)
-# - Debian 12 (Bookworm) & Ubuntu: Microsoft APT repository
+# This role installs Azure CLI using the official Microsoft APT repository.
+# Microsoft currently tests the APT packages on Debian 11/12 and Ubuntu 22.04/24.04.
+# For newer Debian/Ubuntu releases, Microsoft recommends falling back to the
+# latest supported repository codename when no package is yet available.
 #
 # Reference: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux
 
@@ -19,46 +18,88 @@
     - azure-cli
     - always
 
-- name: Detect distribution version
+- name: Initialize Azure CLI repository settings
   ansible.builtin.set_fact:
-    azure_cli_is_debian_13: >-
-      {{ ansible_facts['distribution'] == 'Debian' and
-         ansible_facts['lsb']['major_release'] == '13' }}
-    azure_cli_is_debian_12: >-
-      {{ ansible_facts['distribution'] == 'Debian' and
-         ansible_facts['lsb']['major_release'] == '12' }}
+    azure_cli_detected_codename: "{{ azure_cli_distro_codename_result.stdout | trim }}"
+    azure_cli_repo_codename: "{{ azure_cli_distro_codename_result.stdout | trim }}"
+    azure_cli_repo_is_fallback: false
   tags:
     - azure-cli
     - always
 
-# ==========================================
-# Installation Methods by Distribution
-# ==========================================
-- name: Install Azure CLI for Debian 13 (pip method)
-  ansible.builtin.include_tasks: install-pip.yml
-  when: azure_cli_is_debian_13 or not (enable_external_repositories | default(true))
-  tags:
-    - azure-cli
-    - packages
-
-- name: Install Azure CLI for Debian 12/Ubuntu (APT repository)
-  ansible.builtin.include_tasks: install-apt-repo.yml
+- name: Use Bookworm repository for unsupported Debian releases
+  ansible.builtin.set_fact:
+    azure_cli_repo_codename: bookworm
+    azure_cli_repo_is_fallback: true
   when:
-    - not azure_cli_is_debian_13
+    - ansible_facts['distribution'] == 'Debian'
+    - ansible_facts['distribution_version'] is version('13', '>=')
+  tags:
+    - azure-cli
+    - always
+
+- name: Use Jammy repository for unsupported Ubuntu releases
+  ansible.builtin.set_fact:
+    azure_cli_repo_codename: jammy
+    azure_cli_repo_is_fallback: true
+  when:
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - ansible_facts['distribution_version'] not in ['22.04', '24.04']
+  tags:
+    - azure-cli
+    - always
+
+- name: Fail if Azure CLI role is used on unsupported distribution family
+  ansible.builtin.fail:
+    msg: >-
+      Azure CLI role only supports Debian and Ubuntu. Current distribution:
+      {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}.
+  when: ansible_facts['distribution'] not in ['Debian', 'Ubuntu']
+  tags:
+    - azure-cli
+    - always
+
+- name: Display Azure CLI repository mode
+  ansible.builtin.debug:
+    msg:
+      - >-
+        External repositories are {{ 'enabled' if (enable_external_repositories | default(true)) else 'disabled' }}.
+      - >-
+        Repository source mode: {{ 'Microsoft official APT repository' if (enable_external_repositories | default(true)) else 'local/internal APT repositories (for example JFrog mirror)' }}.
+      - "Azure CLI installation and verification remain enabled in both modes."
+  tags:
+    - azure-cli
+    - always
+
+- name: Display Azure CLI repository fallback information
+  ansible.builtin.debug:
+    msg:
+      - "INFO: Microsoft does not list {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} among the tested Azure CLI APT targets."
+      - >-
+        Using repository suite '{{ azure_cli_repo_codename }}'
+        instead of detected codename '{{ azure_cli_detected_codename }}'
+        as recommended in Microsoft troubleshooting guidance.
+  when:
     - enable_external_repositories | default(true)
+    - azure_cli_repo_is_fallback
+  tags:
+    - azure-cli
+    - always
+
+- name: Install Azure CLI
+  ansible.builtin.include_tasks: install-apt-repo.yml
   tags:
     - azure-cli
     - packages
 
 # ==========================================
-# Verification (all distributions)
+# Verification
 # ==========================================
 - name: Verify Azure CLI installation
   ansible.builtin.command: az version
   register: az_version
   changed_when: false
-  environment:
-    PATH: "/home/{{ ansible_facts['user_id'] }}/.local/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
+  when: not ansible_check_mode
   tags:
     - azure-cli
     - test
@@ -66,6 +107,7 @@
 - name: Display Azure CLI version
   ansible.builtin.debug:
     msg: "{{ az_version.stdout }}"
+  when: not ansible_check_mode
   tags:
     - azure-cli
     - test
