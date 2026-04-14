@@ -320,11 +320,11 @@ ssl_ca_cert_name: "your-company-root-ca.crt"
 
 1. **Place the certificate file** in one of these supported locations:
 
-  * playbook root directory (same name as `ssl_ca_cert_name`)
-  * `ssl_ca_cert_path` directory (default: `/usr/local/share/ca-certificates`)
-  * or set `ssl_ca_cert_name` to an explicit absolute/relative path
+* playbook root directory (same name as `ssl_ca_cert_name`)
+* `ssl_ca_cert_path` directory (default: `/usr/local/share/ca-certificates`)
+* or set `ssl_ca_cert_name` to an explicit absolute/relative path
 
-  Example (playbook root):
+Example (playbook root):
 
 ```bash
 cp /path/to/your-company-root-ca.crt ./

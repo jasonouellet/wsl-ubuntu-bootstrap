@@ -23,18 +23,23 @@ According to Microsoft Learn, Azure CLI APT packages are currently tested on:
 * **Debian**: 11 (Bullseye), 12 (Bookworm)
 * **Ubuntu**: 22.04 (Jammy), 24.04 (Noble)
 
-For newer Debian or Ubuntu releases where no package is yet published, the role keeps a version check and falls back to the latest documented repository suite:
+For newer Debian or Ubuntu releases where no package is yet published, the
+role keeps a version check and falls back to the latest documented repository
+suite:
 
 * newer **Debian** releases use `bookworm`
 * newer **Ubuntu** releases use `jammy`
 
-If `enable_external_repositories` is disabled, the role fails explicitly because the official Microsoft installation method requires the Microsoft package repository.
+If `enable_external_repositories` is disabled, the role fails explicitly because
+the official Microsoft installation method requires the Microsoft package
+repository.
 
 ## Architecture
 
 ```
 roles/azure-cli/tasks/
-├── main.yml              # Orchestrator - selects repository suite and validates prerequisites
+├── main.yml              # Orchestrator - selects repository suite
+│                         # and validates prerequisites
 └── install-apt-repo.yml  # Microsoft APT repository installation
 ```
 

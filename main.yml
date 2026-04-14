@@ -89,7 +89,9 @@
           - "CA Certificate Setup:"
           - "  Configured: {{ ssl_ca_cert_name if ssl_ca_cert_name else 'Not configured' }}"
           - "  File exists: {{ playbook_ssl_cert_source_path != '' }}"
-          - "  Resolved source: {{ playbook_ssl_cert_source_path if playbook_ssl_cert_source_path != '' else 'Not found' }}"
+          - >-
+            Resolved source:
+            {{ playbook_ssl_cert_source_path if playbook_ssl_cert_source_path != '' else 'Not found' }}
       when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
       tags:
         - always

@@ -9,9 +9,9 @@ Purpose: manage SSL/TLS configuration and optional organization CA.
 Usage:
 
 * Provide CA file in one of these locations (first match wins):
-	* exact path in `ssl_ca_cert_name` (absolute or relative)
-	* playbook root as `./{{ ssl_ca_cert_name }}`
-	* system CA directory as `{{ ssl_ca_cert_path }}/{{ ssl_ca_cert_name }}`
+  * exact path in `ssl_ca_cert_name` (absolute or relative)
+  * playbook root as `./{{ ssl_ca_cert_name }}`
+  * system CA directory as `{{ ssl_ca_cert_path }}/{{ ssl_ca_cert_name }}`
 * Run only this role: `ansible-playbook main.yml --tags ssl-config`.
 
 ## HTTPS Connectivity Test (Optional)

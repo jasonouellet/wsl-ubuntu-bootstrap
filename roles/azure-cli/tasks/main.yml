@@ -63,9 +63,14 @@
   ansible.builtin.debug:
     msg:
       - >-
-        External repositories are {{ 'enabled' if (enable_external_repositories | default(true)) else 'disabled' }}.
+        External repositories are
+        {{ 'enabled' if (enable_external_repositories | default(true))
+        else 'disabled' }}.
       - >-
-        Repository source mode: {{ 'Microsoft official APT repository' if (enable_external_repositories | default(true)) else 'local/internal APT repositories (for example JFrog mirror)' }}.
+        Repository source mode:
+        {{ 'Microsoft official APT repository'
+        if (enable_external_repositories | default(true))
+        else 'local/internal APT repositories (for example JFrog mirror)' }}.
       - "Azure CLI installation and verification remain enabled in both modes."
   tags:
     - azure-cli
@@ -74,7 +79,9 @@
 - name: Display Azure CLI repository fallback information
   ansible.builtin.debug:
     msg:
-      - "INFO: Microsoft does not list {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }} among the tested Azure CLI APT targets."
+      - >-
+        INFO: Microsoft does not list {{ ansible_facts['distribution'] }}
+        {{ ansible_facts['distribution_version'] }} among the tested Azure CLI APT targets.
       - >-
         Using repository suite '{{ azure_cli_repo_codename }}'
         instead of detected codename '{{ azure_cli_detected_codename }}'
