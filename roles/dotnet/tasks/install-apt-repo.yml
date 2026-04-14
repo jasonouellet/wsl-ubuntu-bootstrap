@@ -5,6 +5,18 @@
 # Uses official Microsoft APT repository
 # Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-debian
 
+- name: Ensure APT keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - dotnet
+    - packages
+    - gpg
+
 - name: Add Microsoft GPG key for .NET
   ansible.builtin.get_url:
     url: https://packages.microsoft.com/keys/microsoft.asc
@@ -51,6 +63,9 @@
     owner: root
     group: root
     mode: '0644'
+  when:
+    - not ansible_check_mode
+    - dotnet_gpg_file_stat.stat.exists
   tags:
     - dotnet
     - gpg
