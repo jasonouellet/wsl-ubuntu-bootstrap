@@ -127,7 +127,7 @@
         owner: root
         group: root
         mode: '0644'
-      register: bootstrap_cert_installed
+      notify: Update CA certificates immediately (bootstrap)
       when:
         - ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
         - enable_ssl_config | default(true)
@@ -137,14 +137,16 @@
         - always
         - ssl-config
 
-    - name: Update CA certificates immediately (bootstrap)
-      ansible.builtin.command: update-ca-certificates --fresh
-      changed_when: true
-      when:
-        - bootstrap_cert_installed is changed
+    - name: Flush bootstrap certificate handlers immediately
+      ansible.builtin.meta: flush_handlers
       tags:
         - always
         - ssl-config
+
+  handlers:
+    - name: Update CA certificates immediately (bootstrap)
+      ansible.builtin.command: update-ca-certificates --fresh
+      changed_when: true
 
   roles:
     # Base system setup (always required - other roles depend on this)
