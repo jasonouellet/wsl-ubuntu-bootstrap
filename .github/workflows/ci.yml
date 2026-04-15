@@ -12,6 +12,8 @@ jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
     name: Linting and Pre-commit
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     permissions:
       contents: read
       security-events: write
@@ -97,12 +99,19 @@ jobs:
           category: 'codeql'
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        if: ${{ env.SONAR_TOKEN != '' }}
+        uses: SonarSource/sonarqube-scan-action@v5
         with:
           args: >
             -Dsonar.sarifReportPaths=ci-results
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+      - name: Skip SonarCloud Scan when token is unavailable
+        if: ${{ env.SONAR_TOKEN == '' }}
+        run: |
+          echo "SONAR_TOKEN is not configured for this workflow run."
+          echo "Skipping SonarCloud scan (expected for forks or repos without the secret)."
 
       - name: Run Trivy vulnerability and secret scanner
         uses: aquasecurity/trivy-action@master
