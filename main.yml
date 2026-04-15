@@ -23,8 +23,8 @@
 - name: WSL Bootstrap Playbook
   hosts: localhost
   connection: local
-  become: yes
-  gather_facts: yes
+  become: true
+  gather_facts: true
 
   pre_tasks:
     - name: Display playbook information
@@ -97,6 +97,55 @@
         - always
         - ssl-config
 
+    # ==========================================
+    # Bootstrap CA certificate BEFORE apt update
+    # ==========================================
+    # The CA cert must be trusted before apt can reach HTTPS repositories
+    # (e.g. JFrog Artifactory). Installing it here, in pre_tasks, guarantees
+    # it is available when the common role runs apt update.
+    # The ssl-config role still runs later for OpenSSL config & connectivity tests.
+    - name: Create CA certificate directory (bootstrap)
+      ansible.builtin.file:
+        path: "{{ ssl_ca_cert_path }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      when:
+        - ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+        - enable_ssl_config | default(true)
+        - playbook_ssl_cert_source_path is defined
+        - playbook_ssl_cert_source_path != ''
+      tags:
+        - always
+        - ssl-config
+
+    - name: Install CA certificate early (bootstrap, before apt update)
+      ansible.builtin.copy:
+        src: "{{ playbook_ssl_cert_source_path }}"
+        dest: "{{ ssl_ca_cert_full_path }}"
+        owner: root
+        group: root
+        mode: '0644'
+      register: bootstrap_cert_installed
+      when:
+        - ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+        - enable_ssl_config | default(true)
+        - playbook_ssl_cert_source_path is defined
+        - playbook_ssl_cert_source_path != ''
+      tags:
+        - always
+        - ssl-config
+
+    - name: Update CA certificates immediately (bootstrap)
+      ansible.builtin.command: update-ca-certificates --fresh
+      changed_when: true
+      when:
+        - bootstrap_cert_installed is changed
+      tags:
+        - always
+        - ssl-config
+
   roles:
     # Base system setup (always required - other roles depend on this)
     - name: common
@@ -158,7 +207,21 @@
       tags:
         - always
 
-    - name: Suggest next steps
+    - name: Check GitHub CLI authentication status
+      ansible.builtin.command: gh auth status --hostname github.com
+      register: github_auth_status
+      changed_when: false
+      failed_when: false
+      become: false
+      environment:
+        HOME: "{{ lookup('env', 'HOME') }}"
+        XDG_CONFIG_HOME: "{{ lookup('env', 'HOME') }}/.config"
+      when: enable_github_cli | default(true)
+      tags:
+        - always
+        - github
+
+    - name: Suggest next steps (GitHub auth required)
       ansible.builtin.debug:
         msg:
           - ""
@@ -168,5 +231,26 @@
           - "3. Authenticate with GitHub: gh auth login"
           - ""
           - "Note: Terraform version and Azure CLI version were already verified above."
+      when:
+        - not (enable_github_cli | default(true))
+          or (github_auth_status.rc is not defined)
+          or (github_auth_status.rc != 0)
+      tags:
+        - always
+
+    - name: Suggest next steps (GitHub auth already configured)
+      ansible.builtin.debug:
+        msg:
+          - ""
+          - "Next steps:"
+          - "1. Configure git: git config --global user.email 'you@example.com'"
+          - "2. Authenticate with Azure: az login"
+          - "3. GitHub CLI is already authenticated"
+          - ""
+          - "Note: Terraform version and Azure CLI version were already verified above."
+      when:
+        - enable_github_cli | default(true)
+        - github_auth_status.rc is defined
+        - github_auth_status.rc == 0
       tags:
         - always

@@ -73,6 +73,10 @@
 - name: Set Microsoft repository path based on distribution
   ansible.builtin.set_fact:
     dotnet_repo_path: "{{ 'ubuntu' if ansible_facts['distribution'] == 'Ubuntu' else 'debian' }}"
+    dotnet_lsb_version: >-
+      {{ ansible_facts['lsb']['release']
+         if ansible_facts['distribution'] == 'Ubuntu'
+         else ansible_facts['lsb']['major_release'] }}
   tags:
     - dotnet
     - packages
@@ -82,7 +86,8 @@
     repo: |
       deb [arch=amd64,arm64
            signed-by=/etc/apt/keyrings/microsoft-archive-keyring.gpg]
-      {{ dotnet_apt_repo_base }}/{{ dotnet_repo_path }}/{{ ansible_facts['lsb']['release'] if ansible_facts['distribution'] == 'Ubuntu' else ansible_facts['lsb']['major_release'] }}/prod {{ dotnet_distro_codename_result.stdout }} main
+      {{ dotnet_apt_repo_base }}/{{ dotnet_repo_path }}/{{ dotnet_lsb_version }}/prod
+      {{ dotnet_distro_codename_result.stdout }} main
     filename: microsoft-dotnet-prod
     state: present
     update_cache: false

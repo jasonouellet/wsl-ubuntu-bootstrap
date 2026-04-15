@@ -52,27 +52,60 @@
     - test
 
 # Install GitHub Copilot CLI
-- name: Fail when GitHub Copilot CLI is enabled but GitHub CLI is disabled
-  ansible.builtin.fail:
-    msg: >-
-      GitHub Copilot CLI installation requires GitHub CLI (gh).
-      Set github_enable_cli: true or disable github_enable_copilot_cli.
+- name: Detect built-in GitHub Copilot command
+  ansible.builtin.command:
+    cmd: gh copilot --version
+  register: github_copilot_builtin
+  changed_when: false
+  failed_when: false
+  check_mode: false
   when:
-    - github_enable_copilot_cli | bool
-    - not (github_enable_cli | bool)
+    - github_enable_cli | bool
   tags:
     - github
     - copilot-cli
-    - packages
+    - test
+
+- name: Check GitHub CLI authentication status
+  ansible.builtin.command:
+    cmd: gh auth status --hostname github.com
+  register: github_auth_status
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  become: false
+  when:
+    - github_enable_cli | bool
+  tags:
+    - github
+    - copilot-cli
+    - test
 
 - name: Get installed GitHub CLI extensions
   ansible.builtin.command:
     cmd: gh extension list
   register: github_gh_extensions
   changed_when: false
+  failed_when: false
   when:
-    - github_enable_copilot_cli | bool
     - github_enable_cli | bool
+    - github_copilot_builtin.rc != 0
+  tags:
+    - github
+    - copilot-cli
+    - packages
+
+- name: Explain authentication requirement for Copilot extension mode
+  ansible.builtin.debug:
+    msg:
+      - "GitHub Copilot is not built into this gh version."
+      - "Authentication is required to install extension github/gh-copilot."
+      - "Run: gh auth login"
+      - "Then rerun: ansible-playbook main.yml --tags github"
+  when:
+    - github_enable_cli | bool
+    - github_copilot_builtin.rc != 0
+    - github_auth_status.rc != 0
   tags:
     - github
     - copilot-cli
@@ -83,9 +116,11 @@
     cmd: gh extension install github/gh-copilot
   register: github_copilot_install
   changed_when: github_copilot_install.rc == 0
+  failed_when: false
   when:
-    - github_enable_copilot_cli | bool
     - github_enable_cli | bool
+    - github_copilot_builtin.rc != 0
+    - github_auth_status.rc == 0
     - "'github/gh-copilot' not in (github_gh_extensions.stdout | default(''))"
   tags:
     - github
@@ -95,11 +130,13 @@
 - name: Upgrade GitHub Copilot CLI extension
   ansible.builtin.command:
     cmd: gh extension upgrade github/gh-copilot
+  register: github_copilot_upgrade
   changed_when: false
   failed_when: false
   when:
-    - github_enable_copilot_cli | bool
     - github_enable_cli | bool
+    - github_copilot_builtin.rc != 0
+    - github_auth_status.rc == 0
     - "'github/gh-copilot' in (github_gh_extensions.stdout | default(''))"
   tags:
     - github
@@ -114,7 +151,37 @@
   failed_when: false
   register: github_copilot_cli_version
   when:
-    - github_enable_copilot_cli | bool
+    - github_enable_cli | bool
+  tags:
+    - github
+    - copilot-cli
+    - test
+
+- name: Fail if GitHub Copilot CLI is unavailable after installation attempts
+  ansible.builtin.fail:
+    msg: >-
+      GitHub Copilot CLI is not available.
+      If your gh version requires the extension, authenticate first with
+      'gh auth login' and rerun the github role.
+  when:
+    - github_enable_cli | bool
+    - github_copilot_cli_version.rc != 0
+    - github_auth_status.rc == 0 or github_copilot_builtin.rc == 0
+  tags:
+    - github
+    - copilot-cli
+    - test
+
+- name: Display GitHub Copilot source mode
+  ansible.builtin.debug:
+    msg:
+      - >-
+        GitHub Copilot CLI source:
+        {{ 'built-in gh command' if github_copilot_builtin.rc == 0 else 'gh extension github/gh-copilot' }}
+      - >-
+        Upgrade command: {{ 'sudo apt install --only-upgrade gh (or gh copilot)'
+        if github_copilot_builtin.rc == 0 else 'gh extension upgrade github/gh-copilot' }}
+  when:
     - github_enable_cli | bool
   tags:
     - github
@@ -125,7 +192,6 @@
   ansible.builtin.debug:
     msg: "✓ GitHub Copilot CLI installed: {{ github_copilot_cli_version.stdout | default('(version unavailable)') }}"
   when:
-    - github_enable_copilot_cli | bool
     - github_enable_cli | bool
   tags:
     - github

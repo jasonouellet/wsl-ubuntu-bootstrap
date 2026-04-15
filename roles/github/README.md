@@ -1,9 +1,12 @@
 # Role: github
 
-Installs and verifies two complementary GitHub command-line tools:
+Installs and verifies GitHub terminal tooling:
 
-* **GitHub CLI (`gh`)** — interact with the GitHub API (repos, PRs, issues, authentication).
-* **GitHub Copilot CLI (`copilot`)** — AI coding agent directly in the terminal, powered by GitHub Copilot.
+* **GitHub CLI (`gh`)**
+* **GitHub Copilot CLI (`gh copilot`)**
+
+Copilot is managed **with GitHub CLI** (always together). There is no separate
+Copilot enable/disable option in this role anymore.
 
 ## What this role does
 
@@ -12,57 +15,60 @@ Installs and verifies two complementary GitHub command-line tools:
 | apt GPG key | `get_url` | Downloads the signing key for the official GitHub CLI apt repository |
 | apt repository | `apt_repository` | Adds the `cli.github.com/packages/` repository |
 | Install `gh` | `apt` | Installs the `gh` package from the official repository |
-| Download Copilot CLI install script | `get_url` | Downloads `https://gh.io/copilot-install` to `/tmp/` |
-| Install Copilot CLI | `command` | Runs the install script, places `copilot` in `/usr/local/bin/` |
-| Verify | `command` | Displays installed versions of `gh` and `copilot` |
+| Detect Copilot mode | `command` | Detects whether `gh copilot` is built-in or extension-based |
+| Auth check | `command` | Checks `gh auth status` to decide whether extension install is possible |
+| Install/upgrade extension (legacy mode) | `command` | Installs/upgrades `github/gh-copilot` only when needed |
+| Verify | `command` | Validates `gh --version` and `gh copilot --version` |
 
 ## Variables
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `enable_github_cli` | `yes` | Enable/disable installation of `gh` |
-| `enable_copilot_cli` | `yes` | Enable/disable installation of `copilot` |
+| `enable_github_cli` | `yes` | Enable/disable the whole GitHub tooling role (`gh` + Copilot CLI) |
 
 ## Available tags
 
 | Tag | Scope |
 | --- | --- |
 | `github` | All tasks in the role |
-| `copilot-cli` | Copilot CLI tasks only |
+| `copilot-cli` | Copilot-related tasks |
 | `packages` | Installation tasks |
 | `gpg` | apt GPG key task |
 | `repository` | apt repository task |
-| `test` | Version verification and display tasks |
+| `test` | Verification and display tasks |
 
 ## Usage
 
 ```bash
 # Run the full role
 ansible-playbook main.yml --tags github
-
-# Install Copilot CLI only
-ansible-playbook main.yml --tags copilot-cli
-
-# Disable Copilot CLI installation
-ansible-playbook main.yml --tags github -e enable_copilot_cli=no
 ```
+
+## Authentication behavior
+
+* If `gh copilot` is built-in (modern `gh`), no extension install is needed.
+* If extension mode is required, the role asks you to authenticate with
+  `gh auth login` if needed, then rerun the role.
+* The role always prints guidance about the correct upgrade command:
+  * built-in mode: upgrade `gh` via apt
+  * extension mode: `gh extension upgrade github/gh-copilot`
 
 ## After installation
 
 ```bash
 # Verify installations
 gh --version
-copilot --version
+gh copilot --version
 
-# Authenticate GitHub CLI
+# Authenticate GitHub CLI (recommended to use Copilot features)
 gh auth login
 
-# Launch GitHub Copilot CLI (uses gh authentication if already logged in)
-copilot
+# Launch Copilot
+gh copilot
 ```
 
 ## Prerequisites
 
 * Ubuntu/Debian (official GitHub CLI apt repository)
-* Internet access to download packages and the install script
-* An active GitHub Copilot subscription to use `copilot`
+* Internet access to download packages
+* An active GitHub Copilot subscription to use Copilot features
