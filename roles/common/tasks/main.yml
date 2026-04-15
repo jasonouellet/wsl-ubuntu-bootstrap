@@ -68,13 +68,10 @@
     common_packages_linux_effective: >-
       {{
         (
-          common_packages_linux
-          if (common_packages_linux is defined and (common_packages_linux | length) > 0)
-          else (
-            (common_packages_linux_common | default([]))
-            + ((common_packages_linux_debian | default([])) if ansible_facts['distribution'] == 'Debian' else [])
-            + ((common_packages_linux_ubuntu | default([])) if ansible_facts['distribution'] == 'Ubuntu' else [])
-          )
+          (common_packages_linux | default([]))
+          + (common_packages_linux_common | default(common_packages_linux_base | default([])))
+          + ((common_packages_linux_debian | default([])) if ansible_facts['distribution'] == 'Debian' else [])
+          + ((common_packages_linux_ubuntu | default([])) if ansible_facts['distribution'] == 'Ubuntu' else [])
         ) | unique
       }}
   tags:

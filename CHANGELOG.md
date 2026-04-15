@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * **Debian 13**: Microsoft installation script method with ICU library dependencies
   * **Debian 12/Ubuntu**: APT repository method (existing)
 * **Azure CLI Installation**: Dual installation paths based on distribution
-  * **Debian 13**: Python pipx method (PEP 668 compliant)
+  * **Debian 13**: APT repository method with Microsoft-supported fallback suite (`bookworm`)
   * **Debian 12/Ubuntu**: APT repository method (existing)
 * **APT Keyrings**: Centralized `/etc/apt/keyrings/` directory creation in `common` role
 * **GitHub Role Naming**: Renamed role and primary tag from `github-cli` to

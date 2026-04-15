@@ -18,14 +18,7 @@
 
 - name: Install ICU library dependencies for .NET
   ansible.builtin.apt:
-    name:
-      - libicu76
-      - libc6
-      - libgcc-s1
-      - libgssapi-krb5-2
-      - libssl3t64
-      - libstdc++6
-      - zlib1g
+    name: "{{ dotnet_debian_13_dependencies }}"
     state: present
     update_cache: true
   tags:

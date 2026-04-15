@@ -33,12 +33,27 @@
     - packages
     - pipx
 
+- name: Build exact installed pipx package name list
+  ansible.builtin.set_fact:
+    python_pipx_installed_names: >-
+      {{
+        (python_pipx_global_list.stdout_lines | default([]))
+        | map('regex_replace', '^\\s*', '')
+        | map('regex_replace', '\\s+.*$', '')
+        | reject('equalto', '')
+        | list
+      }}
+  tags:
+    - python
+    - packages
+    - pipx
+
 - name: Install Python tools via pipx (global for all users)
   ansible.builtin.command:
     cmd: pipx install "{{ item }}"
     creates: "/opt/pipx/venvs/{{ item }}"
   loop: "{{ python_tools_pipx }}"
-  when: item not in (python_pipx_global_list.stdout | default(''))
+  when: item not in (python_pipx_installed_names | default([]))
   register: python_pipx_global_install
   environment:
     PIPX_HOME: /opt/pipx
@@ -51,7 +66,7 @@
 - name: Upgrade already installed global pipx tools
   ansible.builtin.command: pipx upgrade "{{ item }}"
   loop: "{{ python_tools_pipx }}"
-  when: item in (python_pipx_global_list.stdout | default(''))
+  when: item in (python_pipx_installed_names | default([]))
   changed_when: false
   failed_when: false
   environment:

@@ -6,7 +6,9 @@
     url: "{{ github_cli_apt_key }}"
     dest: /usr/share/keyrings/githubcli-archive-keyring.gpg
     mode: '0644'
-  when: enable_external_repositories | default(true)
+  when:
+    - github_enable_cli | bool
+    - enable_external_repositories | default(true)
   tags:
     - github
     - packages
@@ -17,7 +19,9 @@
     repo: "{{ github_cli_apt_repo }}"
     state: present
     filename: github-cli
-  when: enable_external_repositories | default(true)
+  when:
+    - github_enable_cli | bool
+    - enable_external_repositories | default(true)
   tags:
     - github
     - repository
@@ -48,24 +52,55 @@
     - test
 
 # Install GitHub Copilot CLI
-- name: Download GitHub Copilot CLI install script
-  ansible.builtin.get_url:
-    url: https://gh.io/copilot-install
-    dest: /tmp/copilot-install.sh
-    mode: '0755'
-  when: github_enable_copilot_cli | bool
+- name: Fail when GitHub Copilot CLI is enabled but GitHub CLI is disabled
+  ansible.builtin.fail:
+    msg: >-
+      GitHub Copilot CLI installation requires GitHub CLI (gh).
+      Set github_enable_cli: true or disable github_enable_copilot_cli.
+  when:
+    - github_enable_copilot_cli | bool
+    - not (github_enable_cli | bool)
   tags:
     - github
     - copilot-cli
     - packages
 
-- name: Install GitHub Copilot CLI
+- name: Get installed GitHub CLI extensions
   ansible.builtin.command:
-    cmd: /tmp/copilot-install.sh
-    creates: /usr/local/bin/copilot
-  environment:
-    PREFIX: /usr/local
-  when: github_enable_copilot_cli | bool
+    cmd: gh extension list
+  register: github_gh_extensions
+  changed_when: false
+  when:
+    - github_enable_copilot_cli | bool
+    - github_enable_cli | bool
+  tags:
+    - github
+    - copilot-cli
+    - packages
+
+- name: Install GitHub Copilot CLI extension
+  ansible.builtin.command:
+    cmd: gh extension install github/gh-copilot
+  register: github_copilot_install
+  changed_when: github_copilot_install.rc == 0
+  when:
+    - github_enable_copilot_cli | bool
+    - github_enable_cli | bool
+    - "'github/gh-copilot' not in (github_gh_extensions.stdout | default(''))"
+  tags:
+    - github
+    - copilot-cli
+    - packages
+
+- name: Upgrade GitHub Copilot CLI extension
+  ansible.builtin.command:
+    cmd: gh extension upgrade github/gh-copilot
+  changed_when: false
+  failed_when: false
+  when:
+    - github_enable_copilot_cli | bool
+    - github_enable_cli | bool
+    - "'github/gh-copilot' in (github_gh_extensions.stdout | default(''))"
   tags:
     - github
     - copilot-cli
@@ -73,12 +108,14 @@
 
 - name: Verify GitHub Copilot CLI installation
   ansible.builtin.command:
-    cmd: copilot --version
+    cmd: gh copilot --version
   changed_when: false
   check_mode: false
   failed_when: false
   register: github_copilot_cli_version
-  when: github_enable_copilot_cli | bool
+  when:
+    - github_enable_copilot_cli | bool
+    - github_enable_cli | bool
   tags:
     - github
     - copilot-cli
@@ -87,7 +124,9 @@
 - name: Display GitHub Copilot CLI version
   ansible.builtin.debug:
     msg: "✓ GitHub Copilot CLI installed: {{ github_copilot_cli_version.stdout | default('(version unavailable)') }}"
-  when: github_enable_copilot_cli | bool
+  when:
+    - github_enable_copilot_cli | bool
+    - github_enable_cli | bool
   tags:
     - github
     - copilot-cli

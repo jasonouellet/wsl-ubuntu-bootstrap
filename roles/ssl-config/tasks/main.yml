@@ -165,7 +165,13 @@
   ansible.builtin.uri:
     url: "{{ ssl_test_url }}"
     method: HEAD
+    follow_redirects: all
+    status_code:
+      - 200
+      - 301
+      - 302
   register: curl_https_test
+  changed_when: false
   when:
     - ca_cert_provided is defined
     - ca_cert_provided | bool

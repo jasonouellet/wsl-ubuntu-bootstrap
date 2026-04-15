@@ -19,7 +19,7 @@
 
 - name: Add Microsoft GPG key for .NET
   ansible.builtin.get_url:
-    url: https://packages.microsoft.com/keys/microsoft.asc
+    url: "{{ dotnet_apt_key }}"
     dest: /tmp/microsoft-dotnet-prod.asc
     owner: root
     group: root
@@ -82,11 +82,7 @@
     repo: |
       deb [arch=amd64,arm64
            signed-by=/etc/apt/keyrings/microsoft-archive-keyring.gpg]
-      https://packages.microsoft.com/{{ dotnet_repo_path }}/{{
-        ansible_facts['lsb']['release']
-        if ansible_facts['distribution'] == 'Ubuntu'
-        else ansible_facts['lsb']['major_release']
-      }}/prod {{ dotnet_distro_codename_result.stdout }} main
+      {{ dotnet_apt_repo_base }}/{{ dotnet_repo_path }}/{{ ansible_facts['lsb']['release'] if ansible_facts['distribution'] == 'Ubuntu' else ansible_facts['lsb']['major_release'] }}/prod {{ dotnet_distro_codename_result.stdout }} main
     filename: microsoft-dotnet-prod
     state: present
     update_cache: false

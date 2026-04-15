@@ -51,6 +51,9 @@ common_packages_linux_base:
 # Debian-specific base packages
 common_packages_linux_debian: []
 
+# Alias used by role/task composition and custom overrides
+common_packages_linux_common: "{{ common_packages_linux_base }}"
+
 # Ubuntu-specific packages
 common_packages_linux_ubuntu:
   - software-properties-common     # Manage software repositories and PPAs (Ubuntu only)
@@ -136,6 +139,18 @@ hashicorp_repo_codename: "{{ 'jammy' if distro_codename in ['noble'] else distro
 # https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 dotnet_packages:
   - dotnet-sdk-8.0         # .NET 8 SDK for development and compilation
+
+dotnet_apt_key: https://packages.microsoft.com/keys/microsoft.asc
+dotnet_apt_repo_base: https://packages.microsoft.com
+
+dotnet_debian_13_dependencies:
+  - libicu76
+  - libc6
+  - libgcc-s1
+  - libgssapi-krb5-2
+  - libssl3t64
+  - libstdc++6
+  - zlib1g
 
 # =========================================
 # Node.js Configuration
