@@ -1,69 +1,35 @@
 version: 2
 updates:
-  # GitHub Actions - Monitor and auto-update actions used in workflows
   - package-ecosystem: github-actions
-    directory: '/'
+    directory: /
     schedule:
       interval: weekly
       day: saturday
-      time: '03:00'
+      time: "03:00"
+      timezone: "America/Toronto"
     open-pull-requests-limit: 5
     pull-request-branch-name:
-      separator: '/'
-    reviewers:
-      - jasonouellet
-    assignees:
-      - jasonouellet
+      separator: /
     labels:
       - dependencies
       - github-actions
     commit-message:
-      prefix: 'deps:'
-      prefix-scope: 'github-actions'
+      prefix: "deps"
       include: scope
-    # Auto-merge minor and patch updates
-    auto-merge: true
-    # Only create PRs for major version changes
-    allow:
-      - dependency-type: all
 
-  # Python pip - Monitor Python package dependencies
-  - package-ecosystem: pip
-    directory: '/'
+  - package-ecosystem: pre-commit
+    directory: /
     schedule:
       interval: weekly
       day: monday
-      time: '03:15'
+      time: "03:15"
+      timezone: "America/Toronto"
     open-pull-requests-limit: 5
     pull-request-branch-name:
-      separator: '/'
-    reviewers:
-      - jasonouellet
-    assignees:
-      - jasonouellet
+      separator: /
     labels:
       - dependencies
-      - python
+      - pre-commit
     commit-message:
-      prefix: 'deps:'
-      prefix-scope: 'python'
+      prefix: "deps"
       include: scope
-    # Auto-merge only patch updates (security fixes)
-    automerge: true
-    allow:
-      - dependency-type: 'all'
-
-  # Docker - If containerization is added in the future
-  # - package-ecosystem: docker
-  #   directory: '/'
-  #   schedule:
-  #     interval: weekly
-  #     day: monday
-  #     time: '03:30'
-  #   labels:
-  #     - dependencies
-  #     - docker
-
-# Ignore unnecessary updates
-ignore:
-  []

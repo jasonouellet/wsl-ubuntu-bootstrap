@@ -50,7 +50,7 @@ jobs:
           fi
 
       - name: Set up Python for linting
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -80,19 +80,19 @@ jobs:
           .github/scripts/validate-sonar-version.sh
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: actions
           build-mode: none
 
       - name: Analyze with CodeQL
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           output: ci-results
           upload: false
 
       - name: Upload CodeQL SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always() && hashFiles('ci-results/codeql.sarif') != ''
         with:
           sarif_file: 'ci-results/codeql.sarif'
@@ -100,7 +100,7 @@ jobs:
 
       - name: SonarCloud Scan
         if: ${{ env.SONAR_TOKEN != '' }}
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v6
         with:
           args: >
             -Dsonar.sarifReportPaths=ci-results
@@ -114,17 +114,17 @@ jobs:
           echo "Skipping SonarCloud scan (expected for forks or repos without the secret)."
 
       - name: Run Trivy vulnerability and secret scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0
         with:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'sarif'
           output: 'ci-results/trivy.sarif'
-          scanners: 'vuln,secret,config'
+          scanners: 'vuln,secret,misconfig'
           skip-dirs: '.git,.github,node_modules,.ansible'
 
       - name: Upload Trivy SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always() && hashFiles('ci-results/trivy.sarif') != ''
         with:
           sarif_file: 'ci-results/trivy.sarif'
