@@ -35,7 +35,7 @@
   ansible.builtin.apt:
     name: cron
     state: present
-    update_cache: no
+    update_cache: false
   tags:
     - maintenance
 
@@ -61,7 +61,9 @@
       - "This will run daily at 3:00 AM as root"
       - "To disable: set maintenance_enable_auto_update: no in group_vars/custom.yml"
       - "Or remove cron: sudo crontab -r -u root"
-  when: maintenance_enable_auto_update | default(true)
+  when:
+    - maintenance_enable_auto_update | default(true)
+    - maintenance_show_warning | default(true)
   tags:
     - maintenance
 
@@ -88,7 +90,7 @@
   ansible.builtin.systemd:
     name: cron
     state: started
-  check_mode: yes
+  check_mode: true
   register: maintenance_cron_status
   changed_when: false
   failed_when: false

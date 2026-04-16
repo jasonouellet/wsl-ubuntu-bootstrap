@@ -2,10 +2,10 @@
 # =========================================
 # Example Custom Variables Configuration
 # =========================================
-# Copier ce fichier à group_vars/custom.yml
-# pour customiser votre installation
+# Copy this file to group_vars/custom.yml
+# to customize your installation
 #
-# Exemple d'utilisation :
+# Example usage:
 # ansible-playbook main.yml -i hosts -e @group_vars/custom.yml
 
 # =========================================
@@ -16,16 +16,19 @@
 # 2. Place the certificate file in the playbook root directory
 # ssl_ca_cert_name: "your-company-root-ca.crt"
 
-# Désactiver les composants non-nécessaires
+# Disable components you do not need
 # enable_dotnet: no
 # enable_containers: no
 
-# Personnaliser les versions
+# Disable external repository configuration (Microsoft, Hashicorp, GitHub, NodeSource, Trivy)
+# enable_external_repositories: no
+
+# Customize versions
 # nodejs_version: "20"
 # dotnet_packages:
 #   - dotnet-sdk-7.0
 
-# Ajouter des packages Python supplémentaires
+# Add extra Python packages
 # python_packages_pip:
 #   - pre-commit
 #   - yamllint
@@ -34,13 +37,12 @@
 #   - requests
 #   - numpy
 
-# Ajouter des packages Linux supplémentaires
-# common_packages_linux:
+# Add extra Linux packages (shared for Debian/Ubuntu)
+# common_packages_linux_common:
 #   - ca-certificates
 #   - curl
 #   - git
 #   - lsb-release
-#   - software-properties-common
 #   - apt-transport-https
 #   - gnupg
 #   - unzip
@@ -50,3 +52,18 @@
 #   - htop
 #   - vim
 #   - tmux
+
+# Debian-specific packages
+# common_packages_linux_debian:
+#   - htop
+
+# Ubuntu-specific packages
+# common_packages_linux_ubuntu:
+#   - software-properties-common
+
+# Legacy option: add packages through the combined list
+# (it is merged with the common/debian/ubuntu lists)
+# common_packages_linux:
+#   - ca-certificates
+#   - curl
+#   - git

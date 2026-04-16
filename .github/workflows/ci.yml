@@ -12,13 +12,15 @@ jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
     name: Linting and Pre-commit
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     permissions:
       contents: read
       security-events: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
@@ -48,7 +50,7 @@ jobs:
           fi
 
       - name: Set up Python for linting
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
 
@@ -58,7 +60,7 @@ jobs:
           pip install ansible-core>=2.16 ansible-lint
 
       - name: Run pre-commit hooks (all files)
-        uses: pre-commit/action@v3.0.1
+        uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
       - name: Lint Ansible playbooks and roles (ansible-lint)
         run: |
@@ -78,58 +80,65 @@ jobs:
           .github/scripts/validate-sonar-version.sh
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v4
         with:
           languages: actions
           build-mode: none
 
       - name: Analyze with CodeQL
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@c10b8064de6f491fea524254123dbe5e09572f13 # v4
         with:
           output: ci-results
           upload: false
 
       - name: Upload CodeQL SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4
         if: always() && hashFiles('ci-results/codeql.sarif') != ''
         with:
           sarif_file: 'ci-results/codeql.sarif'
           category: 'codeql'
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        if: ${{ env.SONAR_TOKEN != '' }}
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
         with:
           args: >
             -Dsonar.sarifReportPaths=ci-results
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+      - name: Skip SonarCloud Scan when token is unavailable
+        if: ${{ env.SONAR_TOKEN == '' }}
+        run: |
+          echo "SONAR_TOKEN is not configured for this workflow run."
+          echo "Skipping SonarCloud scan (expected for forks or repos without the secret)."
 
       - name: Run Trivy vulnerability and secret scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'sarif'
           output: 'ci-results/trivy.sarif'
-          scanners: 'vuln,secret,config'
+          scanners: 'vuln,secret,misconfig'
           skip-dirs: '.git,.github,node_modules,.ansible'
 
       - name: Upload Trivy SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4
         if: always() && hashFiles('ci-results/trivy.sarif') != ''
         with:
           sarif_file: 'ci-results/trivy.sarif'
           category: 'trivy'
 
       - name: Generate SBOM with syft
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
         with:
           path: '.'
           format: 'spdx-json'
           output-file: 'sbom.spdx.json'
 
       - name: Upload SBOM as workflow artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
           name: 'sbom'

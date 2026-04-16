@@ -2,12 +2,27 @@
 
 Ansible playbook to automate the complete configuration of a development
 environment on WSL (Windows Subsystem for Linux) or any Debian/Ubuntu
-distribution.
+distributions.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ansible](https://img.shields.io/badge/Ansible-2.16%2B-red.svg)](https://www.ansible.com/)
+[![Release](https://img.shields.io/github/v/release/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/releases)
+
+![Debian](https://img.shields.io/badge/Debian-11%2B-red?logo=debian&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04%2B-E95420?logo=ubuntu&logoColor=white)
+![WSL2](https://img.shields.io/badge/WSL-2-blue?logo=windows&logoColor=white)
+
 [![CI - Validate & Lint](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/ci.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/ci.yml)
 [![Release](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release.yml)
+[![Release Please](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release-please.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release-please.yml)
+[![GitHub issues](https://img.shields.io/github/issues/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/pulls)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jasonouellet_wsl-ubuntu-bootstrap&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=jasonouellet_wsl-ubuntu-bootstrap)
 
 ## 📚 Documentation
 
@@ -21,8 +36,9 @@ distribution.
   * [GitHub Actions Workflows](docs/WORKFLOWS.md) - CI/CD pipeline, automatic versioning, and release process
   * [Security Hardening & Enhancements](docs/HARDENING.md) - Optional security
     hardening and tooling improvements
-  * [Security Scanning](docs/SECURITY_SCANNING.md) - Vulnerability, secret, and code quality scanning tools (Trivy,
-    SonarCloud, detect-secrets)
+  * [Security Scanning](docs/SECURITY_SCANNING.md) - Vulnerability, secret, and code quality scanning tools
+  * [AI Agent Instructions](.github/copilot-instructions.md) - Comprehensive
+    guidelines for code generation and maintenance (GitHub Copilot)
 
 ## 🎯 Objective
 
@@ -72,7 +88,7 @@ wsl-ubuntu-bootstrap/
     ├── dotnet/                 # .NET SDK
     ├── nodejs/                 # Node.js runtime and npm
     ├── azure-cli/              # Azure CLI
-    ├── github-cli/             # GitHub CLI for automation
+    ├── github/                 # GitHub CLI and Copilot CLI
     └── maintenance/            # Automated maintenance (auto-update)
 ```
 
@@ -190,6 +206,9 @@ enable_dotnet: no          # Disable .NET
 enable_containers: no      # Disable OCI tools
 enable_terraform: yes      # Enable Terraform
 
+# Disable external repository configuration (Microsoft, Hashicorp, GitHub, NodeSource, Trivy)
+enable_external_repositories: no
+
 # Modify versions
 nodejs_version: "20"       # Use Node.js 20 LTS instead of 22
 
@@ -210,6 +229,21 @@ common_packages_linux:
   - vim                 # Additional package
 ```
 
+When `enable_external_repositories: no`, roles skip adding third-party APT repositories.
+Some tools may fall back to distro repositories or alternate installers
+depending on the role.
+
+The `python` role installs `pipx`-managed CLI tools globally for all users
+using shared paths:
+
+```yaml
+PIPX_HOME: /opt/pipx
+PIPX_BIN_DIR: /usr/local/bin
+```
+
+This means tools such as exemple `pre-commit`, `ansible-lint`, and `yamllint`
+are expected to be available system-wide.
+
 ### Advanced Customization
 
 For complex modifications, create a `group_vars/custom.yml` file:
@@ -219,6 +253,9 @@ cp group_vars/custom.yml.example group_vars/custom.yml
 # Edit custom.yml with your configurations
 ansible-playbook main.yml -e @group_vars/custom.yml
 ```
+
+> `group_vars/custom.yml` is **not loaded automatically** by Ansible in this project.
+> Use `-e @group_vars/custom.yml` (optionally with `-i hosts`) when you want to apply these overrides.
 
 ## 📦 Available Roles
 
@@ -234,7 +271,7 @@ ansible-playbook main.yml -e @group_vars/custom.yml
 | [**dotnet**](roles/dotnet/README.md) | .NET | .NET SDK 8.0 |
 | [**nodejs**](roles/nodejs/README.md) | Node.js | Node.js 22 LTS, npm, compilation toolchain |
 | [**azure-cli**](roles/azure-cli/README.md) | Azure | Azure CLI for Microsoft Azure cloud management |
-| [**github-cli**](roles/github-cli/README.md) | GitHub | GitHub CLI for repository automation and management |
+| [**github**](roles/github/README.md) | GitHub | GitHub CLI (`gh`) and GitHub Copilot CLI (`copilot`) |
 | [**maintenance**](roles/maintenance/README.md) | Maintenance | Daily automatic updates (cron 3 AM) |
 <!-- markdownlint-enable MD013 -->
 
@@ -281,7 +318,13 @@ If your organization uses an internal CA certificate, you can configure it by:
 ssl_ca_cert_name: "your-company-root-ca.crt"
 ```
 
-1. **Place the certificate file** in the playbook root directory with the same name:
+1. **Place the certificate file** in one of these supported locations:
+
+* playbook root directory (same name as `ssl_ca_cert_name`)
+* `ssl_ca_cert_path` directory (default: `/usr/local/share/ca-certificates`)
+* or set `ssl_ca_cert_name` to an explicit absolute/relative path
+
+Example (playbook root):
 
 ```bash
 cp /path/to/your-company-root-ca.crt ./

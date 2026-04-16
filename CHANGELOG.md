@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* **Debian 13 (Trixie) Support**: Full compatibility with Debian 13 including distribution-specific installation methods
+* **Modular Role Architecture**: Split `dotnet` and `azure-cli` roles into separate task files for better maintainability
+  * `main.yml`: Distribution detection and orchestration
+  * `install-<method>.yml`: Method-specific implementations
+* **GitHub Copilot CLI Support**: Added `copilot` installation and verification to the GitHub tooling role
+
+### Changed
+
+* **.NET SDK Installation**: Dual installation paths based on distribution
+  * **Debian 13**: Microsoft installation script method with ICU library dependencies
+  * **Debian 12/Ubuntu**: APT repository method (existing)
+* **Azure CLI Installation**: Dual installation paths based on distribution
+  * **Debian 13**: APT repository method with Microsoft-supported fallback suite (`bookworm`)
+  * **Debian 12/Ubuntu**: APT repository method (existing)
+* **APT Keyrings**: Centralized `/etc/apt/keyrings/` directory creation in `common` role
+* **GitHub Role Naming**: Renamed role and primary tag from `github-cli` to
+  `github` to better reflect support for both `gh` and `copilot`
+* **Python Role (pipx scope)**: pipx-managed CLI tools are now installed
+  globally for all users using shared paths (`/opt/pipx` and
+  `/usr/local/bin`) instead of user-scoped locations
+
+### Fixed
+
+* Corrected ICU library dependency for .NET on Debian 13 (`libicu76` instead of `libicu72`)
+* Fixed user detection in sudo context for pipx installations (`SUDO_USER` environment variable)
+* Resolved Microsoft package repository unavailability for Debian 13 with alternative methods
+* Fixed `pre-commit` availability mismatch where tools were installed under
+  root context only; tools are now exposed through shared global pipx bin path
+
 ## [0.1.0] - 2026-01-30
 
 ### Initial Release

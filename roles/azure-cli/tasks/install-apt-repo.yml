@@ -1,0 +1,148 @@
+---
+# ==========================================
+# Azure CLI Installation via Microsoft APT
+# ==========================================
+# Uses the official Microsoft APT repository.
+# Reference: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux?view=azure-cli-latest&pivots=apt
+
+- name: Ensure Azure CLI installation prerequisites
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: true
+  tags:
+    - azure-cli
+    - packages
+
+- name: Ensure APT keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: enable_external_repositories | default(true)
+  tags:
+    - azure-cli
+    - packages
+    - gpg
+
+- name: Add Microsoft GPG key for Azure CLI
+  ansible.builtin.get_url:
+    url: "{{ azure_cli_apt_key }}"
+    dest: /tmp/microsoft-azure-cli.asc
+    owner: root
+    group: root
+    mode: '0644'
+  when: enable_external_repositories | default(true)
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Convert and install Microsoft GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /tmp/microsoft-azure-cli.asc > /etc/apt/keyrings/microsoft-azure-cli.gpg
+  args:
+    creates: /etc/apt/keyrings/microsoft-azure-cli.gpg
+  when: enable_external_repositories | default(true)
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Verify Microsoft GPG key file exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/microsoft-azure-cli.gpg
+  register: azure_cli_gpg_file_stat
+  when: not ansible_check_mode and (enable_external_repositories | default(true))
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Fail if Microsoft GPG key file is missing
+  ansible.builtin.fail:
+    msg: "Microsoft GPG key file not found at /etc/apt/keyrings/microsoft-azure-cli.gpg"
+  when:
+    - not ansible_check_mode
+    - not azure_cli_gpg_file_stat.stat.exists
+    - enable_external_repositories | default(true)
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Set Microsoft GPG key permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/microsoft-azure-cli.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - not ansible_check_mode
+    - azure_cli_gpg_file_stat.stat.exists
+    - enable_external_repositories | default(true)
+  tags:
+    - azure-cli
+    - gpg
+
+- name: Get system architecture for Azure CLI repository
+  ansible.builtin.command:
+    argv:
+      - dpkg
+      - --print-architecture
+  register: azure_cli_architecture_result
+  changed_when: false
+  tags:
+    - azure-cli
+    - packages
+    - repository
+
+- name: Remove legacy Azure CLI list repository file
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/azure-cli.list
+    state: absent
+  when: enable_external_repositories | default(true)
+  tags:
+    - azure-cli
+    - packages
+    - repository
+
+- name: Configure Azure CLI APT repository source file
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/azure-cli.sources
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      Types: deb
+      URIs: {{ azure_cli_apt_repo_base }}
+      Suites: {{ azure_cli_repo_codename }}
+      Components: main
+      Architectures: {{ azure_cli_architecture_result.stdout | trim }}
+      Signed-by: /etc/apt/keyrings/microsoft-azure-cli.gpg
+  when: enable_external_repositories | default(true)
+  tags:
+    - azure-cli
+    - packages
+    - repository
+
+- name: Update APT cache after adding Azure CLI repository
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 0
+  when: enable_external_repositories | default(true)
+  tags:
+    - azure-cli
+    - packages
+    - repository
+
+- name: Install Azure CLI via APT
+  ansible.builtin.apt:
+    name: azure-cli
+    state: present
+  tags:
+    - azure-cli
+    - packages
