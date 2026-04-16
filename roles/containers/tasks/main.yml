@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name: "{{ container_packages }}"
     state: present
-    update_cache: yes
+    update_cache: true
   tags:
     - containers
     - packages

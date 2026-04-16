@@ -69,7 +69,7 @@ echo ""
 
 # Check roles structure
 echo "✓ Checking roles structure..."
-required_roles=("common" "ssl-config" "python" "containers" "terraform" "dotnet" "nodejs" "azure-cli" "github-cli" "maintenance")
+required_roles=("common" "ssl-config" "python" "containers" "terraform" "dotnet" "nodejs" "azure-cli" "github" "maintenance")
 for role in "${required_roles[@]}"; do
     if [[ -d "roles/$role/tasks" ]]; then
         echo -e "  ${GREEN}✓${NC} roles/$role/tasks"
@@ -94,17 +94,30 @@ fi
 echo "✓ Checking CA certificate configuration..."
 # Extract ssl_ca_cert_name from group_vars/all.yml or group_vars/custom.yml (custom overrides all)
 CERT_NAME=""
+CERT_PATH=""
 if [[ -f "group_vars/custom.yml" ]] && grep -q "ssl_ca_cert_name:" group_vars/custom.yml; then
     CERT_NAME=$(grep "^ssl_ca_cert_name:" group_vars/custom.yml | sed 's/ssl_ca_cert_name: //;s/"//g;s/'"'"'//g' | xargs)
 elif grep -q "ssl_ca_cert_name:" group_vars/all.yml; then
     CERT_NAME=$(grep "^ssl_ca_cert_name:" group_vars/all.yml | sed 's/ssl_ca_cert_name: //;s/"//g;s/'"'"'//g' | xargs)
 fi
 
+if [[ -f "group_vars/custom.yml" ]] && grep -q "ssl_ca_cert_path:" group_vars/custom.yml; then
+    CERT_PATH=$(grep "^ssl_ca_cert_path:" group_vars/custom.yml | sed 's/ssl_ca_cert_path: //;s/"//g;s/'"'"'//g' | xargs)
+elif grep -q "ssl_ca_cert_path:" group_vars/all.yml; then
+    CERT_PATH=$(grep "^ssl_ca_cert_path:" group_vars/all.yml | sed 's/ssl_ca_cert_path: //;s/"//g;s/'"'"'//g' | xargs)
+else
+    CERT_PATH="/usr/local/share/ca-certificates"
+fi
+
 if [[ -n "$CERT_NAME" && "$CERT_NAME" != "null" && "$CERT_NAME" != "''" ]]; then
     if [[ -f "$CERT_NAME" ]]; then
         echo -e "  ${GREEN}✓${NC} CA certificate found ($CERT_NAME)"
+    elif [[ -f "$CERT_PATH/$CERT_NAME" ]]; then
+        echo -e "  ${GREEN}✓${NC} CA certificate found ($CERT_PATH/$CERT_NAME)"
     else
-        echo -e "  ${RED}✗${NC} CA certificate not found ($CERT_NAME)"
+        echo -e "  ${RED}✗${NC} CA certificate not found"
+        echo "     Checked: $CERT_NAME"
+        echo "     Checked: $CERT_PATH/$CERT_NAME"
         exit 1
     fi
 else

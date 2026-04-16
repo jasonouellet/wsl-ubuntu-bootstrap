@@ -15,6 +15,10 @@ vault_password.txt
 *.pem
 *.crt
 
+# Virtual environment directories
+.venv/
+.uv/
+
 # User-specific customizations
 group_vars/custom.yml
 

@@ -1,111 +1,112 @@
 ---
+# ==========================================
+# Azure CLI Installation - Main Orchestrator
+# ==========================================
+# This role installs Azure CLI using the official Microsoft APT repository.
+# Microsoft currently tests the APT packages on Debian 11/12 and Ubuntu 22.04/24.04.
+# For newer Debian/Ubuntu releases, Microsoft recommends falling back to the
+# latest supported repository codename when no package is yet available.
+#
+# Reference: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux
+
 - name: Get distribution codename
   ansible.builtin.command: lsb_release -cs
-  register: distro_codename_result
+  register: azure_cli_distro_codename_result
   changed_when: false
   check_mode: false
   tags:
     - azure-cli
     - always
 
-- name: Create APT keyrings directory
-  ansible.builtin.file:
-    path: /etc/apt/keyrings
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
+- name: Initialize Azure CLI repository settings
+  ansible.builtin.set_fact:
+    azure_cli_detected_codename: "{{ azure_cli_distro_codename_result.stdout | trim }}"
+    azure_cli_repo_codename: "{{ azure_cli_distro_codename_result.stdout | trim }}"
+    azure_cli_repo_is_fallback: false
   tags:
     - azure-cli
-    - gpg
+    - always
 
-- name: Add Microsoft GPG key
-  ansible.builtin.get_url:
-    url: "{{ azure_cli_apt_key }}"
-    dest: /tmp/microsoft-azure-cli.asc
-    owner: root
-    group: root
-    mode: '0644'
+- name: Use Bookworm repository for unsupported Debian releases
+  ansible.builtin.set_fact:
+    azure_cli_repo_codename: bookworm
+    azure_cli_repo_is_fallback: true
+  when:
+    - ansible_facts['distribution'] == 'Debian'
+    - ansible_facts['distribution_version'] is version('13', '>=')
   tags:
     - azure-cli
-    - gpg
+    - always
 
-- name: Convert and install Microsoft GPG key
-  ansible.builtin.shell: |
-    gpg --dearmor < /tmp/microsoft-azure-cli.asc > /etc/apt/keyrings/microsoft-azure-cli.gpg
-  args:
-    creates: /etc/apt/keyrings/microsoft-azure-cli.gpg
+- name: Use Jammy repository for unsupported Ubuntu releases
+  ansible.builtin.set_fact:
+    azure_cli_repo_codename: jammy
+    azure_cli_repo_is_fallback: true
+  when:
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - ansible_facts['distribution_version'] not in ['22.04', '24.04']
   tags:
     - azure-cli
-    - gpg
+    - always
 
-- name: Verify Microsoft GPG key file exists
-  ansible.builtin.stat:
-    path: /etc/apt/keyrings/microsoft-azure-cli.gpg
-  register: azure_cli_gpg_file_stat
-  when: not ansible_check_mode
-  tags:
-    - azure-cli
-    - gpg
-
-- name: Fail if Microsoft GPG key file is missing
+- name: Fail if Azure CLI role is used on unsupported distribution family
   ansible.builtin.fail:
-    msg: "Microsoft GPG key file not found at /etc/apt/keyrings/microsoft-azure-cli.gpg"
+    msg: >-
+      Azure CLI role only supports Debian and Ubuntu. Current distribution:
+      {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}.
+  when: ansible_facts['distribution'] not in ['Debian', 'Ubuntu']
+  tags:
+    - azure-cli
+    - always
+
+- name: Display Azure CLI repository mode
+  ansible.builtin.debug:
+    msg:
+      - >-
+        External repositories are
+        {{ 'enabled' if (enable_external_repositories | default(true))
+        else 'disabled' }}.
+      - >-
+        Repository source mode:
+        {{ 'Microsoft official APT repository'
+        if (enable_external_repositories | default(true))
+        else 'local/internal APT repositories (for example JFrog mirror)' }}.
+      - "Azure CLI installation and verification remain enabled in both modes."
+  tags:
+    - azure-cli
+    - always
+
+- name: Display Azure CLI repository fallback information
+  ansible.builtin.debug:
+    msg:
+      - >-
+        INFO: Microsoft does not list {{ ansible_facts['distribution'] }}
+        {{ ansible_facts['distribution_version'] }} among the tested Azure CLI APT targets.
+      - >-
+        Using repository suite '{{ azure_cli_repo_codename }}'
+        instead of detected codename '{{ azure_cli_detected_codename }}'
+        as recommended in Microsoft troubleshooting guidance.
   when:
-    - not ansible_check_mode
-    - not azure_cli_gpg_file_stat.stat.exists
+    - enable_external_repositories | default(true)
+    - azure_cli_repo_is_fallback
   tags:
     - azure-cli
-    - gpg
-
-- name: Set Microsoft GPG key permissions
-  ansible.builtin.file:
-    path: /etc/apt/keyrings/microsoft-azure-cli.gpg
-    owner: root
-    group: root
-    mode: '0644'
-  when:
-    - not ansible_check_mode
-    - azure_cli_gpg_file_stat.stat.exists
-  tags:
-    - azure-cli
-    - gpg
-
-- name: Add Azure CLI APT repository
-  ansible.builtin.apt_repository:
-    repo: >
-      deb [signed-by=/etc/apt/keyrings/microsoft-azure-cli.gpg]
-      {{ azure_cli_apt_repo_base }} {{ distro_codename_result.stdout }} main
-    filename: azure-cli
-    state: present
-    update_cache: true
-  tags:
-    - azure-cli
-    - packages
-    - repository
-
-- name: Update APT cache after adding Azure CLI repository
-  ansible.builtin.apt:
-    update_cache: yes
-    cache_valid_time: 0
-  tags:
-    - azure-cli
-    - packages
-    - repository
+    - always
 
 - name: Install Azure CLI
-  ansible.builtin.apt:
-    name: azure-cli
-    state: present
-    update_cache: true
+  ansible.builtin.include_tasks: install-apt-repo.yml
   tags:
     - azure-cli
     - packages
 
+# ==========================================
+# Verification
+# ==========================================
 - name: Verify Azure CLI installation
   ansible.builtin.command: az version
   register: az_version
   changed_when: false
+  when: not ansible_check_mode
   tags:
     - azure-cli
     - test
@@ -113,6 +114,7 @@
 - name: Display Azure CLI version
   ansible.builtin.debug:
     msg: "{{ az_version.stdout }}"
+  when: not ansible_check_mode
   tags:
     - azure-cli
     - test
