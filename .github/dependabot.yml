@@ -7,6 +7,10 @@ updates:
       day: saturday
       time: "03:00"
       timezone: "America/Toronto"
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - "*"
     open-pull-requests-limit: 5
     pull-request-branch-name:
       separator: /
@@ -24,6 +28,10 @@ updates:
       day: monday
       time: "03:15"
       timezone: "America/Toronto"
+    groups:
+      pre-commit-dependencies:
+        patterns:
+          - "*"
     open-pull-requests-limit: 5
     pull-request-branch-name:
       separator: /
