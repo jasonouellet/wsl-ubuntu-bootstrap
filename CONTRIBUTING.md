@@ -136,9 +136,8 @@ docs(readme): update installation instructions
 
 Releases are automated and driven by Release Please and tags.
 
-### Prerequisites
+### Needs to release
 
-* Write access to the repository (merge to `main`)
 * Conventional Commits on merged PRs
 * CHANGELOG.md updated as part of the release PR
 

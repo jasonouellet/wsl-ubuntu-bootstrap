@@ -272,7 +272,9 @@ flowchart TD
 | **GitHub Actions** | `GITHUB_TOKEN` | Repository | Auto | Push SBOM, PR comments |
 | **CD** | N/A | Auto | GitHub | Release creation |
 
-**Required grants**: CI uses `contents: read`; release workflows require `contents: write` to create tags and releases, and `pull-requests: write` for Release Please.
+**Required grants**: CI uses `contents: read`; release workflows require
+`contents: write` to create tags and releases, and `pull-requests: write` for
+Release Please.
 
 ## Deploying on other branches
 
