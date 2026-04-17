@@ -181,13 +181,13 @@ jobs:
         run: mkdir -p ci-results
 
       - name: Download Trivy SARIF artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@a1b72bfbf6f72cecc7e78ae8988b8849d259f0d2 # v4.1.8
         with:
           name: 'trivy-sarif'
           path: 'ci-results'
 
       - name: Download CodeQL SARIF artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@a1b72bfbf6f72cecc7e78ae8988b8849d259f0d2 # v4.1.8
         with:
           name: 'codeql-sarif'
           path: 'ci-results'
@@ -196,8 +196,7 @@ jobs:
         if: ${{ secrets.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
         with:
-          args: >
-            -Dsonar.sarifReportPaths=ci-results/trivy.sarif,ci-results/codeql.sarif
+          args: -Dsonar.sarifReportPaths=ci-results/trivy.sarif,ci-results/codeql.sarif
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
