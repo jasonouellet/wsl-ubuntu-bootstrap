@@ -181,13 +181,13 @@ jobs:
         run: mkdir -p ci-results
 
       - name: Download Trivy SARIF artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.8
         with:
           name: 'trivy-sarif'
           path: 'ci-results'
 
       - name: Download CodeQL SARIF artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.8
         with:
           name: 'codeql-sarif'
           path: 'ci-results'
