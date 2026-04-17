@@ -15,6 +15,8 @@ jobs:
     permissions:
       contents: read
       security-events: write
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -80,11 +82,9 @@ jobs:
       - name: SonarCloud Scan
         if: ${{ env.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
-        env:
-          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
 
       - name: Skip SonarCloud Scan when token is unavailable
-        if: ${{ env.SONAR_TOKEN == '' }}
+        if: ${{ secrets.SONAR_TOKEN == '' }}
         run: |
           echo "SONAR_TOKEN is not configured for this workflow run."
           echo "Skipping SonarCloud scan (expected for forks or repos without the secret)."
