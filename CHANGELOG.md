@@ -5,7 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<!-- markdownlint-disable MD024 -->
+
 ## [Unreleased]
+
+### Changed
+
+* Translate doc in english
+* Improve auto-release processing with release-please tool
+
+## [0.2.0] - 2026-04-15
 
 ### Added
 
@@ -70,3 +79,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Support for both automatic (release-please) and manual tag-based releases
 * CI validation for CHANGELOG updates with releasable commits
 * Configured trunk-based development workflow (main branch only)
+
+<!-- markdownlint-enable MD024 -->
