@@ -170,6 +170,8 @@ jobs:
       - codeql-analyze
     permissions:
       contents: read
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
       - name: Checkout repository
@@ -193,15 +195,13 @@ jobs:
           path: 'ci-results'
 
       - name: Run SonarCloud scan with SARIF imports
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: ${{ env.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
         with:
           args: -Dsonar.sarifReportPaths=ci-results/trivy.sarif,ci-results/codeql.sarif
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Skip SonarCloud scan when token is unavailable
-        if: ${{ secrets.SONAR_TOKEN == '' }}
+        if: ${{ env.SONAR_TOKEN == '' }}
         run: |
           echo "SONAR_TOKEN is not configured for this workflow run."
           echo "Skipping SonarCloud scan (expected for forks or repos without the secret)."
