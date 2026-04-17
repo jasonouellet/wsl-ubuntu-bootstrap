@@ -1,7 +1,7 @@
 # 🔒 Security Hardening & Enhancement Roadmap
 
 This document outlines recommended security hardening measures and additional
-tooling enhancements for the WSL Ubuntu Bootstrap development environment.
+tooling enhancements for the WSL Ubuntu/Debian Bootstrap development environment.
 
 ## 📋 Overview
 
