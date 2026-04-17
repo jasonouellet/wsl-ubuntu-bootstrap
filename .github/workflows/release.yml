@@ -21,13 +21,16 @@ jobs:
 
       - name: Check if CHANGELOG was modified
         id: check-changelog
+        env:
+          GH_REF: ${{ github.ref }}
+          GH_REF_NAME: ${{ github.ref_name }}
         run: |
           # On tag push, check if CHANGELOG was changed in the commit(s) that led to this tag
           # On manual trigger (workflow_dispatch), check if CHANGELOG was changed since last tag
 
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          if [[ "$GH_REF" == refs/tags/* ]]; then
             # Tag event: Get the tag name and find the previous tag
-            CURRENT_TAG="${GITHUB_REF_NAME}"
+            CURRENT_TAG="${GH_REF_NAME}"
             PREVIOUS_TAG=$(git describe --tags --abbrev=0 "${CURRENT_TAG}^" 2>/dev/null || echo "")
 
             if [ -z "$PREVIOUS_TAG" ]; then
@@ -92,19 +95,23 @@ jobs:
 
       - name: Check if GitHub release already exists
         id: release-exists
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+          GH_REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -z "${{ steps.version.outputs.tag }}" ]; then
+          if [ -z "$RELEASE_TAG" ]; then
             echo "exists=false" >> $GITHUB_OUTPUT
             exit 0
           fi
 
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ steps.version.outputs.tag }}")
+            "https://api.github.com/repos/$GH_REPOSITORY/releases/tags/$RELEASE_TAG")
 
           if [ "$STATUS" = "200" ]; then
-            echo "Release already exists for tag ${{ steps.version.outputs.tag }}"
+            echo "Release already exists for tag $RELEASE_TAG"
             echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "exists=false" >> $GITHUB_OUTPUT
