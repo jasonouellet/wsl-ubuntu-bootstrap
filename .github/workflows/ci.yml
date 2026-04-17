@@ -12,8 +12,6 @@ jobs:
   lint-and-validate:
     runs-on: ubuntu-latest
     name: Linting and Pre-commit
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     permissions:
       contents: read
       security-events: write
@@ -79,18 +77,6 @@ jobs:
           chmod +x .github/scripts/validate-sonar-version.sh
           .github/scripts/validate-sonar-version.sh
 
-      - name: SonarCloud Scan
-        if: ${{ env.SONAR_TOKEN != '' }}
-        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
-        env:
-          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
-
-      - name: Skip SonarCloud Scan when token is unavailable
-        if: ${{ env.SONAR_TOKEN == '' }}
-        run: |
-          echo "SONAR_TOKEN is not configured for this workflow run."
-          echo "Skipping SonarCloud scan (expected for forks or repos without the secret)."
-
       - name: Ensure CI results directory exists
         run: mkdir -p ci-results
 
@@ -110,6 +96,14 @@ jobs:
         with:
           sarif_file: 'ci-results/trivy.sarif'
           category: 'trivy'
+
+      - name: Upload Trivy SARIF as workflow artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always() && hashFiles('ci-results/trivy.sarif') != ''
+        with:
+          name: 'trivy-sarif'
+          path: 'ci-results/trivy.sarif'
+          retention-days: 7
 
       - name: Generate SBOM with syft
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
@@ -144,7 +138,71 @@ jobs:
           languages: actions
           build-mode: none
 
+      - name: Ensure CI results directory exists
+        run: mkdir -p ci-results
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
         with:
+          output: ci-results
+          upload: false
+
+      - name: Upload CodeQL SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
+        if: always() && hashFiles('ci-results/codeql.sarif') != ''
+        with:
+          sarif_file: 'ci-results/codeql.sarif'
           category: '/language:actions'
+
+      - name: Upload CodeQL SARIF as workflow artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always() && hashFiles('ci-results/codeql.sarif') != ''
+        with:
+          name: 'codeql-sarif'
+          path: 'ci-results/codeql.sarif'
+          retention-days: 7
+
+  sonar-analyze:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    needs:
+      - lint-and-validate
+      - codeql-analyze
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Ensure CI results directory exists
+        run: mkdir -p ci-results
+
+      - name: Download Trivy SARIF artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: 'trivy-sarif'
+          path: 'ci-results'
+
+      - name: Download CodeQL SARIF artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: 'codeql-sarif'
+          path: 'ci-results'
+
+      - name: Run SonarCloud scan with SARIF imports
+        if: ${{ secrets.SONAR_TOKEN != '' }}
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
+        with:
+          args: >
+            -Dsonar.sarifReportPaths=ci-results/trivy.sarif,ci-results/codeql.sarif
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Skip SonarCloud scan when token is unavailable
+        if: ${{ secrets.SONAR_TOKEN == '' }}
+        run: |
+          echo "SONAR_TOKEN is not configured for this workflow run."
+          echo "Skipping SonarCloud scan (expected for forks or repos without the secret)."
