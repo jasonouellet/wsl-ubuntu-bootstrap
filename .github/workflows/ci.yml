@@ -79,31 +79,9 @@ jobs:
           chmod +x .github/scripts/validate-sonar-version.sh
           .github/scripts/validate-sonar-version.sh
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
-        with:
-          languages: actions
-          build-mode: none
-
-      - name: Analyze with CodeQL
-        uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
-        with:
-          output: ci-results
-          upload: false
-
-      - name: Upload CodeQL SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
-        if: always() && hashFiles('ci-results/codeql.sarif') != ''
-        with:
-          sarif_file: 'ci-results/codeql.sarif'
-          category: 'codeql'
-
       - name: SonarCloud Scan
         if: ${{ env.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
-        with:
-          args: >
-            -Dsonar.sarifReportPaths=ci-results
         env:
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
 
@@ -145,16 +123,25 @@ jobs:
           path: 'sbom.spdx.json'
           retention-days: 30
 
-      - name: Mark Code Scanning check as passed
-        if: success()
-        uses: actions/github-script@v7
+  codeql-analyze:
+    name: Analyze (actions)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
         with:
-          script: |
-            github.rest.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'Code Scanning',
-              head_sha: context.sha,
-              status: 'completed',
-              conclusion: 'success'
-            })
+          languages: actions
+          build-mode: none
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
+        with:
+          category: '/language:actions'
