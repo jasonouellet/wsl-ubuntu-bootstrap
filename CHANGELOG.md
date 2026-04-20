@@ -14,6 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Translate doc in english
 * Improve auto-release processing with release-please tool
 
+## [0.2.2] - 2026-04-17
+
+### Fixed
+
+* **CI Stability**: Resolved CI pipeline issues to restore successful validation and release flow
+
+## [0.2.1] - 2026-04-17
+
+### Changed
+
+* **Release Automation**: Upgraded and improved auto-release workflows for more reliable versioning and publication
+
 ## [0.2.0] - 2026-04-15
 
 ### Added
