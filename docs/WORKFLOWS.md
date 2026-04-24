@@ -55,11 +55,11 @@ This warning is intentionally non-blocking.
 * Push on `main`
 * Manual trigger (`workflow_dispatch`)
 
-### Goal
+### Release Publication Goal
 
 Automatically create a semantic version tag when release prerequisites are met.
 
-### Process
+### Release Publication Process
 
 1. Verify `CHANGELOG.md` changed since last tag (or exists for first release)
 2. Detect intended bump type from commits in range:

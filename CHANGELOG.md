@@ -14,8 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Replaced the previous release-please PR flow with an automated tag-first release flow:
-  * `.github/workflows/tag-release.yml` validates `CHANGELOG.md`, calculates version with GitVersion, and pushes `vX.Y.Z` tags on `main`
-  * `.github/workflows/release.yml` creates GitHub releases from tag events using only the corresponding version section from `CHANGELOG.md`
+  * `.github/workflows/tag-release.yml` validates `CHANGELOG.md`,
+    calculates version with GitVersion, and pushes `vX.Y.Z` tags on `main`
+  * `.github/workflows/release.yml` creates GitHub releases from tag events
+    using only the corresponding version section from `CHANGELOG.md`
 * Set GitVersion semantic bump rules:
   * `feat:` -> minor
   * `feat!:` or `BREAKING CHANGE:` -> major
@@ -25,7 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Made the CI changelog guard non-blocking by emitting a GitHub Actions warning instead of failing the pipeline when releasable changes are missing changelog updates
+* Made the CI changelog guard non-blocking by emitting a GitHub Actions
+  warning instead of failing the pipeline when releasable changes are missing
+  changelog updates
 
 ### Removed
 

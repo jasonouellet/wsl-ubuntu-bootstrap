@@ -101,22 +101,22 @@ jobs:
         if: steps.version.outputs.version != ''
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          
+
           # Extract the section for this version from CHANGELOG.md
           # Format: ## [X.Y.Z] - YYYY-MM-DD
-          
+
           SECTION=$(awk -v version="$VERSION" '
             /^## \['"$VERSION"'\]/ {found=1; next}
             /^## \[/ {if (found) exit}
             found {print}
           ' CHANGELOG.md | sed '/^$/d')
-          
+
           if [ -z "$SECTION" ]; then
             echo "No CHANGELOG section found for version $VERSION"
             # Use empty body if section not found
             SECTION="Release $VERSION"
           fi
-          
+
           # Write to temp file (multiline handling)
           {
             echo 'CHANGELOG_BODY<<EOF'

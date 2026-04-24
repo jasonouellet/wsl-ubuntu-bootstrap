@@ -42,7 +42,10 @@ jobs:
 
           # Detect releasable commits in range (feat/fix/breaking).
           COMMITS=$(git log --oneline -E \
-            --grep="^feat(\([^)]*\))?!:" --grep="^feat(\([^)]*\))?:" --grep="^fix(\([^)]*\))?:" --grep="BREAKING CHANGE:" \
+            --grep="^feat(\([^)]*\))?!:" \
+            --grep="^feat(\([^)]*\))?:" \
+            --grep="^fix(\([^)]*\))?:" \
+            --grep="BREAKING CHANGE:" \
             ${RANGE} 2>/dev/null || true)
 
           if [ -z "$COMMITS" ]; then
@@ -132,9 +135,14 @@ jobs:
           retention-days: 30
 
       - name: Warn when releasable changes miss CHANGELOG update
-        if: always() && steps.changelog-guard.outputs.requires_update == 'true' && steps.changelog-guard.outputs.updated == 'false'
+        if: >-
+          always() &&
+          steps.changelog-guard.outputs.requires_update == 'true' &&
+          steps.changelog-guard.outputs.updated == 'false'
         run: |
-          echo "::warning title=CHANGELOG not updated::Releasable commit(s) detected but CHANGELOG.md was not modified in this change set. This warning is non-blocking."
+          echo "::warning title=CHANGELOG not updated::Releasable commit(s) detected"
+          echo "but CHANGELOG.md was not modified in this change set."
+          echo "This warning is non-blocking."
 
   codeql-analyze:
     name: Analyze (actions)
