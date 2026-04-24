@@ -9,11 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## [0.2.3] - 2026-04-24
+## [0.3.0] - 2026-04-24
 
 ### Changed
 
-* Translate doc in english
+* Replaced the previous release-please PR flow with an automated tag-first release flow:
+  * `.github/workflows/tag-release.yml` validates `CHANGELOG.md`,
+    calculates version with GitVersion, pushes `vX.Y.Z` tags on `main`, and
+    publishes GitHub releases with version-scoped notes from `CHANGELOG.md`
+* Set GitVersion semantic bump rules:
+  * `feat:` -> minor
+  * `feat!:` or `BREAKING CHANGE:` -> major
+  * `fix:` -> patch
+* Added bump visibility in the tag workflow logs with an explicit detected bump type (major/minor/patch)
+* Added CI guard logic to detect releasable commits and verify `CHANGELOG.md` updates
+* Added fail-fast validation in `tag-release.yml` to require an exact
+  `CHANGELOG.md` heading for the GitVersion-calculated release version before
+  tag and release publication
+
+### Fixed
+
+* Made the CI changelog guard non-blocking by emitting a GitHub Actions
+  warning instead of failing the pipeline when releasable changes are missing
+  changelog updates
+
+### Removed
+
+* Removed the `release-please.yml` workflow from the release automation path
+* Removed the standalone `.github/workflows/release.yml` workflow to avoid
+  duplicated release logic
+
+## [0.2.3] - 2026-04-23
+
+### Changed
+
+* Translated documentation to English for consistency across repository guides
 * Improve auto-release processing with release-please tool
 
 ## [0.2.2] - 2026-04-17

@@ -70,11 +70,11 @@ The `ci.yml` workflow runs all tools in this order:
 2. ✅ Ansible-lint
 3. ✅ Playbook syntax check
 4. ✅ Playbook dry-run
-5. ✅ Sonar version validation
-6. ✅ CodeQL scan (SARIF)
-7. ✅ SonarCloud scan
-8. 🔍 Trivy scan (vulnerabilities + secrets)
-9. 📦 SBOM generation
+5. 🔍 Trivy scan (vulnerabilities + secrets + misconfig)
+6. 📦 SBOM generation
+7. ✅ CodeQL scan (separate job, SARIF)
+8. ✅ SonarCloud scan (imports Trivy/CodeQL SARIF when available)
+9. ⚠️ CHANGELOG guard warning for releasable commits without changelog updates (non-blocking)
 
 ### Results
 
