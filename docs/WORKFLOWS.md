@@ -1,369 +1,165 @@
 # GitHub Actions Workflows
 
-This documentation explains the three GitHub Actions workflows in the wsl-ubuntu-bootstrap project.
+This document describes the current CI/CD workflows used in this repository.
 
 ## General structure
 
-```
+```text
 .github/workflows/
-├── ci.yml                 # Validation pipeline (commit)
-├── release-please.yml     # Semantic change detection
-└── release.yml            # Release creation
+├── ci.yml            # Validation, linting, security scans
+├── tag-release.yml   # Version calculation + tag creation on main
+└── release.yml       # GitHub release publication from tags
 ```
 
 ## 1. CI Workflow (ci.yml)
 
-**Trigger**: On every push to main, on PRs, or manual trigger
+**Trigger**:
 
-### Steps
+* Push on `main`
+* Pull requests targeting `main`
+* Manual trigger (`workflow_dispatch`)
 
-1. **Pre-commit Checks**
+### Main responsibilities
 
-   * Installs pre-commit hooks
-   * Validates: YAML, Shell, Secrets, Markdown
-   * Fail fast if an error is detected
+1. Run quality checks (`pre-commit`, `ansible-lint`, syntax, dry-run)
+2. Run security scanning (Trivy, CodeQL, SonarCloud)
+3. Generate and publish SBOM artifacts
+4. Validate releasable changes against `CHANGELOG.md` with a non-blocking warning
 
-   Tools executed:
-   * `yamllint` - YAML validation (120 char max)
-   * `shellcheck` - Shell static analysis
-   * `detect-secrets` - Leak detection (25+ patterns)
-   * `markdownlint` - Markdown validation
+### CHANGELOG guard behavior
 
-2. **Ansible Lint**
+CI inspects the relevant commit range:
 
-   Static analysis of the Ansible playbook (production profile)
+* `pull_request`: `origin/<base>..HEAD`
+* `push`: `${{ github.event.before }}..${{ github.sha }}` (fallback to `${{ github.sha }}`)
 
-   Checks:
-   * Meaningful task names
-   * Consistent variable names (snake_case, prefixes)
-   * Task tagging
-   * Clean YAML syntax
+Then it detects releasable commits:
 
-3. **Ansible Syntax Check**
+* `feat:`
+* `feat!:`
+* `fix:`
+* `BREAKING CHANGE:`
 
-   Validates the main playbook syntax without execution
+If releasable commits exist and `CHANGELOG.md` is not modified, CI emits a warning annotation at the end of the job:
 
-   Command:
+```text
+::warning title=CHANGELOG not updated::...
+```
 
-   ```bash
-   ansible-playbook main.yml --syntax-check
-   ```
+This warning is intentionally non-blocking.
 
-4. **Ansible Dry-run (Check Mode)**
+## 2. Tag Workflow (tag-release.yml)
 
-   Simulates execution **without making changes**
+**Trigger**:
 
-   Verifies:
-   * Module responses (registers)
-   * Conditions (when)
-   * Handlers
-
-   Command:
-
-   ```bash
-   ansible-playbook main.yml --check -i localhost, --connection=local
-   ```
-
-5. **SonarCloud Version Validation**
-
-   Validates that `sonar-project.properties` matches the latest CHANGELOG version
-
-   Prevents release desynchronization
-
-   Runs:
-
-   ```bash
-   bash .github/scripts/validate-sonar-version.sh
-   ```
-
-6. **SonarCloud Scan**
-
-   Sends code to SonarCloud for analysis
-
-   Metrics scanned:
-   * Code coverage (n/a for Ansible)
-   * Duplications
-   * Code smells
-   * Security hotspots
-
-   Secure auth via `SONAR_TOKEN` (secret)
-
-   Organization: `jasonouellet`
-
-7. **CodeQL Scan**
-
-   Runs CodeQL analysis and exports SARIF
-
-   Results:
-   * Upload to GitHub Code Scanning
-   * SARIF import into SonarCloud (external issues)
-
-8. **Trivy Security Scan**
-
-   Scans vulnerabilities and secrets
-
-   **Modes**:
-   * `rootfs` - System files
-   * `fs` - Full filesystem
-   * `config` - Config files (Ansible, Docker, etc.)
-
-   **Outputs**:
-   * Table output in console
-   * SARIF report (GitHub Security tab)
-   * Raw output (logs)
-
-9. **SBOM Generation**
-
-   Generates a Bill of Materials (SBOM) with Syft
-
-   Supported formats:
-   * CycloneDX (JSON) - Recommended
-   * SPDX (JSON/XML) - ISO standard
-   * Table (console)
-
-   **Artifact**:
-   * Stored for 30 days
-   * Available in Actions > Summary
-
-10. **Upload Artifacts**
-
-   Stores SBOMs for inspection
-
-   Artifacts available: `sbom-cyclonedx.json` (CycloneDX format), `sbom-spdx-json.json` (SPDX format)
-
-### Required secrets
-
-| Secret | Usage | Where to create |
-| --- | --- | --- |
-| `GITHUB_TOKEN` | GitHub authentication (auto provided) | Auto |
-| `SONAR_TOKEN` | SonarCloud authentication | Settings > Secrets > Actions |
-
-### Typical duration
-
-* **Pre-commit checks**: 30-60 sec
-* **Ansible lint**: 10 sec
-* **Ansible check**: 1-2 min
-* **CodeQL scan**: 1-3 min
-* **SonarCloud scan**: 1-2 min
-* **Trivy scan**: 30 sec
-* **SBOM generation**: 15 sec
-
-**Total**: ~5-6 minutes
-
-## 2. Release Please Workflow (release-please.yml)
-
-**Trigger**: On every push to main (if changes are detected)
+* Push on `main`
+* Manual trigger (`workflow_dispatch`)
 
 ### Goal
 
-Automates semantic versioning (SemVer) via **Release Please**
+Automatically create a semantic version tag when release prerequisites are met.
 
 ### Process
 
-1. **Detects changes** based on commit messages
+1. Verify `CHANGELOG.md` changed since last tag (or exists for first release)
+2. Detect intended bump type from commits in range:
+   * `feat!:` or `BREAKING CHANGE:` -> `major`
+   * `feat:` -> `minor`
+   * otherwise -> `patch`
+3. Calculate semantic version with GitVersion
+4. Skip if tag already exists
+5. Create and push `vX.Y.Z`
 
-   Conventional Commits:
-   * `feat:` -> Minor version (1.0.x -> 1.1.0)
-   * `fix:` -> Patch version (1.0.0 -> 1.0.1)
-   * `feat!:` -> Major version (1.0.0 -> 2.0.0)
+### Versioning rules
 
-2. **Creates a release PR**
+Configured in `GitVersion.yml`:
 
-   Title: "chore(main): release 1.0.0"
-
-   Contains:
-   * Update to CHANGELOG.md
-   * Version bump in sonar-project.properties (auto sync)
-
-3. **Waits for merge**
-
-   The PR remains open until manually merged
-
-   This allows:
-   * Change review
-   * CHANGELOG verification
-   * Version number validation
-
-### Configuration
-
-Action key: `google-github-actions/release-please-action@v4`
-
-Parameters:
-
-| Param | Value | Purpose |
-| --- | --- | --- |
-| `release-type` | `simple` | Single version number for the project |
-| `changelog-path` | `CHANGELOG.md` | Use the project changelog |
-| `include-v-in-tag` | `true` | Tags are `vX.Y.Z` |
-
-### Result
-
-Automatically generated PR:
-
-```diff
-# CHANGELOG.md
-## [1.0.0] - 2024-01-15
-
-### Added
-- feat: SonarCloud integration (#45)
-- feat: Trivy security scanning (#46)
-
-### Fixed
-- fix: Terraform APT cache issue (#43)
-```
+* `major-version-bump-message`: `feat!:` or `BREAKING CHANGE:`
+* `minor-version-bump-message`: `feat:`
+* `patch-version-bump-message`: `fix:`
 
 ## 3. Release Workflow (release.yml)
 
-**Trigger**: Tag push with format `vX.Y.Z` or manual `workflow_dispatch`
+**Trigger**:
 
-### Publishing
+* Tag push matching `vX.Y.Z`
+* Manual trigger (`workflow_dispatch`)
 
-Creates or completes a GitHub release from a tag, using the changelog
+### Goal
 
-### Release Steps
+Publish a GitHub release from an existing version tag.
 
-1. **Validate CHANGELOG**
+### Process
 
-   Ensures CHANGELOG.md was updated for the new tag (or since the last tag on manual run)
+1. Validate that `CHANGELOG.md` was updated for the release range
+2. Extract version from the tag
+3. Extract only the matching version section from `CHANGELOG.md`
+4. Check whether the GitHub release already exists
+5. Create release when missing
 
-2. **Create release if missing**
+Release body content is scoped to the tagged version section, not the full changelog.
 
-   * Checks if a GitHub release already exists for the tag
-   * Creates the release only when missing
-   * Uses CHANGELOG.md as the release body
-
-3. **Release visible in**
-
-   * Releases page of the repo
-   * RSS feed
-
-### Generated artifacts
-
-```
-Release v1.0.0
-└── Source code (zip, tar.gz) [Auto by GitHub]
-```
-
-## Full architecture
-
-### Change flow
+## Architecture overview
 
 ```mermaid
 flowchart TD
-  A["PR opened/updated"] --> B["CI workflow"]
-  B --> B1["Lint + ansible-lint + syntax"]
-  B --> B2["Dry-run Ansible (--check)"]
-  B --> B3["CHANGELOG guard"]
+  A[PR opened/updated] --> B[CI workflow]
+  B --> B1[Quality checks + scans]
+  B --> B2[CHANGELOG guard warning when needed]
 
-  C["PR merged into main"] --> D["Release-please workflow"]
-  D --> D1["Create/update release PR"]
-  D -->|"Release PR merged"| D2["Create tag vX.Y.Z + GitHub release"]
+  C[PR merged into main] --> D[tag-release workflow]
+  D --> D1[Validate CHANGELOG update]
+  D --> D2[Detect bump type + compute version]
+  D --> D3[Push tag vX.Y.Z]
 
-  D2 --> E["Release workflow (on tag)"]
-  E --> E1["Validate CHANGELOG"]
-  E --> E2["Create release if missing"]
+  D3 --> E[release workflow]
+  E --> E1[Extract section from CHANGELOG]
+  E --> E2[Create GitHub release]
 ```
 
-### Secrets and permissions
+## Secrets and permissions
 
-| Component | Secret | Scope | Created by | Usage |
-| --- | --- | --- | --- | --- |
-| **SonarCloud** | `SONAR_TOKEN` | Organization | SonarCloud UI | Scan authentication |
-| **GitHub Actions** | `GITHUB_TOKEN` | Repository | Auto | Push SBOM, PR comments |
-| **CD** | N/A | Auto | GitHub | Release creation |
+| Component | Secret | Scope | Usage |
+| --- | --- | --- | --- |
+| SonarCloud | `SONAR_TOKEN` | Repository/Org | SonarCloud scan authentication |
+| GitHub Actions | `GITHUB_TOKEN` | Auto-provided | Tag push and release creation |
 
-**Required grants**: CI uses `contents: read`; release workflows require
-`contents: write` to create tags and releases, and `pull-requests: write` for
-Release Please.
+Permission model:
 
-## Deploying on other branches
-
-To deploy on branches other than `main`:
-
-1. Add `branches` to workflow triggers
-
-   ```yaml
-   on:
-     push:
-       branches:
-         - main
-         - develop
-   ```
-
-2. Configure Release Please for each branch
-
-   ```yaml
-   release-type: simple
-   target-branch: develop  # If needed
-   ```
-
-3. Create a merge strategy (rebase onto main after release)
+* `ci.yml`: mostly `contents: read`, `security-events: write`
+* `tag-release.yml`: `contents: write` (required to push tags)
+* `release.yml`: `contents: write` (required to create GitHub releases)
 
 ## Troubleshooting
 
-### CI fails with "lsb_release not found"
+### No tag created on main
 
-**Cause**: Missing distribution detection
+Common causes:
 
-**Solution**:
+* `CHANGELOG.md` was not modified since the latest tag
+* Tag already exists for the computed version
+* Commit history does not match bump patterns
 
-```bash
-All roles use:
-- ansible.builtin.command: lsb_release -cs
-  register: distro_result
-```
+### Incorrect bump level
 
-### SonarCloud scan timeout
+Check commit messages against expected patterns:
 
-**Cause**: Project too large or slow network
+* `feat: ...` -> minor
+* `fix: ...` -> patch
+* `feat!: ...` or `BREAKING CHANGE: ...` -> major
 
-**Solution**: Add timeout in configuration
+### Release not created from tag
 
-```yaml
-SONAR_HOST_URL: "https://sonarcloud.io"
-SONAR_TIMEOUT: "300"
-```
+Verify:
 
-### Release Please creates an incorrect version
-
-**Cause**: Non-conventional commits
-
-**Solution**: Use Conventional Commits format
-
-```bash
-git commit -m "feat: add new feature"      # Minor version bump
-git commit -m "fix: correct bug"           # Patch version bump
-git commit -m "feat!: breaking change"     # Major version bump
-```
-
-### SBOM artifacts do not download
-
-**Cause**: Artifact expiration (30 days by default)
-
-**Solution**: Download from Actions before expiration
-
-Menu: Actions > Latest run > Summary section
-
-## Best practices
-
-### Do
-
-* Use **Conventional Commits** for all commits
-* Review **Release Please PRs** before merge
-* Test locally with `--check` before push
-* Check **security tabs** after CI
-
-### Avoid
-
-* Pushing directly without CI (bypass is risky)
-* Using vague commit messages
-* Ignoring **Trivy alerts**
-* Creating manual releases (Release Please and the tag workflow handle it)
+* Tag matches `vX.Y.Z`
+* Workflow has `contents: write`
+* Release for that tag does not already exist
 
 ## Resources
 
 * [GitHub Actions Documentation](https://docs.github.com/en/actions)
-* [Release Please Action](https://github.com/google-github-actions/release-please-action)
+* [GitVersion Documentation](https://gitversion.net/docs/)
 * [Conventional Commits](https://www.conventionalcommits.org/)
 * [Trivy Documentation](https://aquasecurity.github.io/trivy/)
 * [SonarCloud Documentation](https://docs.sonarcloud.io/)

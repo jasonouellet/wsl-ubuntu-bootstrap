@@ -14,7 +14,7 @@ distributions.
 
 [![CI - Validate & Lint](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/ci.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/ci.yml)
 [![Release](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release.yml)
-[![Release Please](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release-please.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/release-please.yml)
+[![Tag Release](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/tag-release.yml/badge.svg)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/actions/workflows/tag-release.yml)
 [![GitHub issues](https://img.shields.io/github/issues/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/jasonouellet/wsl-ubuntu-bootstrap)](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/pulls)
 
@@ -33,7 +33,7 @@ distributions.
 * [Changelog](CHANGELOG.md) - Version history and changes
 * Technical documentation
   * [Dependabot Configuration](docs/DEPENDABOT.md) - Automated dependency updates for GitHub Actions and Python packages
-  * [GitHub Actions Workflows](docs/WORKFLOWS.md) - CI/CD pipeline, automatic versioning, and release process
+  * [GitHub Actions Workflows](docs/WORKFLOWS.md) - CI/CD pipeline, semantic tag automation, and release process
   * [Security Hardening & Enhancements](docs/HARDENING.md) - Optional security
     hardening and tooling improvements
   * [Security Scanning](docs/SECURITY_SCANNING.md) - Vulnerability, secret, and code quality scanning tools
