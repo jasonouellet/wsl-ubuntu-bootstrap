@@ -8,12 +8,12 @@
 
 <!-- Check all that apply -->
 
-- [ ] Role task(s) (`roles/*/tasks`)
-- [ ] Role defaults/variables (`roles/*/defaults`, `group_vars`)
-- [ ] Workflow/automation (`.github/workflows`)
-- [ ] Documentation (`README.md`, `docs/*`, `CHANGELOG.md`)
-- [ ] Security/scanning configuration
-- [ ] Breaking change
+* [ ] Role task(s) (`roles/*/tasks`)
+* [ ] Role defaults/variables (`roles/*/defaults`, `group_vars`)
+* [ ] Workflow/automation (`.github/workflows`)
+* [ ] Documentation (`README.md`, `docs/*`, `CHANGELOG.md`)
+* [ ] Security/scanning configuration
+* [ ] Breaking change
 
 ## Related Issue
 
@@ -37,16 +37,16 @@ PLAY RECAP: ok=?, changed=?, failed=0
 
 <!-- Required when behavior, roles, or workflows change. -->
 
-- [ ] Commit message follows Conventional Commits
-- [ ] `CHANGELOG.md` updated (when needed)
-- [ ] No release impact
+* [ ] Commit message follows Conventional Commits
+* [ ] `CHANGELOG.md` updated (when needed)
+* [ ] No release impact
 
 ## Checklist
 
-- [ ] Changes are idempotent and follow Ansible best practices
-- [ ] Tasks have appropriate tags
-- [ ] Documentation is updated where relevant
-- [ ] I reviewed my own diff
+* [ ] Changes are idempotent and follow Ansible best practices
+* [ ] Tasks have appropriate tags
+* [ ] Documentation is updated where relevant
+* [ ] I reviewed my own diff
 
 ## Breaking Change / Migration
 
