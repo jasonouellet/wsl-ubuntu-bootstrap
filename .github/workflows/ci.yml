@@ -72,11 +72,6 @@ jobs:
         run: |
           ansible-playbook main.yml --check -i localhost, --connection=local
 
-      - name: Validate SonarCloud project version matches CHANGELOG
-        run: |
-          chmod +x .github/scripts/validate-sonar-version.sh
-          .github/scripts/validate-sonar-version.sh
-
       - name: Ensure CI results directory exists
         run: mkdir -p ci-results
 
@@ -221,14 +216,35 @@ jobs:
 
           echo "SONAR_SARIF_PATHS=$SARIF_PATHS" >> "$GITHUB_ENV"
 
+      - name: Resolve project version from release-please manifest
+        run: |
+          VERSION="$(jq -r '.["."] // empty' .release-please-manifest.json 2>/dev/null || true)"
+
+          if [ -z "$VERSION" ]; then
+            VERSION="$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || true)"
+          fi
+
+          if [ -z "$VERSION" ]; then
+            VERSION="0.0.0"
+          fi
+
+          echo "SONAR_PROJECT_VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Build SonarCloud args
+        run: |
+          ARGS="-Dsonar.projectVersion=${SONAR_PROJECT_VERSION}"
+
+          if [ -n "${SONAR_SARIF_PATHS}" ]; then
+            ARGS="$ARGS -Dsonar.sarifReportPaths=${SONAR_SARIF_PATHS}"
+          fi
+
+          echo "SONAR_ARGS=$ARGS" >> "$GITHUB_ENV"
+
       - name: Run SonarCloud scan with SARIF imports
         if: ${{ env.SONAR_TOKEN != '' }}
-        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
+        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4 # v7.1.0
         with:
-          args: >-
-            ${{ env.SONAR_SARIF_PATHS != ''
-              && format('-Dsonar.sarifReportPaths={0}', env.SONAR_SARIF_PATHS)
-              || '' }}
+          args: ${{ env.SONAR_ARGS }}
 
       - name: Skip SonarCloud scan when token is unavailable
         if: ${{ env.SONAR_TOKEN == '' }}
