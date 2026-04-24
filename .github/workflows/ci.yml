@@ -22,29 +22,45 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Detect releasable commits and guard CHANGELOG
+      - name: Validate CHANGELOG updates for releasable changes
+        id: changelog-guard
         run: |
-          # Get commits with conventional commit format (feat:, fix:, BREAKING CHANGE:)
-          COMMITS=$(git log --oneline --all -E \
-            --grep="^feat(\([^)]*\))?:" --grep="^fix(\([^)]*\))?:" --grep="BREAKING CHANGE:" \
-            2>/dev/null || true)
+          set -euo pipefail
+
+          # Use the relevant commit range for this workflow context.
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            RANGE="origin/${{ github.base_ref }}..HEAD"
+          else
+            BEFORE="${{ github.event.before }}"
+            AFTER="${{ github.sha }}"
+            if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+              RANGE="${BEFORE}..${AFTER}"
+            else
+              RANGE="${AFTER}"
+            fi
+          fi
+
+          # Detect releasable commits in range (feat/fix/breaking).
+          COMMITS=$(git log --oneline -E \
+            --grep="^feat(\([^)]*\))?!:" --grep="^feat(\([^)]*\))?:" --grep="^fix(\([^)]*\))?:" --grep="BREAKING CHANGE:" \
+            ${RANGE} 2>/dev/null || true)
 
           if [ -z "$COMMITS" ]; then
-            echo "No releasable commits found - skipping CHANGELOG check"
+            echo "No releasable commits in ${RANGE}; CHANGELOG validation not required."
+            echo "requires_update=false" >> "$GITHUB_OUTPUT"
+            echo "updated=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          # Check if CHANGELOG mentions "Unreleased" section
-          if grep -q "## \[Unreleased\]" CHANGELOG.md; then
-            echo "✓ CHANGELOG has Unreleased section"
-            exit 0
-          elif grep -q "## \[.*\]" CHANGELOG.md; then
-            echo "⚠ CHANGELOG exists but no Unreleased section found"
-            echo "If you added feat: or fix: commits, please update CHANGELOG.md"
-            exit 0
+          # Releasable commits found: require CHANGELOG.md changed in the same range.
+          if git diff --name-only ${RANGE} | grep -q "^CHANGELOG\.md$"; then
+            echo "CHANGELOG.md was updated for releasable changes."
+            echo "requires_update=true" >> "$GITHUB_OUTPUT"
+            echo "updated=true" >> "$GITHUB_OUTPUT"
           else
-            echo "✗ CHANGELOG.md not found or improperly formatted"
-            exit 1
+            echo "CHANGELOG.md was not updated for releasable changes."
+            echo "requires_update=true" >> "$GITHUB_OUTPUT"
+            echo "updated=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up Python for linting
@@ -114,6 +130,11 @@ jobs:
           name: 'sbom'
           path: 'sbom.spdx.json'
           retention-days: 30
+
+      - name: Warn when releasable changes miss CHANGELOG update
+        if: always() && steps.changelog-guard.outputs.requires_update == 'true' && steps.changelog-guard.outputs.updated == 'false'
+        run: |
+          echo "::warning title=CHANGELOG not updated::Releasable commit(s) detected but CHANGELOG.md was not modified in this change set. This warning is non-blocking."
 
   codeql-analyze:
     name: Analyze (actions)
