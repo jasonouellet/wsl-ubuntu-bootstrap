@@ -1,4 +1,4 @@
-name: CI - Validate & Lint
+name: CI - Validate & Lint Code
 
 on:
   push:
