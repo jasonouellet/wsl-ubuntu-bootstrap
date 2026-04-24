@@ -96,6 +96,34 @@ jobs:
             exit 0
           fi
 
+      - name: Extract CHANGELOG section for version
+        id: changelog
+        if: steps.version.outputs.version != ''
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Extract the section for this version from CHANGELOG.md
+          # Format: ## [X.Y.Z] - YYYY-MM-DD
+          
+          SECTION=$(awk -v version="$VERSION" '
+            /^## \['"$VERSION"'\]/ {found=1; next}
+            /^## \[/ {if (found) exit}
+            found {print}
+          ' CHANGELOG.md | sed '/^$/d')
+          
+          if [ -z "$SECTION" ]; then
+            echo "No CHANGELOG section found for version $VERSION"
+            # Use empty body if section not found
+            SECTION="Release $VERSION"
+          fi
+          
+          # Write to temp file (multiline handling)
+          {
+            echo 'CHANGELOG_BODY<<EOF'
+            echo "$SECTION"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+
       - name: Check if GitHub release already exists
         id: release-exists
         env:
@@ -122,12 +150,12 @@ jobs:
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
-        if: steps.version.outputs.version != ''
+        if: steps.version.outputs.version != '' && steps.release-exists.outputs.exists == 'false'
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: Release ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
-          body_path: CHANGELOG.md
+          body: ${{ steps.changelog.outputs.CHANGELOG_BODY }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
