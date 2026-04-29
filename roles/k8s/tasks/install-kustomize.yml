@@ -26,8 +26,6 @@
     owner: root
     group: root
     mode: '0755'
-  args:
-    creates: /usr/local/bin/kustomize
   tags:
     - k8s
     - kustomize

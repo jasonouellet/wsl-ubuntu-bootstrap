@@ -27,8 +27,6 @@
     owner: root
     group: root
     mode: '0755'
-  args:
-    creates: /usr/local/bin/cilium
   tags:
     - k8s
     - cilium
