@@ -197,6 +197,80 @@ ssl_ca_cert_full_path: "{{ ssl_ca_cert_path }}/{{ ssl_ca_cert_name }}"
 ssl_ca_cert_pem_path: "/etc/ssl/certs/{{ ssl_ca_cert_name }}"
 
 # =========================================
+# Kubernetes CLI Tools Configuration
+# =========================================
+
+# kubectl - Kubernetes CLI (via pkgs.k8s.io APT repository)
+k8s_kubectl_version: "1.32"
+k8s_kubectl_apt_key: >-
+  https://pkgs.k8s.io/core:/stable:/v{{ k8s_kubectl_version }}/deb/Release.key
+k8s_kubectl_apt_repo_url: >-
+  https://pkgs.k8s.io/core:/stable:/v{{ k8s_kubectl_version }}/deb/
+
+# helm - Kubernetes package manager (via APT repository hosted by Buildkite)
+# Reference: https://helm.sh/docs/intro/install/
+k8s_helm_apt_key: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
+k8s_helm_apt_repo_url: "https://packages.buildkite.com/helm-linux/helm-debian/any/"
+
+# istioctl - Istio service mesh CLI (binary from GitHub releases)
+k8s_istio_version: "1.24.3"
+k8s_istioctl_download_url: >-
+  {{ 'https://github.com/istio/istio/releases/download/' ~ k8s_istio_version ~
+  '/istioctl-' ~ k8s_istio_version ~ '-linux-amd64.tar.gz' }}
+
+# calicoctl - Calico CNI CLI (binary from GitHub releases)
+k8s_calico_version: "3.29.3"
+k8s_calicoctl_download_url: >-
+  https://github.com/projectcalico/calico/releases/download/v{{ k8s_calico_version }}/calicoctl-linux-amd64
+
+# k9s - TUI Kubernetes cluster navigator (binary from GitHub releases)
+k8s_k9s_version: "0.32.7"
+k8s_k9s_download_url: >-
+  https://github.com/derailed/k9s/releases/download/v{{ k8s_k9s_version }}/k9s_Linux_amd64.tar.gz
+
+# kubectx / kubens - Context and namespace switcher (binaries from GitHub releases)
+k8s_kubectx_version: "0.9.5"
+k8s_kubectx_download_url: >-
+  https://github.com/ahmetb/kubectx/releases/download/v{{ k8s_kubectx_version }}/kubectx
+k8s_kubens_download_url: >-
+  https://github.com/ahmetb/kubectx/releases/download/v{{ k8s_kubectx_version }}/kubens
+
+# argocd - ArgoCD GitOps CLI (binary from GitHub releases)
+k8s_argocd_version: "2.14.9"
+k8s_argocd_download_url: >-
+  https://github.com/argoproj/argo-cd/releases/download/v{{ k8s_argocd_version }}/argocd-linux-amd64
+
+# kind - Kubernetes IN Docker (binary from GitHub releases)
+k8s_kind_version: "0.27.0"
+k8s_kind_download_url: >-
+  https://github.com/kubernetes-sigs/kind/releases/download/v{{ k8s_kind_version }}/kind-linux-amd64
+
+# kustomize - Kubernetes configuration manager (binary from GitHub releases)
+k8s_kustomize_version: "5.6.0"
+k8s_kustomize_download_url: >-
+  {{
+  'https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv'
+  ~ k8s_kustomize_version ~ '/kustomize_v' ~ k8s_kustomize_version ~
+  '_linux_amd64.tar.gz' }}
+
+# kubescape - Kubernetes security scanner [OPTIONAL] (binary from GitHub releases)
+k8s_kubescape_version: "3.0.21"
+k8s_kubescape_download_url: >-
+  https://github.com/kubescape/kubescape/releases/download/v{{ k8s_kubescape_version }}/kubescape-ubuntu-latest
+
+# falcoctl - Falco runtime security CLI [OPTIONAL] (binary from GitHub releases)
+k8s_falco_version: "0.11.0"
+k8s_falcoctl_download_url: >-
+  {{ 'https://github.com/falcosecurity/falcoctl/releases/download/v' ~
+  k8s_falco_version ~ '/falcoctl_' ~ k8s_falco_version ~
+  '_linux_amd64.tar.gz' }}
+
+# cilium - Cilium CNI CLI [OPTIONAL] (binary from GitHub releases)
+k8s_cilium_version: "0.16.24"
+k8s_cilium_download_url: >-
+  https://github.com/cilium/cilium-cli/releases/download/v{{ k8s_cilium_version }}/cilium-linux-amd64.tar.gz
+
+# =========================================
 # Maintenance Configuration
 # =========================================
 maintenance_enable_auto_update: true
@@ -215,4 +289,9 @@ enable_dotnet: true
 enable_nodejs: true
 enable_azure_cli: true
 enable_github_cli: true
+enable_k8s: true
+# Optional k8s tools (disabled by default - enable in custom.yml as needed)
+enable_k8s_kubescape: false     # Kubernetes security & compliance scanner
+enable_k8s_falcoctl: false      # Falco runtime threat detection CLI
+enable_k8s_cilium: false        # Cilium eBPF networking CLI
 enable_maintenance: true

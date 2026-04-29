@@ -1,0 +1,138 @@
+---
+# =========================================
+# kubectl - Kubernetes CLI (APT repository)
+# Reference: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+# =========================================
+
+- name: Download kubectl APT GPG key
+  ansible.builtin.get_url:
+    url: "{{ k8s_kubectl_apt_key }}"
+    dest: /tmp/kubernetes-apt-keyring.asc
+    owner: root
+    group: root
+    mode: '0644'
+  when: enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - kubectl
+    - gpg
+
+- name: Convert and install kubectl APT GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /tmp/kubernetes-apt-keyring.asc > /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  args:
+    creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  when: enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - kubectl
+    - gpg
+
+- name: Verify kubectl GPG key file exists
+  ansible.builtin.stat:
+    path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  register: k8s_kubectl_gpg_stat
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - kubectl
+    - gpg
+
+- name: Fail if kubectl GPG key file is missing
+  ansible.builtin.fail:
+    msg: "kubectl GPG key file not found at /etc/apt/keyrings/kubernetes-apt-keyring.gpg"
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+    - not k8s_kubectl_gpg_stat.stat.exists
+  tags:
+    - k8s
+    - kubectl
+    - gpg
+
+- name: Set kubectl GPG key permissions
+  ansible.builtin.file:
+    path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+    - k8s_kubectl_gpg_stat.stat.exists
+  tags:
+    - k8s
+    - kubectl
+    - gpg
+
+- name: Add kubectl APT repository
+  ansible.builtin.apt_repository:
+    repo: >
+      deb [arch=amd64 signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
+      {{ k8s_kubectl_apt_repo_url }} /
+    filename: kubernetes
+    state: present
+    update_cache: false
+  when: enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - kubectl
+    - packages
+    - repository
+
+- name: Update APT cache after adding kubectl repository
+  ansible.builtin.command:
+    cmd: >-
+      apt-get update -o Dir::Etc::sourcelist="sources.list.d/kubernetes.list"
+      -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
+  changed_when: false
+  when:
+    - enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - kubectl
+    - packages
+    - repository
+
+- name: Install kubectl
+  ansible.builtin.apt:
+    name: kubectl
+    state: present
+    update_cache: false
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - kubectl
+    - packages
+
+- name: Skip kubectl when external repositories are disabled
+  ansible.builtin.debug:
+    msg: "External repositories are disabled. Skipping kubectl installation."
+  when: not (enable_external_repositories | default(true))
+  tags:
+    - k8s
+    - kubectl
+
+- name: Verify kubectl installation
+  ansible.builtin.command: kubectl version --client --output=yaml
+  register: k8s_kubectl_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubectl
+    - test
+
+- name: Display kubectl version
+  ansible.builtin.debug:
+    msg: "kubectl installed: {{ k8s_kubectl_version_check.stdout_lines | default(['(check mode)']) }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubectl

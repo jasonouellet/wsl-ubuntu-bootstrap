@@ -1,0 +1,54 @@
+---
+# =========================================
+# kustomize - Kubernetes Configuration Manager (binary)
+# Reference: https://kubectl.docs.kubernetes.io/installation/kustomize/
+# =========================================
+
+- name: Download kustomize archive
+  ansible.builtin.get_url:
+    url: "{{ k8s_kustomize_download_url }}"
+    dest: "/tmp/kustomize_{{ k8s_kustomize_version }}_linux_amd64.tar.gz"
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - k8s
+    - kustomize
+    - packages
+
+- name: Extract and install kustomize binary
+  ansible.builtin.unarchive:
+    src: "/tmp/kustomize_{{ k8s_kustomize_version }}_linux_amd64.tar.gz"
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - kustomize
+    owner: root
+    group: root
+    mode: '0755'
+  args:
+    creates: /usr/local/bin/kustomize
+  tags:
+    - k8s
+    - kustomize
+    - packages
+
+- name: Verify kustomize installation
+  ansible.builtin.command: kustomize version
+  register: k8s_kustomize_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kustomize
+    - test
+
+- name: Display kustomize version
+  ansible.builtin.debug:
+    msg: "kustomize installed: {{ k8s_kustomize_version_check.stdout | default('(check mode)') }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kustomize

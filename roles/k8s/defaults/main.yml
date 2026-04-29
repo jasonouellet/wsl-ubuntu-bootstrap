@@ -1,0 +1,9 @@
+---
+# Kubernetes role configuration
+# Enable via enable_k8s flag in group_vars/all.yml
+
+# Optional tools - disabled by default
+# Override in group_vars/custom.yml to enable
+enable_k8s_kubescape: false   # Kubernetes security & compliance scanner
+enable_k8s_falcoctl: false    # Falco runtime threat detection CLI
+enable_k8s_cilium: false      # Cilium eBPF networking CLI

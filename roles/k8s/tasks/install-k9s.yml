@@ -1,0 +1,54 @@
+---
+# =========================================
+# k9s - TUI Kubernetes Cluster Navigator (binary)
+# Reference: https://k9scli.io/
+# =========================================
+
+- name: Download k9s archive
+  ansible.builtin.get_url:
+    url: "{{ k8s_k9s_download_url }}"
+    dest: "/tmp/k9s_Linux_amd64.tar.gz"
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - k8s
+    - k9s
+    - packages
+
+- name: Extract and install k9s binary
+  ansible.builtin.unarchive:
+    src: /tmp/k9s_Linux_amd64.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - k9s
+    owner: root
+    group: root
+    mode: '0755'
+  args:
+    creates: /usr/local/bin/k9s
+  tags:
+    - k8s
+    - k9s
+    - packages
+
+- name: Verify k9s installation
+  ansible.builtin.command: k9s version --short
+  register: k8s_k9s_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - k9s
+    - test
+
+- name: Display k9s version
+  ansible.builtin.debug:
+    msg: "k9s installed: {{ k8s_k9s_version_check.stdout | default('(check mode)') }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - k9s

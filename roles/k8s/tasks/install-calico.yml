@@ -1,0 +1,37 @@
+---
+# =========================================
+# calicoctl - Calico CNI CLI (binary)
+# Reference: https://docs.tigera.io/calico/latest/operations/calicoctl/install
+# =========================================
+
+- name: Download and install calicoctl binary
+  ansible.builtin.get_url:
+    url: "{{ k8s_calicoctl_download_url }}"
+    dest: /usr/local/bin/calicoctl
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - k8s
+    - calico
+    - packages
+
+- name: Verify calicoctl installation
+  ansible.builtin.command: calicoctl version
+  register: k8s_calicoctl_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - calico
+    - test
+
+- name: Display calicoctl version
+  ansible.builtin.debug:
+    msg: "calicoctl installed: {{ k8s_calicoctl_version_check.stdout_lines | default(['(check mode)']) }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - calico

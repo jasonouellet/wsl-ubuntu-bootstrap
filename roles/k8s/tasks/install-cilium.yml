@@ -1,0 +1,55 @@
+---
+# =========================================
+# cilium - Cilium CNI CLI (binary) [OPTIONAL]
+# Reference: https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/
+# Enabled via: enable_k8s_cilium: true
+# =========================================
+
+- name: Download cilium CLI archive
+  ansible.builtin.get_url:
+    url: "{{ k8s_cilium_download_url }}"
+    dest: "/tmp/cilium-linux-amd64.tar.gz"
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - k8s
+    - cilium
+    - packages
+
+- name: Extract and install cilium binary
+  ansible.builtin.unarchive:
+    src: /tmp/cilium-linux-amd64.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - cilium
+    owner: root
+    group: root
+    mode: '0755'
+  args:
+    creates: /usr/local/bin/cilium
+  tags:
+    - k8s
+    - cilium
+    - packages
+
+- name: Verify cilium installation
+  ansible.builtin.command: cilium version --client
+  register: k8s_cilium_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - cilium
+    - test
+
+- name: Display cilium version
+  ansible.builtin.debug:
+    msg: "cilium installed: {{ k8s_cilium_version_check.stdout | default('(check mode)') }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - cilium

@@ -1,0 +1,71 @@
+---
+# =========================================
+# Role: k8s
+# =========================================
+# Installs Kubernetes CLI tools:
+# - kubectl    : Kubernetes CLI             (APT - pkgs.k8s.io)
+# - helm       : Kubernetes package manager (APT - baltocdn.com)
+# - istioctl   : Istio service mesh CLI     (binary - GitHub)
+# - calicoctl  : Calico CNI CLI             (binary - GitHub)
+# - k9s        : TUI cluster navigator      (binary - GitHub)
+# - kubectx    : Context/namespace switcher (binary - GitHub)
+# - kubens     : Namespace switcher         (binary - bundled with kubectx)
+# - argocd     : ArgoCD GitOps CLI          (binary - GitHub)
+# - kubescape  : Security scanner           (binary - GitHub) [optional]
+# - falcoctl   : Falco runtime security CLI (binary - GitHub) [optional]
+# - cilium     : Cilium CNI CLI             (binary - GitHub) [optional]
+# - kind       : Kubernetes in Docker       (binary - GitHub)
+# - kustomize  : Kubernetes config manager  (binary - GitHub)
+#
+# Optional tools are controlled by enable flags in group_vars/all.yml.
+# See: group_vars/all.yml for URLs and versions
+
+- name: Ensure /etc/apt/keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags:
+    - k8s
+    - setup
+
+- name: Install kubectl
+  ansible.builtin.import_tasks: install-kubectl.yml
+
+- name: Install helm
+  ansible.builtin.import_tasks: install-helm.yml
+
+- name: Install istioctl
+  ansible.builtin.import_tasks: install-istio.yml
+
+- name: Install calicoctl
+  ansible.builtin.import_tasks: install-calico.yml
+
+- name: Install k9s
+  ansible.builtin.import_tasks: install-k9s.yml
+
+- name: Install kubectx and kubens
+  ansible.builtin.import_tasks: install-kubectx.yml
+
+- name: Install argocd CLI
+  ansible.builtin.import_tasks: install-argocd.yml
+
+- name: Install kubescape
+  ansible.builtin.import_tasks: install-kubescape.yml
+  when: enable_k8s_kubescape | default(false)
+
+- name: Install falcoctl
+  ansible.builtin.import_tasks: install-falcoctl.yml
+  when: enable_k8s_falcoctl | default(false)
+
+- name: Install cilium CLI
+  ansible.builtin.import_tasks: install-cilium.yml
+  when: enable_k8s_cilium | default(false)
+
+- name: Install kind
+  ansible.builtin.import_tasks: install-kind.yml
+
+- name: Install kustomize
+  ansible.builtin.import_tasks: install-kustomize.yml
