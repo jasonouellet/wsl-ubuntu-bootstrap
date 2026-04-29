@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [0.4.0] - 2026-04-29
+
+### Added
+
+* Added new `k8s` role to install Kubernetes and cloud-native CLI tooling
+* Added Kubernetes tooling installation support for:
+  * `kubectl` (APT via `pkgs.k8s.io`)
+  * `helm` (APT via Helm Buildkite repository)
+  * `istioctl` (GitHub release binary)
+  * `calicoctl` (GitHub release binary)
+  * `k9s` (GitHub release binary)
+  * `kubectx` and `kubens` (GitHub release binaries)
+  * `argocd` (GitHub release binary)
+  * `kind` (GitHub release binary)
+  * `kustomize` (GitHub release binary)
+* Added optional Kubernetes tooling flags and installers for:
+  * `kubescape` (`enable_k8s_kubescape`)
+  * `falcoctl` (`enable_k8s_falcoctl`)
+  * `cilium` (`enable_k8s_cilium`)
+* Added role documentation for Kubernetes tooling in `roles/k8s/README.md`
+
 ## [0.3.0] - 2026-04-24
 
 ### Changed
