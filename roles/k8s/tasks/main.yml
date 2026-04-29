@@ -109,36 +109,69 @@
 
 - name: Install helm
   ansible.builtin.import_tasks: install-helm.yml
+  tags:
+    - k8s
+    - helm
 
 - name: Install istioctl
   ansible.builtin.import_tasks: install-istio.yml
+  tags:
+    - k8s
+    - istio
 
 - name: Install calicoctl
   ansible.builtin.import_tasks: install-calico.yml
+  tags:
+    - k8s
+    - calico
 
 - name: Install k9s
   ansible.builtin.import_tasks: install-k9s.yml
+  tags:
+    - k8s
+    - k9s
 
 - name: Install kubectx and kubens
   ansible.builtin.import_tasks: install-kubectx.yml
+  tags:
+    - k8s
+    - kubectx
 
 - name: Install argocd CLI
   ansible.builtin.import_tasks: install-argocd.yml
+  tags:
+    - k8s
+    - argocd
 
 - name: Install kubescape
   ansible.builtin.import_tasks: install-kubescape.yml
   when: k8s_enable_kubescape | default(false)
+  tags:
+    - k8s
+    - kubescape
 
 - name: Install falcoctl
   ansible.builtin.import_tasks: install-falcoctl.yml
   when: k8s_enable_falcoctl | default(false)
+  tags:
+    - k8s
+    - falcoctl
 
 - name: Install cilium CLI
   ansible.builtin.import_tasks: install-cilium.yml
   when: k8s_enable_cilium | default(false)
+  tags:
+    - k8s
+    - cilium
 
 - name: Install kind
   ansible.builtin.import_tasks: install-kind.yml
+  tags:
+    - k8s
+    - kind
 
 - name: Install kustomize
   ansible.builtin.import_tasks: install-kustomize.yml
+  tags:
+    - k8s
+    - kustomize
