@@ -291,7 +291,7 @@ enable_azure_cli: true
 enable_github_cli: true
 enable_k8s: true
 # Optional k8s tools (disabled by default - enable in custom.yml as needed)
-k8s_enable_kubescape: false     # Kubernetes security & compliance scanner
-k8s_enable_falcoctl: false      # Falco runtime threat detection CLI
-k8s_enable_cilium: false        # Cilium eBPF networking CLI
+enable_k8s_kubescape: false     # Kubernetes security & compliance scanner
+enable_k8s_falcoctl: false      # Falco runtime threat detection CLI
+enable_k8s_cilium: false        # Cilium eBPF networking CLI
 enable_maintenance: true

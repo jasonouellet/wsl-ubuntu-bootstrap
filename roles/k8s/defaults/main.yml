@@ -4,6 +4,6 @@
 
 # Optional tools - disabled by default
 # Override in group_vars/custom.yml to enable
-k8s_enable_kubescape: false   # Kubernetes security & compliance scanner
-k8s_enable_falcoctl: false    # Falco runtime threat detection CLI
-k8s_enable_cilium: false      # Cilium eBPF networking CLI
+enable_k8s_kubescape: false   # Kubernetes security & compliance scanner
+enable_k8s_falcoctl: false    # Falco runtime threat detection CLI
+enable_k8s_cilium: false      # Cilium eBPF networking CLI

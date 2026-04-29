@@ -28,6 +28,8 @@
     group: root
     mode: '0755'
   when: not ansible_check_mode
+  args:
+    creates: /usr/local/bin/kustomize
   tags:
     - k8s
     - kustomize
