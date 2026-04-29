@@ -82,7 +82,7 @@
     - packages
     - repository
 
-- name: Update APT cache after adding kubectl repository
+- name: Update APT cache after adding kubectl repository # noqa command-instead-of-module
   ansible.builtin.command:
     cmd: >-
       apt-get update -o Dir::Etc::sourcelist="sources.list.d/kubernetes.list"

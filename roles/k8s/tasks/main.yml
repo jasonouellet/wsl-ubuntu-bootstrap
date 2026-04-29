@@ -127,15 +127,15 @@
 
 - name: Install kubescape
   ansible.builtin.import_tasks: install-kubescape.yml
-  when: enable_k8s_kubescape | default(false)
+  when: k8s_enable_kubescape | default(false)
 
 - name: Install falcoctl
   ansible.builtin.import_tasks: install-falcoctl.yml
-  when: enable_k8s_falcoctl | default(false)
+  when: k8s_enable_falcoctl | default(false)
 
 - name: Install cilium CLI
   ansible.builtin.import_tasks: install-cilium.yml
-  when: enable_k8s_cilium | default(false)
+  when: k8s_enable_cilium | default(false)
 
 - name: Install kind
   ansible.builtin.import_tasks: install-kind.yml
