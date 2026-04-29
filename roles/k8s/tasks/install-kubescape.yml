@@ -2,7 +2,7 @@
 # =========================================
 # kubescape - Kubernetes Security Scanner (binary) [OPTIONAL]
 # Reference: https://kubescape.io/docs/install-operator/
-# Enabled via: enable_k8s_kubescape: true
+# Enabled via: k8s_enable_kubescape: true
 # =========================================
 
 - name: Download and install kubescape binary

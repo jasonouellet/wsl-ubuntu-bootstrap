@@ -25,9 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * `kind` (GitHub release binary)
   * `kustomize` (GitHub release binary)
 * Added optional Kubernetes tooling flags and installers for:
-  * `kubescape` (`enable_k8s_kubescape`)
-  * `falcoctl` (`enable_k8s_falcoctl`)
-  * `cilium` (`enable_k8s_cilium`)
+  * `kubescape` (`k8s_enable_kubescape`)
+  * `falcoctl` (`k8s_enable_falcoctl`)
+  * `cilium` (`k8s_enable_cilium`)
 * Added role documentation for Kubernetes tooling in `roles/k8s/README.md`
 
 ## [0.3.0] - 2026-04-24

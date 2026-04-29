@@ -94,7 +94,7 @@
     - packages
     - repository
 
-- name: Update APT cache after adding Helm repository
+- name: Update APT cache after adding Helm repository # noqa command-instead-of-module
   ansible.builtin.command:
     cmd: >-
       apt-get update -o Dir::Etc::sourcelist="sources.list.d/helm.list"

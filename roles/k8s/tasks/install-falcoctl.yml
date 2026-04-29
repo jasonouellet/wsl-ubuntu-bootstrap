@@ -2,7 +2,7 @@
 # =========================================
 # falcoctl - Falco Runtime Security CLI (binary) [OPTIONAL]
 # Reference: https://github.com/falcosecurity/falcoctl
-# Enabled via: enable_k8s_falcoctl: true
+# Enabled via: k8s_enable_falcoctl: true
 # =========================================
 
 - name: Download falcoctl archive
