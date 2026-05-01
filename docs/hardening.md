@@ -370,7 +370,7 @@ ssh localhost "echo 'SSH still works'"
 When implementing these enhancements, follow the existing patterns and always
 validate with linters before committing.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for more details.
 
 ---
 

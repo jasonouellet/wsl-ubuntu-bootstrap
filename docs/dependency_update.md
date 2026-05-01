@@ -1,4 +1,4 @@
-# Dependabot Configuration
+# Dependency Update
 
 Dependabot automates project dependency updates via GitHub.
 
@@ -37,8 +37,8 @@ Dependabot automatically creates pull requests to update:
 
 1. Dependabot **detects** new versions every Saturday
 2. Creates a **PR with available updates**
-3. **Auto-merges** minor/patch updates (v1.2.3 → v1.2.4)
-4. PRs remain **manual** for major changes (v1.2.3 → v2.0.0)
+3. **Requires manual review** before merge
+4. CI validates workflow updates before merge
 
 Example:
 
@@ -58,6 +58,11 @@ deps(github-actions): bump aquasecurity/trivy-action from master to v0.16.0
 
 Dependabot does not update custom Ansible variable versions in this repository.
 Those updates are handled by Renovate (`.renovaterc.json` + `renovate.yml` workflow).
+
+Renovate schedule:
+
+* Weekly: Sunday 04:00 UTC
+* Manual: `workflow_dispatch`
 
 ## GitHub UI - Check Status
 

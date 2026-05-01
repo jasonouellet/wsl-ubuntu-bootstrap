@@ -31,11 +31,11 @@ distributions.
 * [Support](SUPPORT.md) - How to get help
 * [Changelog](CHANGELOG.md) - Version history and changes
 * Technical documentation
-  * [Dependabot Configuration](docs/DEPENDABOT.md) - Automated dependency updates for GitHub Actions and Python packages
-  * [GitHub Actions Workflows](docs/WORKFLOWS.md) - CI/CD pipeline, semantic tag and release automation
-  * [Security Hardening & Enhancements](docs/HARDENING.md) - Optional security
+  * [Dependency update](docs/dependency_update.md) - Automated dependency updates for Dependabot and Renovate
+  * [GitHub Actions Workflows](docs/workflows.md) - CI/CD pipeline, semantic tag and release automation
+  * [Security Hardening & Enhancements](docs/hardening.md) - Optional security
     hardening and tooling improvements
-  * [Security Scanning](docs/SECURITY_SCANNING.md) - Vulnerability, secret, and code quality scanning tools
+  * [Security Scanning](docs/security_scanning.md) - Vulnerability, secret, and code quality scanning tools
   * [AI Agent Instructions](.github/copilot-instructions.md) - Comprehensive
     guidelines for code generation and maintenance (GitHub Copilot)
 
@@ -377,9 +377,9 @@ ansible-lint main.yml roles/
 
 ### Project
 
-* [Issues](../../issues) - Report bugs or request features
-* [Pull Requests](../../pulls) - Submit contributions
-* [Discussions](../../discussions) - Community questions and discussions
+* [Issues](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/issues) - Report bugs or request features
+* [Pull Requests](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/pulls) - Submit contributions
+* [Discussions](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/discussions) - Community questions and discussions
 
 ## 🤝 Contribution
 
