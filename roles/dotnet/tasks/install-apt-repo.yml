@@ -83,11 +83,10 @@
 
 - name: Add Microsoft .NET APT repository
   ansible.builtin.apt_repository:
-    repo: |
-      deb [arch=amd64,arm64
-           signed-by=/etc/apt/keyrings/microsoft-archive-keyring.gpg]
+    repo: >-
+      deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/microsoft-archive-keyring.gpg]
       {{ dotnet_apt_repo_base }}/{{ dotnet_repo_path }}/{{ dotnet_lsb_version }}/prod
-      {{ dotnet_distro_codename_result.stdout }} main
+      {{ dotnet_distro_codename_result.stdout | trim }} main
     filename: microsoft-dotnet-prod
     state: present
     update_cache: false
