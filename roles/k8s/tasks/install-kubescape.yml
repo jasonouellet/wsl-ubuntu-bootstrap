@@ -1,0 +1,39 @@
+---
+# =========================================
+# kubescape - Kubernetes Security Scanner (binary) [OPTIONAL]
+# Reference: https://kubescape.io/docs/install-operator/
+# Enabled via: k8s_enable_kubescape: true
+# =========================================
+
+- name: Download and install kubescape binary
+  ansible.builtin.get_url:
+    url: "{{ k8s_kubescape_download_url }}"
+    dest: /usr/local/bin/kubescape
+    owner: root
+    group: root
+    mode: '0755'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubescape
+    - packages
+
+- name: Verify kubescape installation
+  ansible.builtin.command: kubescape version
+  register: k8s_kubescape_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubescape
+    - test
+
+- name: Display kubescape version
+  ansible.builtin.debug:
+    msg: "kubescape installed: {{ k8s_kubescape_version_check.stdout | default('(check mode)') }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubescape

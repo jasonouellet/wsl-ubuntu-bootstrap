@@ -19,9 +19,15 @@
 # Disable components you do not need
 # enable_dotnet: no
 # enable_containers: no
+# enable_k8s: yes
 
 # Disable external repository configuration (Microsoft, Hashicorp, GitHub, NodeSource, Trivy)
 # enable_external_repositories: no
+
+# Optional k8s tools (disabled by default)
+# k8s_enable_kubescape: true
+# k8s_enable_falcoctl: true
+# k8s_enable_cilium: true
 
 # Customize versions
 # nodejs_version: "20"

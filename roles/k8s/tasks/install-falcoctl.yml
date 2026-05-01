@@ -1,0 +1,55 @@
+---
+# =========================================
+# falcoctl - Falco Runtime Security CLI (binary) [OPTIONAL]
+# Reference: https://github.com/falcosecurity/falcoctl
+# Enabled via: k8s_enable_falcoctl: true
+# =========================================
+
+- name: Download falcoctl archive
+  ansible.builtin.get_url:
+    url: "{{ k8s_falcoctl_download_url }}"
+    dest: "/tmp/falcoctl_{{ k8s_falco_version }}_linux_amd64.tar.gz"
+    owner: root
+    group: root
+    mode: '0644'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - falcoctl
+    - packages
+
+- name: Extract and install falcoctl binary
+  ansible.builtin.unarchive:
+    src: "/tmp/falcoctl_{{ k8s_falco_version }}_linux_amd64.tar.gz"
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - falcoctl
+    owner: root
+    group: root
+    mode: '0755'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - falcoctl
+    - packages
+
+- name: Verify falcoctl installation
+  ansible.builtin.command: falcoctl version
+  register: k8s_falcoctl_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - falcoctl
+    - test
+
+- name: Display falcoctl version
+  ansible.builtin.debug:
+    msg: "falcoctl installed: {{ k8s_falcoctl_version_check.stdout | default('(check mode)') }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - falcoctl

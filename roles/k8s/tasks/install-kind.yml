@@ -1,0 +1,38 @@
+---
+# =========================================
+# kind - Kubernetes IN Docker (binary)
+# Reference: https://kind.sigs.k8s.io/docs/user/quick-start/
+# =========================================
+
+- name: Download and install kind binary
+  ansible.builtin.get_url:
+    url: "{{ k8s_kind_download_url }}"
+    dest: /usr/local/bin/kind
+    owner: root
+    group: root
+    mode: '0755'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kind
+    - packages
+
+- name: Verify kind installation
+  ansible.builtin.command: kind version
+  register: k8s_kind_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kind
+    - test
+
+- name: Display kind version
+  ansible.builtin.debug:
+    msg: "kind installed: {{ k8s_kind_version_check.stdout | default('(check mode)') }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kind

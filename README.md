@@ -47,6 +47,7 @@ DevOps development environment, including:
 * **Languages & Runtimes**: Python 3, Node.js, .NET SDK
 * **Infrastructure as Code**: Terraform and complete Hashicorp suite
 * **Cloud Tools**: Azure CLI
+* **Kubernetes**: kubectl, helm, istioctl, calicoctl, k9s, kubectx/kubens, argocd, kind, kustomize
 * **Development Tools**: GitHub CLI for GitHub automation
 * **Containers**: Buildah, Skopeo (OCI)
 * **Security Scanning**: Trivy, Syft, detect-secrets for vulnerability and secret detection
@@ -88,6 +89,7 @@ wsl-ubuntu-bootstrap/
     ├── nodejs/                 # Node.js runtime and npm
     ├── azure-cli/              # Azure CLI
     ├── github/                 # GitHub CLI and Copilot CLI
+    ├── k8s/                    # Kubernetes and cloud-native CLI tools
     └── maintenance/            # Automated maintenance (auto-update)
 ```
 
@@ -271,6 +273,7 @@ ansible-playbook main.yml -e @group_vars/custom.yml
 | [**nodejs**](roles/nodejs/README.md) | Node.js | Node.js 22 LTS, npm, compilation toolchain |
 | [**azure-cli**](roles/azure-cli/README.md) | Azure | Azure CLI for Microsoft Azure cloud management |
 | [**github**](roles/github/README.md) | GitHub | GitHub CLI (`gh`) and GitHub Copilot CLI (`copilot`) |
+| [**k8s**](roles/k8s/README.md) | Kubernetes | kubectl, helm, istioctl, calicoctl, k9s, kubectx/kubens, argocd, kind, kustomize (+ optional kubescape, falcoctl, cilium) |
 | [**maintenance**](roles/maintenance/README.md) | Maintenance | Daily automatic updates (cron 3 AM) |
 <!-- markdownlint-enable MD013 -->
 

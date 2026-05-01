@@ -22,6 +22,8 @@ ROLES=(
     "azure-cli"
     "maintenance"
     "github"
+    "security"
+    "k8s"
 )
 
 echo "=========================================="

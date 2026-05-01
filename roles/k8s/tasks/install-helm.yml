@@ -1,0 +1,149 @@
+---
+# =========================================
+# Helm - Kubernetes Package Manager (APT)
+# Reference: https://helm.sh/docs/intro/install/
+# Repository hosted by Buildkite (official Helm APT source)
+# =========================================
+
+- name: Install Helm APT prerequisites
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg
+      - apt-transport-https
+    state: present
+    update_cache: true
+  tags:
+    - k8s
+    - helm
+    - packages
+
+- name: Download Helm APT GPG key
+  ansible.builtin.get_url:
+    url: "{{ k8s_helm_apt_key }}"
+    dest: /tmp/helm-apt-keyring.asc
+    owner: root
+    group: root
+    mode: '0644'
+  when: enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - helm
+    - gpg
+
+- name: Convert and install Helm APT GPG key
+  ansible.builtin.shell: |
+    gpg --dearmor < /tmp/helm-apt-keyring.asc > /usr/share/keyrings/helm.gpg
+  args:
+    creates: /usr/share/keyrings/helm.gpg
+  when: enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - helm
+    - gpg
+
+- name: Verify Helm GPG key file exists
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/helm.gpg
+  register: k8s_helm_gpg_stat
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - helm
+    - gpg
+
+- name: Fail if Helm GPG key file is missing
+  ansible.builtin.fail:
+    msg: "Helm GPG key file not found at /usr/share/keyrings/helm.gpg"
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+    - not k8s_helm_gpg_stat.stat.exists
+  tags:
+    - k8s
+    - helm
+    - gpg
+
+- name: Set Helm GPG key permissions
+  ansible.builtin.file:
+    path: /usr/share/keyrings/helm.gpg
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+    - k8s_helm_gpg_stat.stat.exists
+  tags:
+    - k8s
+    - helm
+    - gpg
+
+- name: Add Helm APT repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/helm.gpg] {{ k8s_helm_apt_repo_url }} any main"
+    filename: helm
+    state: present
+    update_cache: false
+  when: enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - helm
+    - packages
+    - repository
+
+- name: Update APT cache after adding Helm repository # noqa command-instead-of-module
+  ansible.builtin.command:
+    cmd: >-
+      apt-get update -o Dir::Etc::sourcelist="sources.list.d/helm.list"
+      -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
+  changed_when: false
+  when: enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - helm
+    - packages
+    - repository
+
+- name: Install helm
+  ansible.builtin.apt:
+    name: helm
+    state: present
+    update_cache: false
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
+  tags:
+    - k8s
+    - helm
+    - packages
+
+- name: Skip helm when external repositories are disabled
+  ansible.builtin.debug:
+    msg: "External repositories are disabled. Skipping helm installation."
+  when: not (enable_external_repositories | default(true))
+  tags:
+    - k8s
+    - helm
+
+- name: Verify helm installation
+  ansible.builtin.command: helm version --short
+  register: k8s_helm_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - helm
+    - test
+
+- name: Display helm version
+  ansible.builtin.debug:
+    msg: "helm installed: {{ k8s_helm_version_check.stdout | default('(check mode)') }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - helm

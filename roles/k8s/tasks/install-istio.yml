@@ -1,0 +1,54 @@
+---
+# =========================================
+# istioctl - Istio Service Mesh CLI (binary)
+# Reference: https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/
+# =========================================
+
+- name: Download istioctl archive
+  ansible.builtin.get_url:
+    url: "{{ k8s_istioctl_download_url }}"
+    dest: "/tmp/istioctl-{{ k8s_istio_version }}-linux-amd64.tar.gz"
+    owner: root
+    group: root
+    mode: '0644'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - istio
+    - packages
+
+- name: Extract and install istioctl binary
+  ansible.builtin.unarchive:
+    src: "/tmp/istioctl-{{ k8s_istio_version }}-linux-amd64.tar.gz"
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - istioctl
+    owner: root
+    group: root
+    mode: '0755'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - istio
+    - packages
+
+- name: Verify istioctl installation
+  ansible.builtin.command: istioctl version --remote=false
+  register: k8s_istioctl_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - istio
+    - test
+
+- name: Display istioctl version
+  ansible.builtin.debug:
+    msg: "istioctl installed: {{ k8s_istioctl_version_check.stdout | default('(check mode)') }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - istio

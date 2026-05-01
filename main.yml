@@ -184,6 +184,11 @@
       tags: github
       when: enable_github_cli
 
+    # Kubernetes CLI tools
+    - name: k8s
+      tags: k8s
+      when: enable_k8s
+
     # Container tools
     - name: containers
       tags: containers
