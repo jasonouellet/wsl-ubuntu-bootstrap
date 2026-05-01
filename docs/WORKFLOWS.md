@@ -6,7 +6,8 @@ This document describes the current CI/CD workflows used in this repository.
 
 ```text
 .github/workflows/
-├── ci.yml            # Validation, linting, security scans
+├── ci.yml            # Validation, linting, security scans, Renovate validation summary
+├── renovate.yml      # Weekly and manual dependency update execution (Renovate)
 └── tag-release.yml   # Version calculation, tagging, and GitHub release on main
 ```
 
@@ -18,12 +19,14 @@ This document describes the current CI/CD workflows used in this repository.
 * Pull requests targeting `main`
 * Manual trigger (`workflow_dispatch`)
 
-### Main responsibilities
+### Workflow responsibilities
 
 1. Run quality checks (`pre-commit`, `ansible-lint`, syntax, dry-run)
 2. Run security scanning (Trivy, CodeQL, SonarCloud)
 3. Generate and publish SBOM artifacts
 4. Validate releasable changes against `CHANGELOG.md` with a non-blocking warning
+5. Validate Renovate configuration and print a markdown summary table
+6. Post/update Renovate validation summary as PR comment for pull requests
 
 ### CHANGELOG guard behavior
 
@@ -71,6 +74,33 @@ Automatically create a semantic version tag when release prerequisites are met.
 6. Create and push `vX.Y.Z`
 7. Create GitHub release if it does not already exist
 
+## 3. Dependency Update Workflow (renovate.yml)
+
+**Trigger**:
+
+* Weekly schedule: Sunday at 04:00 UTC
+* Manual trigger (`workflow_dispatch`)
+
+### Main responsibilities
+
+1. Run Renovate with repository config (`.renovaterc.json`)
+2. Create/update dependency branches and pull requests
+3. Keep updates grouped and reviewed through normal PR workflow
+
+### Security controls
+
+* Renovate container image is pinned by immutable digest
+* Workflow uses explicit timeout and concurrency controls
+* Token scope is limited to workflow permissions (`contents`, `pull-requests`, `issues`)
+
+### Renovate validation in CI
+
+The `renovate-validate` job in `ci.yml` runs Renovate in local dry-run mode and publishes:
+
+* A markdown table in the workflow job summary
+* A `renovate-validation` artifact (`renovate-local.log` + summary)
+* A PR comment update (idempotent) when the event is `pull_request`
+
 ### Versioning rules
 
 Configured in `GitVersion.yml`:
@@ -86,6 +116,7 @@ flowchart TD
   A[PR opened/updated] --> B[CI workflow]
   B --> B1[Quality checks + scans]
   B --> B2[CHANGELOG guard warning when needed]
+  B --> B3[Renovate validation summary + PR comment]
 
   C[PR merged into main] --> D[tag-release workflow]
   D --> D1[Validate CHANGELOG update]
@@ -93,6 +124,10 @@ flowchart TD
   D --> D3[Push tag vX.Y.Z]
   D --> D4[Extract section from CHANGELOG]
   D --> D5[Create GitHub release]
+
+  E[Sunday 04:00 UTC or manual trigger] --> F[renovate workflow]
+  F --> F1[Run Renovate with repo config]
+  F --> F2[Create or update dependency PRs]
 ```
 
 ## Secrets and permissions
@@ -101,11 +136,13 @@ flowchart TD
 | --- | --- | --- | --- |
 | SonarCloud | `SONAR_TOKEN` | Repository/Org | SonarCloud scan authentication |
 | GitHub Actions | `GITHUB_TOKEN` | Auto-provided | Tag push and release creation |
+| Renovate (workflow) | `GITHUB_TOKEN` | Auto-provided | Renovate PR/branch operations in GitHub platform mode |
 
 Permission model:
 
 * `ci.yml`: mostly `contents: read`, `security-events: write`
 * `tag-release.yml`: `contents: write` (required to push tags and create GitHub releases)
+* `renovate.yml`: `contents: write`, `pull-requests: write`, `issues: write`
 
 ## Troubleshooting
 
