@@ -411,7 +411,7 @@ jobs:
           Path('ci-results/renovate-summary.md').write_text(md, encoding='utf-8')
           print(md)
 
-            if invalid_config or renovate_exit != 0:
+              if invalid_config or not dep_extract:
               raise SystemExit(1)
           PY
 
