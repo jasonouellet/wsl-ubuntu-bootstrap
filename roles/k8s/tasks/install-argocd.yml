@@ -2,12 +2,39 @@
 # =========================================
 # argocd - ArgoCD GitOps CLI (binary)
 # Reference: https://argo-cd.readthedocs.io/en/stable/cli_installation/
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download and install argocd binary
+- name: Download argocd checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ k8s_argocd_version }}/checksums.txt"
+    dest: /tmp/argocd.checksums.txt
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - argocd
+    - gpg
+
+- name: Extract argocd binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "argocd-linux-amd64$" /tmp/argocd.checksums.txt | awk '{print $1}'
+  register: k8s_argocd_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - argocd
+    - gpg
+
+- name: Download and install argocd binary with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_argocd_download_url }}"
     dest: /usr/local/bin/argocd
+    checksum: "sha256:{{ k8s_argocd_checksum.stdout | trim }}"
     owner: root
     group: root
     mode: '0755'
@@ -16,6 +43,26 @@
     - k8s
     - argocd
     - packages
+
+- name: Verify argocd installation
+  ansible.builtin.command: argocd version --client
+  register: k8s_argocd_version_check
+  changed_when: false
+  become: false
+  failed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - argocd
+    - test
+
+- name: Display argocd version
+  ansible.builtin.debug:
+    msg: "argocd installed: {{ k8s_argocd_version_check.stdout_lines | default(['(check mode)']) }}"
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - argocd
 
 - name: Verify argocd installation
   ansible.builtin.command: argocd version --client

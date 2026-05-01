@@ -2,12 +2,39 @@
 # =========================================
 # kind - Kubernetes IN Docker (binary)
 # Reference: https://kind.sigs.k8s.io/docs/user/quick-start/
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download and install kind binary
+- name: Download kind checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/kubernetes-sigs/kind/releases/download/v{{ k8s_kind_version }}/kind-linux-amd64.sha256sum"
+    dest: /tmp/kind.sha256sum
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kind
+    - gpg
+
+- name: Extract kind binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "kind-linux-amd64$" /tmp/kind.sha256sum | awk '{print $1}'
+  register: k8s_kind_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kind
+    - gpg
+
+- name: Download and install kind binary with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_kind_download_url }}"
     dest: /usr/local/bin/kind
+    checksum: "sha256:{{ k8s_kind_checksum.stdout | trim }}"
     owner: root
     group: root
     mode: '0755'

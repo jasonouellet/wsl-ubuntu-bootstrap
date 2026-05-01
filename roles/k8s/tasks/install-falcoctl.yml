@@ -3,12 +3,39 @@
 # falcoctl - Falco Runtime Security CLI (binary) [OPTIONAL]
 # Reference: https://github.com/falcosecurity/falcoctl
 # Enabled via: k8s_enable_falcoctl: true
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download falcoctl archive
+- name: Download falcoctl checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/falcosecurity/falcoctl/releases/download/{{ k8s_falcoctl_version }}/checksums.txt"
+    dest: /tmp/falcoctl-checksums.txt
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - falcoctl
+    - gpg
+
+- name: Extract falcoctl binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "falcoctl_.*_linux_amd64.tar.gz$" /tmp/falcoctl-checksums.txt | awk '{print $1}'
+  register: k8s_falcoctl_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - falcoctl
+    - gpg
+
+- name: Download falcoctl archive with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_falcoctl_download_url }}"
     dest: "/tmp/falcoctl_{{ k8s_falco_version }}_linux_amd64.tar.gz"
+    checksum: "sha256:{{ k8s_falcoctl_checksum.stdout | trim }}"
     owner: root
     group: root
     mode: '0600'

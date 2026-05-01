@@ -2,12 +2,39 @@
 # =========================================
 # kubectx + kubens - Context & Namespace Switcher (binaries)
 # Reference: https://github.com/ahmetb/kubectx
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download and install kubectx binary
+- name: Download kubectx checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/ahmetb/kubectx/releases/download/v{{ k8s_kubectx_version }}/checksums.txt"
+    dest: /tmp/kubectx.checksums.txt
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubectx
+    - gpg
+
+- name: Extract kubectx binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "^[a-f0-9]\\{64\\}.*kubectx$" /tmp/kubectx.checksums.txt | awk '{print $1}'
+  register: k8s_kubectx_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubectx
+    - gpg
+
+- name: Download and install kubectx binary with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_kubectx_download_url }}"
     dest: /usr/local/bin/kubectx
+    checksum: "sha256:{{ k8s_kubectx_checksum.stdout | trim }}"
     owner: root
     group: root
     mode: '0755'

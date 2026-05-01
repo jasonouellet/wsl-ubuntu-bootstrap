@@ -2,12 +2,39 @@
 # =========================================
 # k9s - TUI Kubernetes Cluster Navigator (binary)
 # Reference: https://k9scli.io/
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download k9s archive
+- name: Download k9s checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/derailed/k9s/releases/download/v{{ k8s_k9s_version }}/checksums.txt"
+    dest: /tmp/k9s-checksums.txt
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - k9s
+    - gpg
+
+- name: Extract k9s binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "k9s_Linux_amd64.tar.gz$" /tmp/k9s-checksums.txt | awk '{print $1}'
+  register: k8s_k9s_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - k9s
+    - gpg
+
+- name: Download k9s archive with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_k9s_download_url }}"
     dest: "/tmp/k9s_Linux_amd64.tar.gz"
+    checksum: "sha256:{{ k8s_k9s_checksum.stdout | trim }}"
     owner: root
     group: root
     mode: '0600'

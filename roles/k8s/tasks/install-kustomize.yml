@@ -2,12 +2,40 @@
 # =========================================
 # kustomize - Kubernetes Configuration Manager (binary)
 # Reference: https://kubectl.docs.kubernetes.io/installation/kustomize/
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download kustomize archive
+- name: Download kustomize checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/kubernetes-sigs/kustomize/releases/download/\
+      kustomize/v{{ k8s_kustomize_version }}/checksums.txt"
+    dest: /tmp/kustomize-checksums.txt
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kustomize
+    - gpg
+
+- name: Extract kustomize binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "kustomize_v{{ k8s_kustomize_version }}_linux_amd64.tar.gz$" /tmp/kustomize-checksums.txt | awk '{print $1}'
+  register: k8s_kustomize_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kustomize
+    - gpg
+
+- name: Download kustomize archive with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_kustomize_download_url }}"
     dest: "/tmp/kustomize_{{ k8s_kustomize_version }}_linux_amd64.tar.gz"
+    checksum: "sha256:{{ k8s_kustomize_checksum.stdout | trim }}"
     owner: root
     group: root
     mode: '0600'
