@@ -8,7 +8,7 @@
 
 - name: Download falcoctl checksum file from GitHub releases
   ansible.builtin.get_url:
-    url: "https://github.com/falcosecurity/falcoctl/releases/download/{{ k8s_falcoctl_version }}/checksums.txt"
+    url: "https://github.com/falcosecurity/falcoctl/releases/download/v{{ k8s_falco_version }}/checksums.txt"
     dest: /tmp/falcoctl-checksums.txt
     owner: root
     group: root
@@ -55,7 +55,6 @@
     owner: root
     group: root
     mode: '0755'
-  args:
     creates: /usr/local/bin/falcoctl
   when: not ansible_check_mode
   tags:

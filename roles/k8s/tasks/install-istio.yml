@@ -54,9 +54,8 @@
     owner: root
     group: root
     mode: '0755'
-  when: not ansible_check_mode
-  args:
     creates: /usr/local/bin/istioctl
+  when: not ansible_check_mode
   tags:
     - k8s
     - istio

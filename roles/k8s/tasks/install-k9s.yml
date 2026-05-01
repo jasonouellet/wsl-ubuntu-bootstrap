@@ -54,9 +54,8 @@
     owner: root
     group: root
     mode: '0755'
-  when: not ansible_check_mode
-  args:
     creates: /usr/local/bin/k9s
+  when: not ansible_check_mode
   tags:
     - k8s
     - k9s
