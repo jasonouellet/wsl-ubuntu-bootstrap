@@ -74,12 +74,12 @@
 
 - name: Add Hashicorp APT repository (modern method)
   ansible.builtin.apt_repository:
-    repo: >
+    repo: >-
       deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg]
-      {{ hashicorp_apt_repo_url }} {{ hashicorp_repo_codename }} main
+      {{ hashicorp_apt_repo_url }} {{ hashicorp_repo_codename | trim }} main
     filename: hashicorp
     state: present
-    update_cache: true
+    update_cache: false
   when: enable_external_repositories | default(true)
   tags:
     - terraform
