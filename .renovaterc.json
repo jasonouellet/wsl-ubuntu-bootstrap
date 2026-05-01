@@ -5,7 +5,7 @@
     "schedule:weekly"
   ],
   "schedule": [
-    "before 3am on Monday"
+    "before 5am on Sunday"
   ],
   "timezone": "UTC",
   "semanticCommits": "enabled",
