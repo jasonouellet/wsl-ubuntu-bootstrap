@@ -15,7 +15,9 @@
     owner: root
     group: root
     mode: '0644'
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -80,7 +82,9 @@
     filename: hashicorp
     state: present
     update_cache: false
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -91,7 +95,9 @@
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 0
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp

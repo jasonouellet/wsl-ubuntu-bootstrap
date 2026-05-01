@@ -24,6 +24,7 @@
     owner: root
     group: root
     mode: '0644'
+  when: not ansible_check_mode
   tags:
     - dotnet
     - gpg
@@ -90,6 +91,7 @@
     filename: microsoft-dotnet-prod
     state: present
     update_cache: false
+  when: not ansible_check_mode
   tags:
     - dotnet
     - packages
@@ -98,6 +100,7 @@
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 0
+  when: not ansible_check_mode
   tags:
     - dotnet
     - packages
@@ -107,6 +110,7 @@
     name: "{{ dotnet_packages }}"
     state: present
     update_cache: true
+  when: not ansible_check_mode
   tags:
     - dotnet
     - packages
