@@ -23,13 +23,13 @@ echo "CHANGELOG.md version:      $CHANGELOG_VERSION"
 echo "sonar-project.properties:  $SONAR_VERSION"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-if [ -z "$CHANGELOG_VERSION" ]; then
-  echo "⚠  Warning: Could not extract version from CHANGELOG.md"
-  echo "   This might indicate no released versions exist yet."
+if [[ -z "$CHANGELOG_VERSION" ]]; then
+  echo "⚠  Warning: Could not extract version from CHANGELOG.md" >&2
+  echo "   This might indicate no released versions exist yet." >&2
   exit 0
 fi
 
-if [ "$CHANGELOG_VERSION" != "$SONAR_VERSION" ]; then
+if [[ "$CHANGELOG_VERSION" != "$SONAR_VERSION" ]]; then
   echo "❌ Error: Version mismatch!"
   echo ""
   echo "   Action required:"
