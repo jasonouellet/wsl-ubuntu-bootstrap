@@ -12,6 +12,7 @@
     owner: root
     group: root
     mode: '0755'
+  when: not ansible_check_mode
   tags:
     - k8s
     - kubescape
