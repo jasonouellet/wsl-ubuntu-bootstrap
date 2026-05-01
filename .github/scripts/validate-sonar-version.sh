@@ -30,7 +30,7 @@ if [[ -z "$CHANGELOG_VERSION" ]]; then
 fi
 
 if [[ "$CHANGELOG_VERSION" != "$SONAR_VERSION" ]]; then
-  echo "❌ Error: Version mismatch!"
+  echo "❌ Error: Version mismatch!" >&2
   echo ""
   echo "   Action required:"
   echo "   1. Update sonar-project.properties:"

@@ -26,8 +26,8 @@
     path: /etc/apt/keyrings
     state: directory
     owner: root
-    group: root
-    mode: '0755'
+    group: _apt
+    mode: '0750'
   tags:
     - k8s
     - setup

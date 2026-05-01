@@ -114,10 +114,19 @@ jobs:
       - name: Validate CHANGELOG section for calculated version
         id: changelog
         if: steps.gitversion.outputs.version != ''
-        env:
-          CALCULATED_VERSION: ${{ steps.gitversion.outputs.version }}
         run: |
-          VERSION="$CALCULATED_VERSION"
+          set -euo pipefail
+
+          VERSION=$(jq -r '.SemVer' gitversion.json)
+          if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
+            echo "Unable to read version from gitversion.json" >&2
+            exit 1
+          fi
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid SemVer extracted from gitversion.json: $VERSION" >&2
+            exit 1
+          fi
 
           SECTION=$(awk -v version="$VERSION" '
             BEGIN {
@@ -143,9 +152,20 @@ jobs:
       - name: Check if tag already exists
         id: tag-check
         if: steps.gitversion.outputs.version != ''
-        env:
-          CALCULATED_VERSION: ${{ steps.gitversion.outputs.version }}
         run: |
+          set -euo pipefail
+
+          CALCULATED_VERSION=$(jq -r '.SemVer' gitversion.json)
+          if [[ -z "$CALCULATED_VERSION" || "$CALCULATED_VERSION" == "null" ]]; then
+            echo "Unable to read version from gitversion.json" >&2
+            exit 1
+          fi
+
+          if [[ ! "$CALCULATED_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid SemVer extracted from gitversion.json: $CALCULATED_VERSION" >&2
+            exit 1
+          fi
+
           TAG="v${CALCULATED_VERSION}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null || \

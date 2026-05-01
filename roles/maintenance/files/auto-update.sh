@@ -16,9 +16,7 @@ mkdir -p "$(dirname "$LOG_FILE")"
 # Function to log messages with current timestamp
 log() {
     local timestamp
-    local message
-
-    message="$1"
+    local message="$1"
     timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     echo "[$timestamp] $message" | tee -a "$LOG_FILE"
     return 0

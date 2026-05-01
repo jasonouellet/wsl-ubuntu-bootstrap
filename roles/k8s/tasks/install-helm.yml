@@ -24,7 +24,7 @@
     dest: /tmp/helm-apt-keyring.asc
     owner: root
     group: root
-    mode: '0644'
+    mode: '0600'
   when: enable_external_repositories | default(true)
   tags:
     - k8s
@@ -70,8 +70,8 @@
   ansible.builtin.file:
     path: /usr/share/keyrings/helm.gpg
     owner: root
-    group: root
-    mode: '0644'
+    group: _apt
+    mode: '0640'
   when:
     - not ansible_check_mode
     - enable_external_repositories | default(true)

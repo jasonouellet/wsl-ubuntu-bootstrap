@@ -73,8 +73,8 @@ jobs:
 
       - name: Install Ansible and lint dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install ansible-core>=2.16 ansible-lint
+          python -m pip install --upgrade "pip==25.0.1"
+          pip install --only-binary :all: "ansible-core==2.16.3" "ansible-lint==6.17.2"
 
       - name: Run pre-commit hooks (all files)
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1

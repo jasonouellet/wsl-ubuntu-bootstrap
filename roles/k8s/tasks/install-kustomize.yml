@@ -10,7 +10,7 @@
     dest: "/tmp/kustomize_{{ k8s_kustomize_version }}_linux_amd64.tar.gz"
     owner: root
     group: root
-    mode: '0644'
+    mode: '0600'
   when: not ansible_check_mode
   tags:
     - k8s
