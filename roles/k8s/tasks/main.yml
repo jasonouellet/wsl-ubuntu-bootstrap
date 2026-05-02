@@ -25,8 +25,9 @@
     path: /etc/apt/keyrings
     state: directory
     owner: root
-    group: _apt
-    mode: '0750'
+    group: root
+    mode: '0755'
+  when: not ansible_check_mode
   tags:
     - k8s
     - setup

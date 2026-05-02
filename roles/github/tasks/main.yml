@@ -9,6 +9,7 @@
     group: _apt
     mode: '0640'
   when:
+    - not ansible_check_mode
     - github_enable_cli | bool
     - enable_external_repositories | default(true)
   tags:
