@@ -11,7 +11,9 @@
     owner: root
     group: root
     mode: '0600'
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - k8s
     - kubectl
@@ -22,7 +24,9 @@
     gpg --dearmor < /tmp/kubernetes-apt-keyring.asc > /etc/apt/keyrings/kubernetes-apt-keyring.gpg
   args:
     creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - k8s
     - kubectl
@@ -69,13 +73,15 @@
 
 - name: Add kubectl APT repository
   ansible.builtin.apt_repository:
-    repo: >
+    repo: >-
       deb [arch=amd64 signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
       {{ k8s_kubectl_apt_repo_url }} /
     filename: kubernetes
     state: present
     update_cache: false
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - k8s
     - kubectl
@@ -89,6 +95,7 @@
       -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
   changed_when: false
   when:
+    - not ansible_check_mode
     - enable_external_repositories | default(true)
   tags:
     - k8s
