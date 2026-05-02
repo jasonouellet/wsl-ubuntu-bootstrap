@@ -5,6 +5,7 @@ kinds:
 skip_list:
   - '406'  # git checksum changed
   - '204'  # lines too long
+  - 'yaml[line-length]'  # URL lines exceed 120 chars
   - schema
 
 warn_list:

@@ -3,15 +3,42 @@
 # cilium - Cilium CNI CLI (binary) [OPTIONAL]
 # Reference: https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/
 # Enabled via: k8s_enable_cilium: true
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download cilium CLI archive
+- name: Download cilium checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/cilium/cilium-cli/releases/download/v{{ k8s_cilium_version }}/checksums.txt"
+    dest: /tmp/cilium-checksums.txt
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - cilium
+    - gpg
+
+- name: Extract cilium binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "cilium-linux-amd64.tar.gz$" /tmp/cilium-checksums.txt | awk '{print $1}'
+  register: k8s_cilium_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - cilium
+    - gpg
+
+- name: Download cilium CLI archive with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_cilium_download_url }}"
     dest: "/tmp/cilium-linux-amd64.tar.gz"
+    checksum: "sha256:{{ k8s_cilium_checksum.stdout | trim }}"
     owner: root
     group: root
-    mode: '0644'
+    mode: '0600'
   when: not ansible_check_mode
   tags:
     - k8s

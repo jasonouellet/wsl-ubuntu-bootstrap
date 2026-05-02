@@ -1,0 +1,209 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "schedule:weekly"
+  ],
+  "schedule": [
+    "before 5am on Sunday"
+  ],
+  "timezone": "UTC",
+  "semanticCommits": "enabled",
+  "commitMessagePrefix": "chore(deps): ",
+  "groupName": "Repository Roles Dependencies",
+  "groupSlug": "repo-roles-deps",
+  "prConcurrentLimit": 1,
+  "prCreation": "auto",
+  "automerge": false,
+  "assignees": [],
+  "reviewers": [],
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update Node.js role major version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "nodejs_version:\\s+\"(?<currentValue>\\d+)\""
+      ],
+      "datasourceTemplate": "node-version",
+      "packageNameTemplate": "node",
+      "versioningTemplate": "node",
+      "autoReplaceStringTemplate": "nodejs_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update kubectl minor version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_kubectl_version:\\s+\"(?<currentValue>\\d+\\.\\d+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "kubernetes/kubernetes",
+      "versioningTemplate": "regex:^v?(?<major>\\d+)\\.(?<minor>\\d+)$",
+      "extractVersionTemplate": "^v?(?<major>\\d+)\\.(?<minor>\\d+)",
+      "autoReplaceStringTemplate": "k8s_kubectl_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update istio version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_istio_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "istio/istio",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_istio_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update calico version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_calico_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "projectcalico/calico",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_calico_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update k9s version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_k9s_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "derailed/k9s",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_k9s_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update kubectx version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_kubectx_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "ahmetb/kubectx",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_kubectx_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update argocd version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_argocd_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "argoproj/argo-cd",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_argocd_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update kind version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_kind_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "kubernetes-sigs/kind",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_kind_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update kustomize version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_kustomize_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "kubernetes-sigs/kustomize",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^kustomize\\/v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_kustomize_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update kubescape version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_kubescape_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "kubescape/kubescape",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_kubescape_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update falcoctl version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_falco_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "falcosecurity/falcoctl",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_falco_version: \"{{{newValue}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update cilium version in group_vars/all.yml",
+      "managerFilePatterns": [
+        "/^group_vars\\/all\\.yml$/"
+      ],
+      "matchStrings": [
+        "k8s_cilium_version:\\s+\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "cilium/cilium-cli",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v?(?<version>.*)$",
+      "autoReplaceStringTemplate": "k8s_cilium_version: \"{{{newValue}}}\""
+    }
+  ],
+  "ignoreDeps": [],
+  "enabled": true,
+  "baseBranchPatterns": [
+    "main"
+  ]
+}

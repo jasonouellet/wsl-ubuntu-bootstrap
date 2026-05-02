@@ -39,7 +39,9 @@
     owner: root
     group: root
     mode: '0644'
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - azure-cli
     - gpg
@@ -104,7 +106,9 @@
   ansible.builtin.file:
     path: /etc/apt/sources.list.d/azure-cli.list
     state: absent
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - azure-cli
     - packages
@@ -123,7 +127,9 @@
       Components: main
       Architectures: {{ azure_cli_architecture_result.stdout | trim }}
       Signed-by: /etc/apt/keyrings/microsoft-azure-cli.gpg
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - azure-cli
     - packages
@@ -133,7 +139,9 @@
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 0
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - azure-cli
     - packages
@@ -143,6 +151,7 @@
   ansible.builtin.apt:
     name: azure-cli
     state: present
+  when: not ansible_check_mode
   tags:
     - azure-cli
     - packages

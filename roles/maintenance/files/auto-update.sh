@@ -8,6 +8,7 @@
 set -euo pipefail
 
 LOG_FILE="/var/log/auto-update/auto-update.log"
+LOG_SEPARATOR="=========================================="
 
 # Ensure log directory exists
 mkdir -p "$(dirname "$LOG_FILE")"
@@ -15,13 +16,15 @@ mkdir -p "$(dirname "$LOG_FILE")"
 # Function to log messages with current timestamp
 log() {
     local timestamp
+    local message="$1"
     timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo "[$timestamp] $1" | tee -a "$LOG_FILE"
+    echo "[$timestamp] $message" | tee -a "$LOG_FILE"
+    return 0
 }
 
-log "=========================================="
+log "$LOG_SEPARATOR"
 log "Starting automated system update"
-log "=========================================="
+log "$LOG_SEPARATOR"
 
 # Update APT packages
 log "Updating APT package cache..."
@@ -81,6 +84,6 @@ if command -v az &> /dev/null; then
     DEBIAN_FRONTEND=noninteractive apt-get install --only-upgrade -y azure-cli 2>&1 | tee -a "$LOG_FILE" || log "No Azure CLI updates available"
 fi
 
-log "=========================================="
+log "$LOG_SEPARATOR"
 log "Automated system update completed"
-log "=========================================="
+log "$LOG_SEPARATOR"
