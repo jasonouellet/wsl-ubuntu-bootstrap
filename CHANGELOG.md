@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## [0.5.0] - 2026-05-01
+## [0.5.0] - 2026-05-02
 
 ### Added
 
@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Improved workflow runtime safety with concurrency controls and explicit timeout settings
+* Bumped `github/codeql-action` from 4.35.2 to 4.35.3 (patch)
+* Bumped `SonarSource/sonarqube-scan-action` from 7.1.0 to 8.0.0 (major)
 
 ### Fixed
 
