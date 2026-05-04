@@ -13,6 +13,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+* Fixed `github` role GPG key task failing with `chgrp failed: failed to look up group _apt` on Ubuntu
+  environments where the `_apt` group is absent: changed `group` to `root` and `mode` to `0644`
+* Fixed `k8s` role checksum download 404 errors caused by upstream GitHub release asset renames:
+  * `istio`: replaced `checksums.txt` with per-asset `.sha256` file (`{{ k8s_istioctl_download_url }}.sha256`)
+  * `calico`: replaced `checksums` with `SHA256SUMS` (uppercase, actual asset name)
+  * `k9s`: replaced `checksums.txt` with `checksums.sha256`
+  * `argocd`: replaced `checksums.txt` with `cli_checksums.txt`
+  * `kubectx`/`kubens`: aligned download URLs to tarball assets (`kubectx_v..._linux_x86_64.tar.gz`)
+    and added `unarchive` install tasks; updated `group_vars/all.yml` download URLs accordingly
+* Fixed all `k8s` role checksum extraction tasks failing with `/bin/sh: set: Illegal option -o pipefail`
+  on Ubuntu (dash shell): replaced all `shell` tasks using `set -o pipefail | grep | awk` with
+  portable `command` tasks using `awk` regex matching across all k8s installer task files
+  (`install-argocd.yml`, `install-calico.yml`, `install-cilium.yml`, `install-falcoctl.yml`,
+  `install-kind.yml`, `install-kubectx.yml`, `install-kubescape.yml`, `install-kustomize.yml`)
+* Fixed Hashicorp APT repository conflict (`Conflicting values set for option Signed-By`) caused by
+  duplicate entries with different `signed-by` key paths in `/etc/apt/sources.list.d/hashicorp.list`
 * Fixed `ansible-playbook --check` in Ubuntu environment with multiple tasks
   that were silently skipped due to Jinja2 3.0.x changes in string handling and
   undefined variable behavior:

@@ -19,9 +19,7 @@
     - gpg
 
 - name: Extract kubectx binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "^[a-f0-9]\\{64\\}.*kubectx$" /tmp/kubectx.checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk '$1 ~ /^[0-9a-f]{64}$/ && $2 ~ /^kubectx_v[0-9.]+_linux_x86_64\.tar\.gz$/ { print $1; exit }' /tmp/kubectx.checksums.txt
   register: k8s_kubectx_checksum
   changed_when: false
   when: not ansible_check_mode
@@ -31,9 +29,7 @@
     - gpg
 
 - name: Extract kubens binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "^[a-f0-9]\\{64\\}.*kubens$" /tmp/kubectx.checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk '$1 ~ /^[0-9a-f]{64}$/ && $2 ~ /^kubens_v[0-9.]+_linux_x86_64\.tar\.gz$/ { print $1; exit }' /tmp/kubectx.checksums.txt
   register: k8s_kubens_checksum
   changed_when: false
   when: not ansible_check_mode
@@ -42,28 +38,62 @@
     - kubectx
     - gpg
 
-- name: Download and install kubectx binary with checksum verification
+- name: Download kubectx archive with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_kubectx_download_url }}"
-    dest: /usr/local/bin/kubectx
+    dest: "/tmp/kubectx_v{{ k8s_kubectx_version }}_linux_x86_64.tar.gz"
     checksum: "sha256:{{ k8s_kubectx_checksum.stdout | trim }}"
     owner: root
     group: root
-    mode: '0755'
+    mode: '0600'
   when: not ansible_check_mode
   tags:
     - k8s
     - kubectx
     - packages
 
-- name: Download and install kubens binary with checksum verification
+- name: Download kubens archive with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_kubens_download_url }}"
-    dest: /usr/local/bin/kubens
+    dest: "/tmp/kubens_v{{ k8s_kubectx_version }}_linux_x86_64.tar.gz"
     checksum: "sha256:{{ k8s_kubens_checksum.stdout | trim }}"
     owner: root
     group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubectx
+    - packages
+
+- name: Extract and install kubectx binary
+  ansible.builtin.unarchive:
+    src: "/tmp/kubectx_v{{ k8s_kubectx_version }}_linux_x86_64.tar.gz"
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - kubectx
+    owner: root
+    group: root
     mode: '0755'
+    creates: /usr/local/bin/kubectx
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubectx
+    - packages
+
+- name: Extract and install kubens binary
+  ansible.builtin.unarchive:
+    src: "/tmp/kubens_v{{ k8s_kubectx_version }}_linux_x86_64.tar.gz"
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - kubens
+    owner: root
+    group: root
+    mode: '0755'
+    creates: /usr/local/bin/kubens
   when: not ansible_check_mode
   tags:
     - k8s

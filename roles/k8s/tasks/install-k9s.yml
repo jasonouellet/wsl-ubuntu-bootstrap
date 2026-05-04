@@ -7,8 +7,8 @@
 
 - name: Download k9s checksum file from GitHub releases
   ansible.builtin.get_url:
-    url: "https://github.com/derailed/k9s/releases/download/v{{ k8s_k9s_version }}/checksums.txt"
-    dest: /tmp/k9s-checksums.txt
+    url: "https://github.com/derailed/k9s/releases/download/v{{ k8s_k9s_version }}/checksums.sha256"
+    dest: /tmp/k9s-checksums.sha256
     owner: root
     group: root
     mode: '0600'
@@ -19,9 +19,7 @@
     - gpg
 
 - name: Extract k9s binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "k9s_Linux_amd64.tar.gz$" /tmp/k9s-checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk '/k9s_Linux_amd64.tar.gz$/ {print $1; exit}' /tmp/k9s-checksums.sha256
   register: k8s_k9s_checksum
   changed_when: false
   when: not ansible_check_mode

@@ -74,8 +74,8 @@
   ansible.builtin.file:
     path: /usr/share/keyrings/helm.gpg
     owner: root
-    group: _apt
-    mode: '0640'
+    group: root
+    mode: '0644'
   when:
     - not ansible_check_mode
     - enable_external_repositories | default(true)

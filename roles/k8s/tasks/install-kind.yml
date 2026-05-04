@@ -19,9 +19,7 @@
     - gpg
 
 - name: Extract kind binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "kind-linux-amd64$" /tmp/kind.sha256sum | awk '{print $1}'
+  ansible.builtin.command: awk '/kind-linux-amd64$/ {print $1; exit}' /tmp/kind.sha256sum
   register: k8s_kind_checksum
   changed_when: false
   when: not ansible_check_mode

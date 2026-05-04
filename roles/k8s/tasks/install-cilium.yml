@@ -20,9 +20,7 @@
     - gpg
 
 - name: Extract cilium binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "cilium-linux-amd64.tar.gz$" /tmp/cilium-checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk '/cilium-linux-amd64.tar.gz$/ {print $1; exit}' /tmp/cilium-checksums.txt
   register: k8s_cilium_checksum
   changed_when: false
   when: not ansible_check_mode

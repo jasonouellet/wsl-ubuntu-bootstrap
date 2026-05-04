@@ -20,9 +20,7 @@
     - gpg
 
 - name: Extract kustomize binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "kustomize_v{{ k8s_kustomize_version }}_linux_amd64.tar.gz$" /tmp/kustomize-checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk '/kustomize_v{{ k8s_kustomize_version }}_linux_amd64.tar.gz$/ {print $1; exit}' /tmp/kustomize-checksums.txt
   register: k8s_kustomize_checksum
   changed_when: false
   when: not ansible_check_mode

@@ -20,9 +20,7 @@
     - gpg
 
 - name: Extract kubescape binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "kubescape.*linux-amd64.tar.gz$" /tmp/kubescape-checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk '/kubescape.*linux-amd64.tar.gz$/ {print $1; exit}' /tmp/kubescape-checksums.txt
   register: k8s_kubescape_checksum
   changed_when: false
   when: not ansible_check_mode
