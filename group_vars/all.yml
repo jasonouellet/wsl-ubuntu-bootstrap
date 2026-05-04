@@ -256,7 +256,7 @@ k8s_kustomize_download_url: >-
 # kubescape - Kubernetes security scanner [OPTIONAL] (binary from GitHub releases)
 k8s_kubescape_version: "3.0.21"
 k8s_kubescape_download_url: >-
-  https://github.com/kubescape/kubescape/releases/download/v{{ k8s_kubescape_version }}/kubescape-ubuntu-latest
+  https://github.com/kubescape/kubescape/releases/download/v{{ k8s_kubescape_version }}/kubescape-ubuntu-latest.tar.gz
 
 # falcoctl - Falco runtime security CLI [OPTIONAL] (binary from GitHub releases)
 k8s_falco_version: "0.11.0"

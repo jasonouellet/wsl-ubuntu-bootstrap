@@ -3,12 +3,55 @@
 # kubescape - Kubernetes Security Scanner (binary) [OPTIONAL]
 # Reference: https://kubescape.io/docs/install-operator/
 # Enabled via: k8s_enable_kubescape: true
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download and install kubescape binary
+- name: Download kubescape checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/kubescape/kubescape/releases/download/v{{ k8s_kubescape_version }}/checksums-amd64.txt"
+    dest: /tmp/kubescape-checksums.txt
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubescape
+    - gpg
+
+- name: Extract kubescape binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "kubescape.*linux-amd64.tar.gz$" /tmp/kubescape-checksums.txt | awk '{print $1}'
+  register: k8s_kubescape_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubescape
+    - gpg
+
+- name: Download kubescape archive with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_kubescape_download_url }}"
-    dest: /usr/local/bin/kubescape
+    dest: /tmp/kubescape-amd64.tar.gz
+    checksum: "sha256:{{ k8s_kubescape_checksum.stdout | trim }}"
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - kubescape
+    - packages
+
+- name: Extract and install kubescape binary
+  ansible.builtin.unarchive:
+    src: /tmp/kubescape-amd64.tar.gz
+    dest: /usr/local/bin/
+    remote_src: true
+    include:
+      - kubescape
     owner: root
     group: root
     mode: '0755'

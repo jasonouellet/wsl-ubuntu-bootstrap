@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [0.5.0] - 2026-05-02
+
+### Added
+
+* Added Renovate configuration in `.renovaterc.json` for variable-driven dependency updates in `group_vars/all.yml`
+* Added scheduled Renovate workflow `.github/workflows/renovate.yml`:
+  * Weekly execution on Sunday at 04:00 UTC
+  * Manual execution via `workflow_dispatch`
+* Added `renovate-validate` job in CI:
+  * Runs Renovate in local dry-run mode
+  * Publishes a markdown summary table in workflow job summary
+  * Uploads validation artifacts (`renovate-local.log`, summary markdown)
+  * Posts or updates a PR comment with the validation summary
+* Added dynamic checksum verification for Kubernetes binary installers by
+  downloading official upstream checksum files at install time
+
+### Changed
+
+* Improved workflow runtime safety with concurrency controls and explicit timeout settings
+* Bumped `github/codeql-action` from 4.35.2 to 4.35.3 (patch)
+* Bumped `SonarSource/sonarqube-scan-action` from 7.1.0 to 8.0.0 (major)
+
+### Fixed
+
+* Resolved Sonar and shell quality issues in CI and scripts (`validate-sonar-version.sh`, `auto-update.sh`)
+
 ## [0.4.0] - 2026-04-29
 
 ### Added

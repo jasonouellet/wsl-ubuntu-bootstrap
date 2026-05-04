@@ -24,8 +24,10 @@
     dest: /tmp/helm-apt-keyring.asc
     owner: root
     group: root
-    mode: '0644'
-  when: enable_external_repositories | default(true)
+    mode: '0600'
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - k8s
     - helm
@@ -36,7 +38,9 @@
     gpg --dearmor < /tmp/helm-apt-keyring.asc > /usr/share/keyrings/helm.gpg
   args:
     creates: /usr/share/keyrings/helm.gpg
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - k8s
     - helm
@@ -70,8 +74,8 @@
   ansible.builtin.file:
     path: /usr/share/keyrings/helm.gpg
     owner: root
-    group: root
-    mode: '0644'
+    group: _apt
+    mode: '0640'
   when:
     - not ansible_check_mode
     - enable_external_repositories | default(true)
@@ -87,7 +91,9 @@
     filename: helm
     state: present
     update_cache: false
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - k8s
     - helm
@@ -100,7 +106,9 @@
       apt-get update -o Dir::Etc::sourcelist="sources.list.d/helm.list"
       -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup="0"
   changed_when: false
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - k8s
     - helm

@@ -1,0 +1,46 @@
+---
+name: Renovate - Weekly Dependency Updates
+
+on:
+  schedule:
+    - cron: '0 4 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: renovate-weekly-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  renovate:
+    name: Run Renovate Updates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run Renovate against repository
+        env:
+          RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOG_LEVEL: info
+        run: |
+          set -euo pipefail
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/repo" \
+            -w /repo \
+            -e RENOVATE_TOKEN \
+            -e LOG_LEVEL \
+            ghcr.io/renovatebot/renovate@sha256:00185c0d63462acec8331cc9a94dcd74a763f2765fca0edcc3ff568af1dc8104 \
+            renovate \
+            --platform=github \
+            --onboarding=false \
+            --require-config=ignored \
+            --use-base-branch-config=merge \
+            --config-file-names=.renovaterc.json \
+            "${{ github.repository }}"

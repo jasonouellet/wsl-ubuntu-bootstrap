@@ -6,7 +6,7 @@ updates:
       interval: weekly
       day: saturday
       time: "03:00"
-      timezone: "America/Toronto"
+      timezone: "UTC"
     groups:
       github-actions-dependencies:
         patterns:
@@ -27,7 +27,7 @@ updates:
       interval: weekly
       day: monday
       time: "03:15"
-      timezone: "America/Toronto"
+      timezone: "UTC"
     groups:
       pre-commit-dependencies:
         patterns:

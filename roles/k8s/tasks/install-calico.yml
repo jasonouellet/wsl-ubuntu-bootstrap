@@ -2,12 +2,39 @@
 # =========================================
 # calicoctl - Calico CNI CLI (binary)
 # Reference: https://docs.tigera.io/calico/latest/operations/calicoctl/install
+# Checksum Verification: Downloaded from official GitHub release
 # =========================================
 
-- name: Download and install calicoctl binary
+- name: Download calicoctl checksum file from GitHub releases
+  ansible.builtin.get_url:
+    url: "https://github.com/projectcalico/calico/releases/download/v{{ k8s_calico_version }}/checksums"
+    dest: /tmp/calicoctl.checksums
+    owner: root
+    group: root
+    mode: '0600'
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - calico
+    - gpg
+
+- name: Extract calicoctl binary hash from GitHub checksums
+  ansible.builtin.shell: |
+    set -o pipefail
+    grep "calicoctl-linux-amd64$" /tmp/calicoctl.checksums | awk '{print $1}'
+  register: k8s_calicoctl_checksum
+  changed_when: false
+  when: not ansible_check_mode
+  tags:
+    - k8s
+    - calico
+    - gpg
+
+- name: Download and install calicoctl binary with checksum verification
   ansible.builtin.get_url:
     url: "{{ k8s_calicoctl_download_url }}"
     dest: /usr/local/bin/calicoctl
+    checksum: "sha256:{{ k8s_calicoctl_checksum.stdout | trim }}"
     owner: root
     group: root
     mode: '0755'

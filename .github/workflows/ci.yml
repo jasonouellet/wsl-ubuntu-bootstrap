@@ -73,8 +73,8 @@ jobs:
 
       - name: Install Ansible and lint dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install ansible-core>=2.16 ansible-lint
+          python -m pip install --upgrade "pip==25.0.1"
+          pip install --only-binary :all: "ansible-core==2.16.3" "ansible-lint==6.17.2"
 
       - name: Run pre-commit hooks (all files)
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
@@ -105,7 +105,7 @@ jobs:
           skip-dirs: '.git,.github,node_modules,.ansible'
 
       - name: Upload Trivy SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
+        uses: github/codeql-action/upload-sarif@e46ed2cbd01164d986452f91f178727624ae40d7 # v4
         if: always() && hashFiles('ci-results/trivy.sarif') != ''
         with:
           sarif_file: 'ci-results/trivy.sarif'
@@ -157,7 +157,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
+        uses: github/codeql-action/init@e46ed2cbd01164d986452f91f178727624ae40d7 # v4
         with:
           languages: actions
           build-mode: none
@@ -166,7 +166,7 @@ jobs:
         run: mkdir -p ci-results
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
+        uses: github/codeql-action/analyze@e46ed2cbd01164d986452f91f178727624ae40d7 # v4
         with:
           output: ci-results
           upload: false
@@ -180,7 +180,7 @@ jobs:
           fi
 
       - name: Upload CodeQL SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4
+        uses: github/codeql-action/upload-sarif@e46ed2cbd01164d986452f91f178727624ae40d7 # v4
         if: always() && hashFiles('ci-results/codeql.sarif') != ''
         with:
           sarif_file: 'ci-results/codeql.sarif'
@@ -267,7 +267,7 @@ jobs:
 
       - name: Run SonarCloud scan with SARIF imports
         if: ${{ env.SONAR_TOKEN != '' }}
-        uses: SonarSource/sonarqube-scan-action@299e4b793aaa83bf2aba7c9c14bedbb485688ec4 # v7.1.0
+        uses: SonarSource/sonarqube-scan-action@59db25f34e16620e48ab4bb9e4a5dce155cb5432 # v8.0.0
         with:
           args: ${{ env.SONAR_ARGS }}
 
@@ -276,3 +276,185 @@ jobs:
         run: |
           echo "SONAR_TOKEN is not configured for this workflow run."
           echo "Skipping SonarCloud scan (expected for forks or repos without the secret)."
+
+  renovate-validate:
+    name: Renovate Validation Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Ensure CI results directory exists
+        run: mkdir -p ci-results
+
+      - name: Run Renovate local validation (dry-run)
+        id: renovate-dry-run
+        env:
+          LOG_LEVEL: debug
+          GITHUB_COM_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          renovate_exit=0
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/repo" \
+            -w /repo \
+            -e LOG_LEVEL \
+            -e GITHUB_COM_TOKEN \
+            ghcr.io/renovatebot/renovate@sha256:00185c0d63462acec8331cc9a94dcd74a763f2765fca0edcc3ff568af1dc8104 \
+            renovate \
+            --platform=local \
+            --dry-run=full \
+            --print-config=true \
+            --config-file-names=.renovaterc.json \
+            > ci-results/renovate-local.log 2>&1 || renovate_exit=$?
+          echo "renovate_exit=$renovate_exit" >> "$GITHUB_OUTPUT"
+
+      - name: Build Renovate markdown summary
+        id: renovate-summary
+        env:
+          RENOVATE_EXIT: ${{ steps.renovate-dry-run.outputs.renovate_exit }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          log_path = Path('ci-results/renovate-local.log')
+          text = log_path.read_text(encoding='utf-8', errors='replace')
+          renovate_exit = int(os.environ.get('RENOVATE_EXIT', '0'))
+
+          invalid_config = 'Repository has invalid config' in text
+          dep_extract = 'Dependency extraction complete' in text
+
+          regex_file_count = '-'
+          regex_dep_count = '-'
+          m = re.search(r'"regex": \{"fileCount":\s*(\d+),\s*"depCount":\s*(\d+)\}', text)
+          if m:
+              regex_file_count, regex_dep_count = m.group(1), m.group(2)
+
+          update_rows = []
+          update_pattern = re.compile(
+              r'"currentValue":\s*"(?P<current>[^"]+)".*?'
+              r'"depName":\s*"(?P<tool>[^"]+)".*?'
+              r'"updates":\s*\[\s*\{(?P<update>.*?)\}\s*\]',
+              re.S,
+          )
+
+          for match in update_pattern.finditer(text):
+              tool = match.group('tool').strip()
+              current = match.group('current').strip()
+              update_blob = match.group('update')
+
+              new_version_match = re.search(r'"newVersion":\s*"([^"]+)"', update_blob)
+              new_value_match = re.search(r'"newValue":\s*"([^"]+)"', update_blob)
+
+              if not new_version_match and not new_value_match:
+                continue
+
+              new_version = (
+                  new_version_match.group(1).strip()
+                  if new_version_match
+                  else new_value_match.group(1).strip()
+              )
+              update_rows.append((tool, current, new_version))
+
+          # Keep output stable and avoid duplicate rows from repeated log sections.
+          update_rows = sorted(set(update_rows), key=lambda row: row[0].lower())
+
+          skip_reasons = re.findall(r'"skipReason": "([^"]+)"', text)
+          skip_counts = {}
+          for reason in skip_reasons:
+              skip_counts[reason] = skip_counts.get(reason, 0) + 1
+          if skip_counts:
+              skip_summary = ', '.join(f'{k}={v}' for k, v in sorted(skip_counts.items()))
+          else:
+              skip_summary = 'none'
+
+          summary = [
+              '<!-- renovate-validation-summary -->',
+              '## Renovate Validation Summary',
+              '',
+              '| Check | Value |',
+              '|---|---|',
+              f'| Config valid | {"yes" if not invalid_config else "no"} |',
+              f'| Dependency extraction | {"yes" if dep_extract else "no"} |',
+              f'| Renovate dry-run exit code | {renovate_exit} |',
+              f'| Regex file count | {regex_file_count} |',
+              f'| Regex dependency count | {regex_dep_count} |',
+              f'| Skip reasons | {skip_summary} |',
+              '',
+              '### Dependency Updates',
+              '',
+              '| Tool | Current | New Version |',
+              '|---|---|---|',
+          ]
+
+          if update_rows:
+              for tool, current, new_version in update_rows:
+                  summary.append(f'| {tool} | {current} | {new_version} |')
+          else:
+              summary.append('| - | - | - |')
+
+          summary.extend([
+              '',
+              '_Generated by CI job `renovate-validate`._',
+          ])
+
+          md = '\n'.join(summary) + '\n'
+          Path('ci-results/renovate-summary.md').write_text(md, encoding='utf-8')
+          print(md)
+
+          if invalid_config:
+              raise SystemExit(1)
+          PY
+
+      - name: Publish summary table in workflow summary
+        run: cat ci-results/renovate-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Renovate validation artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: 'renovate-validation'
+          path: |
+            ci-results/renovate-local.log
+            ci-results/renovate-summary.md
+          retention-days: 14
+
+      - name: Comment summary on pull request
+        if: >-
+          ${{
+            github.event_name == 'pull_request' &&
+            github.event.pull_request.head.repo.full_name == github.repository
+          }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          jq -Rs '{body: .}' ci-results/renovate-summary.md > ci-results/renovate-summary-comment.json
+
+          COMMENT_FILTER='.[] | select(.user.login=="github-actions[bot]")'
+          COMMENT_FILTER+=" | select(.body | contains(\"<!-- renovate-validation-summary -->\"))"
+          COMMENT_FILTER+=" | .id"
+          COMMENT_ID=$(gh api "repos/${REPO}/issues/${PR_NUMBER}/comments" \
+            --jq "$COMMENT_FILTER" | tail -n1 || true)
+
+          if [ -n "${COMMENT_ID:-}" ]; then
+            gh api "repos/${REPO}/issues/comments/${COMMENT_ID}" \
+              --method PATCH \
+              --input ci-results/renovate-summary-comment.json
+          else
+            gh api "repos/${REPO}/issues/${PR_NUMBER}/comments" \
+              --method POST \
+              --input ci-results/renovate-summary-comment.json
+          fi

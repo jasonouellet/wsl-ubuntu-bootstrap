@@ -15,7 +15,9 @@
     owner: root
     group: root
     mode: '0644'
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -74,13 +76,15 @@
 
 - name: Add Hashicorp APT repository (modern method)
   ansible.builtin.apt_repository:
-    repo: >
+    repo: >-
       deb [arch=amd64 signed-by=/etc/apt/keyrings/hashicorp-archive-keyring.gpg]
-      {{ hashicorp_apt_repo_url }} {{ hashicorp_repo_codename }} main
+      {{ hashicorp_apt_repo_url }} {{ hashicorp_repo_codename | trim }} main
     filename: hashicorp
     state: present
-    update_cache: true
-  when: enable_external_repositories | default(true)
+    update_cache: false
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp
@@ -91,7 +95,9 @@
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 0
-  when: enable_external_repositories | default(true)
+  when:
+    - not ansible_check_mode
+    - enable_external_repositories | default(true)
   tags:
     - terraform
     - hashicorp

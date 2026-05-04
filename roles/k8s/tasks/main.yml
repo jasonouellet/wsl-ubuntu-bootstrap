@@ -4,7 +4,7 @@
 # =========================================
 # Installs Kubernetes CLI tools:
 # - kubectl    : Kubernetes CLI             (APT - pkgs.k8s.io)
-# - helm       : Kubernetes package manager (APT - Buildkite-hosted repo)
+# - helm       : Kubernetes package manager (APT - baltocdn.com)
 # - istioctl   : Istio service mesh CLI     (binary - GitHub)
 # - calicoctl  : Calico CNI CLI             (binary - GitHub)
 # - k9s        : TUI cluster navigator      (binary - GitHub)
@@ -27,6 +27,7 @@
     owner: root
     group: root
     mode: '0755'
+  when: not ansible_check_mode
   tags:
     - k8s
     - setup

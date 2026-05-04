@@ -1,22 +1,26 @@
-# Dependabot Configuration
+# Dependency Update
 
 Dependabot automates project dependency updates via GitHub.
+
+This repository uses **both** Dependabot and Renovate:
+
+* **Dependabot**: ecosystem-native updates (`github-actions`, `pre-commit`)
+* **Renovate**: repository variable-driven updates from `group_vars/all.yml`
 
 ## Overview
 
 Dependabot automatically creates pull requests to update:
 
 * **GitHub Actions** (workflows CI/CD)
-* **Python packages** (pip)
-* **Docker images** (future, if containerization is added)
+* **pre-commit hooks** (`.pre-commit-config.yaml`)
 
 ## Configuration
 
 ### Schedule
 
 ```yaml
-- Day: Wednesday
-- Time: 03:00 UTC (GitHub Actions), 03:15 UTC (Python)
+- Day: Saturday (GitHub Actions), Monday (pre-commit)
+- Time: 03:00 and 03:15 (UTC)
 - Frequency: Weekly
 ```
 
@@ -24,18 +28,17 @@ Dependabot automatically creates pull requests to update:
 
 | Ecosystem | Auto-merge | PR Limit | Labels |
 | --- | --- | --- | --- |
-| **github-actions** | ✅ Auto (toutes versions) | 5 | `dependencies`, `github-actions` |
-| **pip** | ❌ Manuel | 5 | `dependencies`, `python` |
-| **docker** | N/A (commenté) | - | - |
+| **github-actions** | ❌ Manual | 5 | `dependencies`, `github-actions` |
+| **pre-commit** | ❌ Manual | 5 | `dependencies`, `pre-commit` |
 
 ## Workflow
 
 ### For GitHub Actions
 
-1. Dependabot **detects** new versions every Wednesday
+1. Dependabot **detects** new versions every Saturday
 2. Creates a **PR with available updates**
-3. **Auto-merges** minor/patch updates (v1.2.3 → v1.2.4)
-4. PRs remain **manual** for major changes (v1.2.3 → v2.0.0)
+3. **Requires manual review** before merge
+4. CI validates workflow updates before merge
 
 Example:
 
@@ -44,12 +47,22 @@ deps(github-actions): bump actions/checkout from v4.0.0 to v4.1.0
 deps(github-actions): bump aquasecurity/trivy-action from master to v0.16.0
 ```
 
-### For Python pip
+### For pre-commit hooks
 
-1. Dependabot **scans** Python dependencies
+1. Dependabot **scans** pinned hook versions in `.pre-commit-config.yaml`
 2. Creates a **PR for each available update**
 3. **Requires manual review** before merge
-4. Useful for future dependencies (ansible-core, etc.)
+4. Keeps developer tooling and lint hook versions current
+
+### For role and tool versions in group_vars/all.yml
+
+Dependabot does not update custom Ansible variable versions in this repository.
+Those updates are handled by Renovate (`.renovaterc.json` + `renovate.yml` workflow).
+
+Renovate schedule:
+
+* Weekly: Sunday 04:00 UTC
+* Manual: `workflow_dispatch`
 
 ## GitHub UI - Check Status
 
@@ -79,6 +92,13 @@ Edit `.github/dependabot.yml` and comment out sections
 
 GitHub automatically validates the syntax. Errors appear in:
 **Settings** → **Code security & analysis** → **Dependabot** → **Alerts**
+
+## Relation with Renovate
+
+Use both tools with separate responsibilities:
+
+* Dependabot for ecosystem-native dependency manifests
+* Renovate for variable-driven versions and custom regex managers
 
 ## Best Practices
 
