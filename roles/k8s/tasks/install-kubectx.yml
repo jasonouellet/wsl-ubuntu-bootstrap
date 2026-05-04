@@ -19,7 +19,12 @@
     - gpg
 
 - name: Extract kubectx binary hash from GitHub checksums
-  ansible.builtin.command: awk '$1 ~ /^[0-9a-f]{64}$/ && $2 ~ /^kubectx_v[0-9.]+_linux_x86_64\.tar\.gz$/ { print $1; exit }' /tmp/kubectx.checksums.txt
+  ansible.builtin.command:
+    argv:
+      - awk
+      - >-
+        $1 ~ /^[0-9a-f]{64}$/ && $2 ~ /^kubectx_v[0-9.]+_linux_x86_64\.tar\.gz$/ { print $1; exit }
+      - /tmp/kubectx.checksums.txt
   register: k8s_kubectx_checksum
   changed_when: false
   when: not ansible_check_mode
@@ -29,7 +34,12 @@
     - gpg
 
 - name: Extract kubens binary hash from GitHub checksums
-  ansible.builtin.command: awk '$1 ~ /^[0-9a-f]{64}$/ && $2 ~ /^kubens_v[0-9.]+_linux_x86_64\.tar\.gz$/ { print $1; exit }' /tmp/kubectx.checksums.txt
+  ansible.builtin.command:
+    argv:
+      - awk
+      - >-
+        $1 ~ /^[0-9a-f]{64}$/ && $2 ~ /^kubens_v[0-9.]+_linux_x86_64\.tar\.gz$/ { print $1; exit }
+      - /tmp/kubectx.checksums.txt
   register: k8s_kubens_checksum
   changed_when: false
   when: not ansible_check_mode

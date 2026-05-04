@@ -7,6 +7,11 @@ ci:
   # and you will need to tell it to skip the hook.
   skip:
     - ansible-lint
+
+default_language_version:
+  # Avoid picking distro Node 12 from /usr/bin; force a modern Node runtime.
+  node: "22.20.0"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
