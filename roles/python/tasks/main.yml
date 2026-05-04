@@ -104,6 +104,7 @@
   ansible.builtin.command: python3 --version
   register: python_version
   changed_when: false
+  check_mode: false
   tags:
     - python
     - test
@@ -124,6 +125,7 @@
   register: python_pipx_tools
   changed_when: false
   failed_when: false
+  check_mode: false
   tags:
     - python
     - test

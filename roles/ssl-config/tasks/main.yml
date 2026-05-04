@@ -1,7 +1,7 @@
 ---
 - name: Check if CA certificate is provided
   ansible.builtin.set_fact:
-    ca_cert_provided: "{{ ssl_ca_cert_name is defined and ssl_ca_cert_name != '' }}"
+    ca_cert_provided: "{{ ssl_ca_cert_name is defined and ssl_ca_cert_name | length > 0 }}"
   tags:
     - ssl-config
     - certificates
@@ -68,7 +68,7 @@
     msg: >-
       CA certificate file '{{ ssl_ca_cert_name }}' not found.
       Checked: {{ ssl_ca_cert_source_candidates | join(', ') }}
-  when: ca_cert_provided and ssl_ca_cert_source_path == ''
+  when: ca_cert_provided and ssl_ca_cert_source_path | length == 0
   tags:
     - ssl-config
     - certificates
@@ -76,7 +76,7 @@
 - name: Display resolved certificate source path
   ansible.builtin.debug:
     msg: "Using CA certificate source: {{ ssl_ca_cert_source_path }}"
-  when: ca_cert_provided and ssl_ca_cert_source_path != ''
+  when: ca_cert_provided and ssl_ca_cert_source_path | length > 0
   tags:
     - ssl-config
     - certificates
@@ -101,7 +101,7 @@
     group: root
     mode: '0644'
   notify: Update CA certificates
-  when: ca_cert_provided and ssl_ca_cert_source_path != ''
+  when: ca_cert_provided and ssl_ca_cert_source_path | length > 0
   tags:
     - ssl-config
     - certificates
@@ -132,6 +132,7 @@
   ansible.builtin.command: openssl version
   register: openssl_version
   changed_when: false
+  check_mode: false
   tags:
     - ssl-config
     - test
@@ -174,8 +175,8 @@
   changed_when: false
   when:
     - ca_cert_provided is defined
-    - ca_cert_provided | bool
-    - ssl_test_connectivity | bool
+    - ca_cert_provided
+    - ssl_test_connectivity
   tags:
     - ssl-config
     - test
@@ -190,8 +191,8 @@
   become: false
   when:
     - ca_cert_provided is defined
-    - ca_cert_provided | bool
-    - ssl_test_connectivity | bool
+    - ca_cert_provided
+    - ssl_test_connectivity
   tags:
     - ssl-config
     - test
@@ -205,7 +206,7 @@
       - "✓ CA certificate is working correctly"
   when:
     - ca_cert_provided is defined
-    - ca_cert_provided | bool
+    - ca_cert_provided
     - curl_https_test.rc is defined and curl_https_test.rc == 0
     - python_https_test.rc is defined and python_https_test.rc == 0
   tags:

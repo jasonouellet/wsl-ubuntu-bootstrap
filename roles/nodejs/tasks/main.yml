@@ -72,6 +72,7 @@
   register: nodejs_npm_path
   changed_when: false
   failed_when: false
+  check_mode: false
   environment:
     PATH: "/usr/bin:{{ ansible_facts['env']['PATH'] }}"
   tags:
@@ -83,7 +84,9 @@
     src: /usr/bin/npm
     dest: /usr/local/bin/npm
     state: link
-  when: nodejs_npm_path.rc != 0
+  when:
+    - nodejs_npm_path.rc is defined
+    - nodejs_npm_path.rc != 0
   failed_when: false
   tags:
     - nodejs
@@ -114,6 +117,7 @@
       ansible.builtin.command: node --version
       register: nodejs_node_version
       changed_when: false
+      check_mode: false
       environment:
         PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
       tags:
@@ -124,6 +128,7 @@
       ansible.builtin.command: npm --version
       register: nodejs_npm_version
       changed_when: false
+      check_mode: false
       environment:
         PATH: "/usr/bin:/usr/local/bin:{{ ansible_facts['env']['PATH'] }}"
       ignore_errors: true
@@ -138,6 +143,7 @@
       register: nodejs_npm_path_verify
       changed_when: false
       failed_when: false
+      check_mode: false
       tags:
         - nodejs
         - test

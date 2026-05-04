@@ -49,7 +49,12 @@
 
 - name: Display GitHub CLI version
   ansible.builtin.debug:
-    msg: "✓ GitHub CLI installed: {{ github_gh_version.stdout }}"
+    msg: >-
+      {{
+        '✓ GitHub CLI installed: ' ~ github_gh_version.stdout
+        if (github_gh_version.stdout is defined and github_gh_version.stdout | length > 0)
+        else 'GitHub CLI version unavailable during check mode or before installation.'
+      }}
   tags:
     - github
     - test
