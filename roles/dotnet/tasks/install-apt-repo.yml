@@ -4,6 +4,7 @@
 # ==========================================
 # Uses official Microsoft APT repository
 # Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-debian
+#            https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 
 - name: Ensure APT keyrings directory exists
   ansible.builtin.file:

@@ -9,6 +9,7 @@
 # - Debian 12 (Bookworm) & Ubuntu: Microsoft APT repository
 #
 # Reference: https://learn.microsoft.com/en-us/dotnet/core/install/linux-debian
+#            https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install
 
 - name: Get distribution codename
   ansible.builtin.command: lsb_release -cs
@@ -19,24 +20,14 @@
     - dotnet
     - always
 
-- name: Detect distribution version
-  ansible.builtin.set_fact:
-    dotnet_is_debian_13: >
-      {{ ansible_facts['distribution'] == 'Debian' and
-         ansible_facts['lsb']['major_release'] == '13' }}
-    dotnet_is_debian_12: >
-      {{ ansible_facts['distribution'] == 'Debian' and
-         ansible_facts['lsb']['major_release'] == '12' }}
-  tags:
-    - dotnet
-    - always
-
 # ==========================================
 # Installation Methods by Distribution
 # ==========================================
 - name: Install .NET SDK for Debian 13 (script method)
   ansible.builtin.include_tasks: install-debian-13.yml
-  when: dotnet_is_debian_13
+  when:
+    - ansible_facts['distribution'] == 'Debian'
+    - dotnet_distro_codename_result.stdout == 'trixie'
   tags:
     - dotnet
     - packages
@@ -44,7 +35,8 @@
 - name: Install .NET SDK for Debian 12/Ubuntu (APT repository)
   ansible.builtin.include_tasks: install-apt-repo.yml
   when:
-    - not dotnet_is_debian_13
+    - ansible_facts['distribution'] in ['Debian', 'Ubuntu']
+    - not (ansible_facts['distribution'] == 'Debian' and dotnet_distro_codename_result.stdout == 'trixie')
     - enable_external_repositories | default(true)
   tags:
     - dotnet
@@ -56,7 +48,8 @@
     state: present
     update_cache: true
   when:
-    - not dotnet_is_debian_13
+    - ansible_facts['distribution'] in ['Debian', 'Ubuntu']
+    - not (ansible_facts['distribution'] == 'Debian' and dotnet_distro_codename_result.stdout == 'trixie')
     - not (enable_external_repositories | default(true))
   tags:
     - dotnet

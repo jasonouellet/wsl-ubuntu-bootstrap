@@ -6,6 +6,7 @@ Purpose: install .NET SDK.
 * Tags: `dotnet`
 * Key vars: `dotnet_packages`
 * Reference: <https://learn.microsoft.com/en-us/dotnet/core/install/linux-debian>
+* Reference: <https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install>
 
 ## Installation Methods
 
