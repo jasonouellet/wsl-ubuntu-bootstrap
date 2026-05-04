@@ -198,7 +198,7 @@
       "autoReplaceStringTemplate": "k8s_cilium_version: \"{{{newValue}}}\""
     }
   ],
-  "ignoreDeps": [],
+  "ignoreDeps": ["ubuntu"],
   "enabled": true,
   "baseBranchPatterns": [
     "main"
