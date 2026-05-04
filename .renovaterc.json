@@ -1,11 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended",
-    "schedule:weekly"
-  ],
-  "schedule": [
-    "before 5am on Sunday"
+    "config:recommended"
   ],
   "timezone": "UTC",
   "semanticCommits": "enabled",
