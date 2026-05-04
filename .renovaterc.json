@@ -195,7 +195,22 @@
       "packageNameTemplate": "cilium/cilium-cli",
       "versioningTemplate": "semver",
       "extractVersionTemplate": "^v?(?<version>.*)$",
-      "autoReplaceStringTemplate": "k8s_cilium_version: \"{{{newValue}}}\""
+      "autoReplaceStringTemplate": "k8s_cilium_version: \"{{{newVersion}}}\""
+    },
+    {
+      "customType": "regex",
+      "description": "Update Node.js LTS version in .pre-commit-config.yaml",
+      "managerFilePatterns": [
+        "/^\\.pre-commit-config\\.yaml$/"
+      ],
+      "matchStrings": [
+        "node:\\s+\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "datasourceTemplate": "node-version",
+      "packageNameTemplate": "node",
+      "versioningTemplate": "node",
+      "rangeStrategy": "replace",
+      "autoReplaceStringTemplate": "node: \"{{{newValue}}}\""
     }
   ],
   "ignoreDeps": ["ubuntu"],
