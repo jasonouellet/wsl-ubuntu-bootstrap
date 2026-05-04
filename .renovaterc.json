@@ -8,7 +8,6 @@
   "commitMessagePrefix": "chore(deps): ",
   "groupName": "Repository Roles Dependencies",
   "groupSlug": "repo-roles-deps",
-  "schedule": ["before 5am on sunday"],
   "prConcurrentLimit": 1,
   "prCreation": "auto",
   "automerge": false,
