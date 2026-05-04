@@ -132,6 +132,7 @@
   ansible.builtin.command: openssl version
   register: openssl_version
   changed_when: false
+  failed_when: false
   check_mode: false
   tags:
     - ssl-config
@@ -139,7 +140,7 @@
 
 - name: Display OpenSSL version
   ansible.builtin.debug:
-    msg: "OpenSSL version: {{ openssl_version.stdout }}"
+    msg: "OpenSSL version: {{ openssl_version.stdout | default('(check mode)') }}"
   tags:
     - ssl-config
     - test

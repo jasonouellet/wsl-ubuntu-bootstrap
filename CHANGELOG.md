@@ -41,6 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Guarded `github` and `containers` version display tasks against missing
     `stdout` in check mode or before installation
   * Fixed `nodejs_npm_path.rc` condition with `is defined` guard
+* Added `failed_when: false` to `Verify Python installation` task in `python` role —
+  prevents check-mode failure when `python3` is not yet installed
+* Added `failed_when: false` to `Check Node.js version` task in `nodejs` role —
+  same protection for `node --version` during `--check`
+* Added `failed_when: false` to `Verify OpenSSL configuration` task in `ssl-config` role —
+  same protection for `openssl version` during `--check`
+* Guarded `python_version.stdout`, `nodejs_node_version.stdout` and `openssl_version.stdout`
+  references in debug tasks with `| default('(check mode)')` / `| default('not found')`
+  to avoid undefined variable errors when the verify tasks are skipped or fail gracefully
 
 ### Changed
 
