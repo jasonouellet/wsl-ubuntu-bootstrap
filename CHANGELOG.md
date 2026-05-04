@@ -13,22 +13,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* Fixed `ansible-playbook --check` failures caused by Jinja2 3.1.x installed in user Python path shadowing distro Jinja2 3.0.x used by Ansible 2.10 ([#21](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/pull/21))
-  * Replaced `!= ''` string comparisons with `| length > 0` in `main.yml` and `ssl-config` role for Jinja2 3.0.x compatibility
-  * Added `check_mode: false` to version verification tasks in `python`, `nodejs`, and `ssl-config` roles to prevent silent skips during `--check`
-  * Added `failed_when: false` and `check_mode: false` to OCI tool checks in `containers` role; use `| default()` filter on `stdout` references
-  * Guarded `github` and `containers` version display tasks against missing `stdout` in check mode or before installation
+* Fixed `ansible-playbook --check` in Ubuntu environment with multiple tasks
+  that were silently skipped due to Jinja2 3.0.x changes in string handling and
+  undefined variable behavior:
+  * Replaced `!= ''` string comparisons with `| length > 0` in `main.yml` and
+    `ssl-config` role for Jinja2 3.0.x compatibility
+  * Added `check_mode: false` to version verification tasks in `python`,
+    `nodejs`, and `ssl-config` roles to prevent silent skips during `--check`
+  * Added `failed_when: false` and `check_mode: false` to OCI tool checks in
+    `containers` role; use `| default()` filter on `stdout` references
+  * Guarded `github` and `containers` version display tasks against missing
+    `stdout` in check mode or before installation
   * Fixed `nodejs_npm_path.rc` condition with `is defined` guard
 
 ### Changed
 
-* Simplified `.NET` distribution condition checks in `dotnet` role: removed intermediate `set_fact` variables `dotnet_is_debian_13` / `dotnet_is_debian_12` in favour of inline conditions ([#21](https://github.com/jasonouellet/wsl-ubuntu-bootstrap/pull/21))
+* Simplified `.NET` distribution condition checks in `dotnet` role: removed
+  intermediate `set_fact` variables `dotnet_is_debian_13` / `dotnet_is_debian_12`
+  in favour of inline conditions
 
 ## [0.5.0] - 2026-05-02
 
 ### Added
 
-* Added Renovate configuration in `.renovaterc.json` for variable-driven dependency updates in `group_vars/all.yml`
+* Added Renovate configuration in `.renovaterc.json` for variable-driven
+  dependency updates in `group_vars/all.yml`
 * Added scheduled Renovate workflow `.github/workflows/renovate.yml`:
   * Weekly execution on Sunday at 04:00 UTC
   * Manual execution via `workflow_dispatch`
