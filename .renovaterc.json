@@ -195,7 +195,7 @@
       "packageNameTemplate": "cilium/cilium-cli",
       "versioningTemplate": "semver",
       "extractVersionTemplate": "^v?(?<version>.*)$",
-      "autoReplaceStringTemplate": "k8s_cilium_version: \"{{{newVersion}}}\""
+      "autoReplaceStringTemplate": "k8s_cilium_version: \"{{{newValue}}}\""
     },
     {
       "customType": "regex",
@@ -209,7 +209,6 @@
       "datasourceTemplate": "node-version",
       "packageNameTemplate": "node",
       "versioningTemplate": "node",
-      "rangeStrategy": "replace",
       "autoReplaceStringTemplate": "node: \"{{{newValue}}}\""
     }
   ],
