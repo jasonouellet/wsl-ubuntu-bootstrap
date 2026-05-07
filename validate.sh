@@ -83,7 +83,7 @@ echo ""
 # Run ansible-lint if available
 if command -v ansible-lint &> /dev/null; then
     echo "✓ Running ansible-lint..."
-    if ! ansible-lint main.yml roles/ --config-file .ansible-lint; then
+    if ! ansible-lint main.yml roles/ -c .ansible-lint; then
         echo -e "${RED}✗ ansible-lint found errors${NC}"
         exit 1
     fi

@@ -7,8 +7,8 @@
 
 - name: Download istio checksum file from GitHub releases
   ansible.builtin.get_url:
-    url: "https://github.com/istio/istio/releases/download/{{ k8s_istio_version }}/checksums.txt"
-    dest: /tmp/istio-checksums.txt
+    url: "{{ k8s_istioctl_download_url }}.sha256"
+    dest: /tmp/istio-checksum.txt
     owner: root
     group: root
     mode: '0600'
@@ -19,9 +19,7 @@
     - gpg
 
 - name: Extract istio binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "istioctl-{{ k8s_istio_version }}-linux-amd64.tar.gz$" /tmp/istio-checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk 'NF {print $1; exit}' /tmp/istio-checksum.txt
   register: k8s_istio_checksum
   changed_when: false
   when: not ansible_check_mode

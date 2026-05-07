@@ -48,7 +48,7 @@
           - "{{ ssl_ca_cert_name }}"
           - "{{ playbook_dir }}/{{ ssl_ca_cert_name }}"
           - "{{ ssl_ca_cert_path }}/{{ ssl_ca_cert_name }}"
-      when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+      when: ssl_ca_cert_name is defined and ssl_ca_cert_name | length > 0
       tags:
         - always
         - ssl-config
@@ -60,7 +60,7 @@
       register: playbook_ssl_cert_stats
       become: false
       changed_when: false
-      when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+      when: ssl_ca_cert_name is defined and ssl_ca_cert_name | length > 0
       tags:
         - always
         - ssl-config
@@ -78,7 +78,7 @@
             )
             | default('')
           }}
-      when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+      when: ssl_ca_cert_name is defined and ssl_ca_cert_name | length > 0
       tags:
         - always
         - ssl-config
@@ -88,11 +88,11 @@
         msg:
           - "CA Certificate Setup:"
           - "  Configured: {{ ssl_ca_cert_name if ssl_ca_cert_name else 'Not configured' }}"
-          - "  File exists: {{ playbook_ssl_cert_source_path != '' }}"
+          - "  File exists: {{ playbook_ssl_cert_source_path | length > 0 }}"
           - >-
             Resolved source:
-            {{ playbook_ssl_cert_source_path if playbook_ssl_cert_source_path != '' else 'Not found' }}
-      when: ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+            {{ playbook_ssl_cert_source_path if playbook_ssl_cert_source_path | length > 0 else 'Not found' }}
+      when: ssl_ca_cert_name is defined and ssl_ca_cert_name | length > 0
       tags:
         - always
         - ssl-config
@@ -112,10 +112,10 @@
         group: root
         mode: '0755'
       when:
-        - ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+        - ssl_ca_cert_name is defined and ssl_ca_cert_name | length > 0
         - enable_ssl_config | default(true)
         - playbook_ssl_cert_source_path is defined
-        - playbook_ssl_cert_source_path != ''
+        - playbook_ssl_cert_source_path | length > 0
       tags:
         - always
         - ssl-config
@@ -129,10 +129,10 @@
         mode: '0644'
       notify: Update CA certificates immediately (bootstrap)
       when:
-        - ssl_ca_cert_name is defined and ssl_ca_cert_name != ''
+        - ssl_ca_cert_name is defined and ssl_ca_cert_name | length > 0
         - enable_ssl_config | default(true)
         - playbook_ssl_cert_source_path is defined
-        - playbook_ssl_cert_source_path != ''
+        - playbook_ssl_cert_source_path | length > 0
       tags:
         - always
         - ssl-config

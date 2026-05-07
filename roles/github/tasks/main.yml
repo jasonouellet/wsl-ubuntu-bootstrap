@@ -6,8 +6,8 @@
     url: "{{ github_cli_apt_key }}"
     dest: /usr/share/keyrings/githubcli-archive-keyring.gpg
     owner: root
-    group: _apt
-    mode: '0640'
+    group: root
+    mode: '0644'
   when:
     - not ansible_check_mode
     - github_enable_cli | bool
@@ -49,7 +49,12 @@
 
 - name: Display GitHub CLI version
   ansible.builtin.debug:
-    msg: "✓ GitHub CLI installed: {{ github_gh_version.stdout }}"
+    msg: >-
+      {{
+        '✓ GitHub CLI installed: ' ~ github_gh_version.stdout
+        if (github_gh_version.stdout is defined and github_gh_version.stdout | length > 0)
+        else 'GitHub CLI version unavailable during check mode or before installation.'
+      }}
   tags:
     - github
     - test

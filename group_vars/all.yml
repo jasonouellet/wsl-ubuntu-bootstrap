@@ -231,9 +231,9 @@ k8s_k9s_download_url: >-
 # kubectx / kubens - Context and namespace switcher (binaries from GitHub releases)
 k8s_kubectx_version: "0.9.5"
 k8s_kubectx_download_url: >-
-  https://github.com/ahmetb/kubectx/releases/download/v{{ k8s_kubectx_version }}/kubectx
+  https://github.com/ahmetb/kubectx/releases/download/v{{ k8s_kubectx_version }}/kubectx_v{{ k8s_kubectx_version }}_linux_x86_64.tar.gz
 k8s_kubens_download_url: >-
-  https://github.com/ahmetb/kubectx/releases/download/v{{ k8s_kubectx_version }}/kubens
+  https://github.com/ahmetb/kubectx/releases/download/v{{ k8s_kubectx_version }}/kubens_v{{ k8s_kubectx_version }}_linux_x86_64.tar.gz
 
 # argocd - ArgoCD GitOps CLI (binary from GitHub releases)
 k8s_argocd_version: "2.14.9"

@@ -7,7 +7,7 @@
 
 - name: Download argocd checksum file from GitHub releases
   ansible.builtin.get_url:
-    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ k8s_argocd_version }}/checksums.txt"
+    url: "https://github.com/argoproj/argo-cd/releases/download/v{{ k8s_argocd_version }}/cli_checksums.txt"
     dest: /tmp/argocd.checksums.txt
     owner: root
     group: root
@@ -19,9 +19,7 @@
     - gpg
 
 - name: Extract argocd binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "argocd-linux-amd64$" /tmp/argocd.checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk '/argocd-linux-amd64$/ {print $1; exit}' /tmp/argocd.checksums.txt
   register: k8s_argocd_checksum
   changed_when: false
   when: not ansible_check_mode

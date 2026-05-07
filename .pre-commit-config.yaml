@@ -7,6 +7,12 @@ ci:
   # and you will need to tell it to skip the hook.
   skip:
     - ansible-lint
+
+default_language_version:
+  # Avoid picking distro Node 12 from /usr/bin; force a modern Node runtime.
+  # Using latest Node 24 LTS (24.15.0) — Renovate will update to next LTS (26+).
+  node: "24.15.0"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0

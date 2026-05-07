@@ -7,7 +7,7 @@
 
 - name: Download calicoctl checksum file from GitHub releases
   ansible.builtin.get_url:
-    url: "https://github.com/projectcalico/calico/releases/download/v{{ k8s_calico_version }}/checksums"
+    url: "https://github.com/projectcalico/calico/releases/download/v{{ k8s_calico_version }}/SHA256SUMS"
     dest: /tmp/calicoctl.checksums
     owner: root
     group: root
@@ -19,9 +19,7 @@
     - gpg
 
 - name: Extract calicoctl binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "calicoctl-linux-amd64$" /tmp/calicoctl.checksums | awk '{print $1}'
+  ansible.builtin.command: awk '/calicoctl-linux-amd64$/ {print $1; exit}' /tmp/calicoctl.checksums
   register: k8s_calicoctl_checksum
   changed_when: false
   when: not ansible_check_mode

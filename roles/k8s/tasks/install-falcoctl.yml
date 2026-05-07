@@ -20,9 +20,7 @@
     - gpg
 
 - name: Extract falcoctl binary hash from GitHub checksums
-  ansible.builtin.shell: |
-    set -o pipefail
-    grep "falcoctl_.*_linux_amd64.tar.gz$" /tmp/falcoctl-checksums.txt | awk '{print $1}'
+  ansible.builtin.command: awk '/falcoctl_.*_linux_amd64.tar.gz$/ {print $1; exit}' /tmp/falcoctl-checksums.txt
   register: k8s_falcoctl_checksum
   changed_when: false
   when: not ansible_check_mode

@@ -104,6 +104,8 @@
   ansible.builtin.command: python3 --version
   register: python_version
   changed_when: false
+  failed_when: false
+  check_mode: false
   tags:
     - python
     - test
@@ -124,6 +126,7 @@
   register: python_pipx_tools
   changed_when: false
   failed_when: false
+  check_mode: false
   tags:
     - python
     - test
@@ -131,7 +134,7 @@
 - name: Display Python version
   ansible.builtin.debug:
     msg:
-      - "Python version: {{ python_version.stdout }}"
+      - "Python version: {{ python_version.stdout | default('(check mode)') }}"
       - "pre-commit accessible: {{ python_pipx_tools.results[0].rc == 0 }}"
       - "yamllint accessible: {{ python_pipx_tools.results[1].rc == 0 }}"
       - "pylint accessible: {{ python_pipx_tools.results[2].rc == 0 }}"
