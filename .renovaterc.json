@@ -44,7 +44,6 @@
       "packageNameTemplate": "kubernetes/kubernetes",
       "versioningTemplate": "regex:^v?(?<major>\\d+)\\.(?<minor>\\d+)$",
       "extractVersionTemplate": "^v?(?<major>\\d+)\\.(?<minor>\\d+)",
-      "allowedVersions": ">=1.32",
       "autoReplaceStringTemplate": "k8s_kubectl_version: \"{{{newValue}}}\""
     },
     {
@@ -216,5 +215,11 @@
   "enabled": true,
   "baseBranchPatterns": [
     "main"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["kubernetes/kubernetes"],
+      "allowedVersions": ">=1.32"
+    }
   ]
 }
