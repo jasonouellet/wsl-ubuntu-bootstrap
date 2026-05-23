@@ -105,7 +105,7 @@ jobs:
           skip-dirs: '.git,.github,node_modules,.ansible'
 
       - name: Upload Trivy SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@e46ed2cbd01164d986452f91f178727624ae40d7 # v4.35.3
+        uses: github/codeql-action/upload-sarif@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         if: always() && hashFiles('ci-results/trivy.sarif') != ''
         with:
           sarif_file: 'ci-results/trivy.sarif'
@@ -157,7 +157,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@e46ed2cbd01164d986452f91f178727624ae40d7 # v4.35.3
+        uses: github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           languages: actions
           build-mode: none
@@ -166,7 +166,7 @@ jobs:
         run: mkdir -p ci-results
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@e46ed2cbd01164d986452f91f178727624ae40d7 # v4.35.3
+        uses: github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         with:
           output: ci-results
           upload: false
@@ -180,7 +180,7 @@ jobs:
           fi
 
       - name: Upload CodeQL SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@e46ed2cbd01164d986452f91f178727624ae40d7 # v4.35.3
+        uses: github/codeql-action/upload-sarif@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0
         if: always() && hashFiles('ci-results/codeql.sarif') != ''
         with:
           sarif_file: 'ci-results/codeql.sarif'
@@ -267,7 +267,7 @@ jobs:
 
       - name: Run SonarCloud scan with SARIF imports
         if: ${{ env.SONAR_TOKEN != '' }}
-        uses: SonarSource/sonarqube-scan-action@59db25f34e16620e48ab4bb9e4a5dce155cb5432 # v8.0.0
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         with:
           args: ${{ env.SONAR_ARGS }}
 
