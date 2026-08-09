@@ -105,7 +105,7 @@ jobs:
           skip-dirs: '.git,.github,node_modules,.ansible'
 
       - name: Upload Trivy SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
         if: always() && hashFiles('ci-results/trivy.sarif') != ''
         with:
           sarif_file: 'ci-results/trivy.sarif'
@@ -157,7 +157,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
         with:
           languages: actions
           build-mode: none
@@ -166,7 +166,7 @@ jobs:
         run: mkdir -p ci-results
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
         with:
           output: ci-results
           upload: false
@@ -180,7 +180,7 @@ jobs:
           fi
 
       - name: Upload CodeQL SARIF to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+        uses: github/codeql-action/upload-sarif@5595ccaf912efad79be6eef63a5619ff05969be3 # v4.37.6
         if: always() && hashFiles('ci-results/codeql.sarif') != ''
         with:
           sarif_file: 'ci-results/codeql.sarif'
