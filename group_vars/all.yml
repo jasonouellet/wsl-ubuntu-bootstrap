@@ -96,6 +96,13 @@ python_packages_pip:
   - plantuml-markdown                  # PlantUML diagram support
   - markdown-graphviz-inline           # Inline Graphviz diagrams in Markdown
 
+# uv is installed by the python role for uvx-based MCP servers.
+python_enable_uv: true
+python_uv_install_url: "https://astral.sh/uv/install.sh"
+python_uv_user: "{{ lookup('env', 'USER') }}"
+python_uv_user_home: "{{ lookup('env', 'HOME') }}"
+python_uv_install_dir: "{{ python_uv_user_home }}/.local/bin"
+
 # =========================================
 # OCI / Container Tools
 # =========================================

@@ -8,6 +8,71 @@
     - python
     - packages
 
+- name: Check if uv is already installed
+  ansible.builtin.command: "{{ python_uv_install_dir }}/uv --version"
+  register: python_uv_existing_install
+  changed_when: false
+  failed_when: false
+  become: false
+  when: python_enable_uv | bool
+  tags:
+    - python
+    - uv
+
+- name: Download uv installer
+  ansible.builtin.get_url:
+    url: "{{ python_uv_install_url }}"
+    dest: /tmp/uv-install.sh
+    mode: "0755"
+  become: false
+  when:
+    - python_enable_uv | bool
+    - python_uv_existing_install.rc != 0
+  tags:
+    - python
+    - uv
+
+- name: Install uv for uvx-based MCP servers
+  ansible.builtin.command:
+    cmd: /tmp/uv-install.sh --no-modify-path
+  environment:
+    UV_INSTALL_DIR: "{{ python_uv_install_dir }}"
+    HOME: "{{ python_uv_user_home }}"
+  become: false
+  when:
+    - python_enable_uv | bool
+    - python_uv_existing_install.rc != 0
+  register: python_uv_install
+  changed_when: true
+  tags:
+    - python
+    - uv
+
+- name: Configure uv PATH in the user shell
+  ansible.builtin.lineinfile:
+    path: "{{ python_uv_user_home }}/.bashrc"
+    line: "export PATH=\"${HOME}/.local/bin:$PATH\"  # uv"
+    regexp: "^\\s*export PATH=.*\\.local/bin.*uv"
+    create: true
+    owner: "{{ python_uv_user }}"
+    mode: "0644"
+  become: false
+  when: python_enable_uv | bool
+  tags:
+    - python
+    - uv
+
+- name: Verify uvx is available
+  ansible.builtin.command: "{{ python_uv_install_dir }}/uvx --help"
+  changed_when: false
+  become: false
+  environment:
+    HOME: "{{ python_uv_user_home }}"
+  when: python_enable_uv | bool
+  tags:
+    - python
+    - uv
+
 - name: Ensure global pipx shared directory exists
   ansible.builtin.file:
     path: /opt/pipx
