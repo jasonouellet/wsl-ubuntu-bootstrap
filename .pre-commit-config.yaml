@@ -40,7 +40,7 @@ repos:
         args: ['-c', '.yamllint']
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1
+    rev: v0.11.0.1-1
     hooks:
       - id: shellcheck
         args: ['--severity=warning']
@@ -51,7 +51,7 @@ repos:
       - id: detect-secrets
         args: ['--baseline', '.secrets.baseline']
 
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.49.1
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.3
     hooks:
-      - id: markdownlint
+      - id: markdownlint-cli2-docker
